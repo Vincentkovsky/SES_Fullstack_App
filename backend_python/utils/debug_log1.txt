@@ -1,0 +1,3 @@
+After Processing:
+topLeftX: 520190.0, topLeftY: 6103760.0, bottomRightX: 560520.0, bottomRightY: 6122040.0
+rows: 36, cols: 80

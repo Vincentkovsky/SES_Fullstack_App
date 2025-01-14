@@ -46,3 +46,9 @@ yarn-error.log*
 # System Files
 .DS_Store
 Thumbs.db 
+
+
+#large files and other tedious files
+timeseries_tiles/
+**/timeseries_tiles/
+*.nc

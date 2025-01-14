@@ -1,0 +1,29 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@deck.gl/core": "^9.0.36",
+    "@deck.gl/geo-layers": "^9.0.36",
+    "@deck.gl/layers": "^9.0.36",
+    "@deck.gl/mapbox": "^9.0.36",
+    "@tweenjs/tween.js": "^25.0.0",
+    "@types/geojson": "^7946.0.14",
+    "luma.gl": "^7.3.2",
+    "mapbox-gl": "^3.8.0",
+    "popmotion": "^11.0.5",
+    "vue": "^3.5.12"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10",
+    "vue-tsc": "^2.1.8"
+  }
+}
