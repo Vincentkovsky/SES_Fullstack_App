@@ -59,6 +59,15 @@ let currentTimeIndex = 0;
 const TRANSITION_DURATION = 1000;
 const FADE_DURATION = 300;
 
+// 添加平滑过渡控制
+const TRANSITION_SETTINGS = {
+  duration: 300,
+  easing: (t: number) => t * (2 - t), // easeOut
+  interpolation: {
+    opacity: (from: number, to: number, t: number) => from + (to - from) * t
+  }
+};
+
 // Computed
 const formattedTimestamp = computed(() => {
   if (!currentTimestamp.value) return '';
@@ -87,50 +96,85 @@ const createTileLayer = (timestamp: string) => {
     updateTriggers: {
       data: timestamp
     },
+    onTileError: (err) => {
+      console.warn(`Tile loading error for timestamp ${timestamp}:`, err);
+      return null;
+    },
+    onTileLoad: (tile) => {
+      console.debug(`Tile loaded successfully for timestamp ${timestamp} at z=${tile.index[0]}, x=${tile.index[1]}, y=${tile.index[2]}`);
+    },
     renderSubLayers: (props) => {
-      const { boundingBox } = props.tile;
-      return new BitmapLayer({
-        id: props.id,
-        image: props.data,
-        bounds: [
-          boundingBox[0][0],
-          boundingBox[0][1],
-          boundingBox[1][0],
-          boundingBox[1][1],
-        ],
-        opacity: 1,
-      });
+      const { boundingBox, data } = props.tile;
+
+      if (!data) {
+        return null;
+      }
+
+      try {
+        return new BitmapLayer({
+          id: props.id,
+          image: data,
+          bounds: [
+            boundingBox[0][0],
+            boundingBox[0][1],
+            boundingBox[1][0],
+            boundingBox[1][1],
+          ],
+          opacity: 1,
+        });
+      } catch (error) {
+        console.warn(`Error rendering tile layer for timestamp ${timestamp}:`, error);
+        return null;
+      }
     },
   });
 };
 
 const updateLayers = (index: number) => {
-  const newLayer = createTileLayer(timestamps[index]);
+  try {
+    const newLayer = createTileLayer(timestamps[index]);
 
-  if (previousLayer) {
-    animate({
-      from: 1,
-      to: 0,
-      duration: FADE_DURATION,
-      onUpdate: (opacity) => {
+    if (previousLayer) {
+      let startTime: number | null = null;
+      
+      const animate = (currentTime: number) => {
+        if (!startTime) startTime = currentTime;
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / TRANSITION_SETTINGS.duration, 1);
+        const eased = TRANSITION_SETTINGS.easing(progress);
+        
+        const opacity = TRANSITION_SETTINGS.interpolation.opacity(1, 0, eased);
+        
         const layerProps = previousLayer?.props;
         previousLayer = new TileLayer({
           ...layerProps,
           opacity,
         });
+        
         deckOverlay?.setProps({ 
           layers: [previousLayer, currentLayer].filter(Boolean) 
         });
-      },
-      onComplete: () => {
-        previousLayer = null;
-      },
-    });
-  }
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          previousLayer = null;
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }
 
-  previousLayer = currentLayer;
-  currentLayer = newLayer;
-  deckOverlay?.setProps({ layers: [previousLayer, currentLayer].filter(Boolean) });
+    previousLayer = currentLayer;
+    currentLayer = newLayer;
+    deckOverlay?.setProps({ layers: [previousLayer, currentLayer].filter(Boolean) });
+  } catch (error) {
+    console.error(`Error updating layers for timestamp index ${index}:`, error);
+    if (animationInstance) {
+      animationInstance.stop();
+      isPlaying.value = false;
+    }
+  }
 };
 
 const startAnimation = () => {
