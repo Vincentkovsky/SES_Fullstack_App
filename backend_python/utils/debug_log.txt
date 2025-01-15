@@ -1,3 +1,0 @@
-Before Processing:
-topLeftX: 520690.0, topLeftY: 6104260.0, bottomRightX: 560020.0, bottomRightY: 6121540.0
-rows: 34, cols: 78
