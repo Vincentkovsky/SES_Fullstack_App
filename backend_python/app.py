@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, send_file, abort
 from flask_cors import CORS
 import os
+import subprocess
+from typing import Tuple, Dict, Union
+import logging
 
 app = Flask(__name__)
 
@@ -13,6 +16,61 @@ CORS(app, resources={
     }
 })
 
+# 添加日志配置
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def execute_inference_script() -> Tuple[Dict[str, str], int]:
+    """
+    执行推理脚本并返回结果
+    
+    Returns:
+        Tuple[Dict, int]: 包含执行结果和状态码的元组
+    """
+    script_path = os.path.join(os.path.dirname(__file__), "../../cnnModel/run_inference.sh")
+    
+    if not os.path.exists(script_path):
+        logger.error(f"Inference script not found at: {script_path}")
+        return {"error": "Inference script not found"}, 404
+    
+    try:
+        # 确保脚本有执行权限
+        os.chmod(script_path, 0o755)
+        
+        # 执行脚本并捕获输出
+        result = subprocess.run(
+            [script_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        
+        logger.info("Inference script executed successfully")
+        return {
+            "message": "Inference completed successfully",
+            "output": result.stdout
+        }, 200
+        
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Error executing inference script: {str(e)}")
+        return {
+            "error": "Inference script execution failed",
+            "details": e.stderr
+        }, 500
+    except Exception as e:
+        logger.error(f"Unexpected error during inference: {str(e)}")
+        return {
+            "error": "Unexpected error during inference",
+            "details": str(e)
+        }, 500
+
+@app.route('/api/run-inference', methods=['POST'])
+def run_inference():
+    """
+    API端点用于触发模型推理
+    """
+    response, status_code = execute_inference_script()
+    return jsonify(response), status_code
 
 @app.route('/api/test', methods=['GET'])
 def test():
