@@ -27,7 +27,10 @@ def execute_inference_script() -> Tuple[Dict[str, str], int]:
     Returns:
         Tuple[Dict, int]: 包含执行结果和状态码的元组
     """
-    script_path = os.path.join(os.path.dirname(__file__), "../../cnnModel/run_inference.sh")
+    # script_path = os.path.join(os.path.dirname(__file__), "../../cnnModel/run_inference.sh")
+
+    
+    script_path = "/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh"
     
     if not os.path.exists(script_path):
         logger.error(f"Inference script not found at: {script_path}")
@@ -36,14 +39,13 @@ def execute_inference_script() -> Tuple[Dict[str, str], int]:
     try:
         # 确保脚本有执行权限
         os.chmod(script_path, 0o755)
+        print(f"Script path: {script_path}")
         
         # 执行脚本并捕获输出
         result = subprocess.run(
             [script_path],
-            capture_output=True,
-            text=True,
-            check=True
         )
+        print(f"Result: {result}")
         
         logger.info("Inference script executed successfully")
         return {
