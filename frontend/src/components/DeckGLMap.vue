@@ -1,28 +1,64 @@
 <template>
   <div class="map-container">
     <div ref="mapContainer" style="width: 100%; height: 100vh;"></div>
-    
-    <div class="control-panel">
-      <div class="progress-bar">
-        <div 
-          class="progress-fill" 
-          :style="{ width: `${progress}%` }"
-        ></div>
+    <div class="map-controls">
+      <MapZoomControls
+        @zoom-in="zoomIn"
+        @zoom-out="zoomOut"
+      />
+      <MapLayerControls
+        :is-flood-layer-active="isFloodLayerActive"
+        :is-weather-layer-active="isWeatherLayerActive"
+        @toggle-flood="toggleFloodLayer"
+        @toggle-weather="toggleWeatherLayer"
+      />
+    </div>
+    <div class="bottom-control-bar">
+      <div class="logos">
+        <img src="../assets/icon/SES.svg" alt="SES Logo" class="logo" />
+        <img src="../assets/icon/UTS.svg" alt="UTS Logo" class="logo" />
       </div>
-      <div class="controls">
-        <button @click="togglePlayPause">
-          {{ isPlaying ? '⏸️' : '▶️' }}
+      <div class="playback-controls">
+        <button 
+          class="control-button" 
+          :class="{ active: isPlaying && playbackSpeed === 1 }"
+          @click="setPlayback(true, 1)" 
+          aria-label="Play"
+        >
+          <img src="../assets/icon/play_inactive.svg" alt="Play" />
         </button>
-        <div class="timestamp">{{ formattedTimestamp }}</div>
-        <div class="speed-control">
-          <label>Speed: {{ playbackSpeed }}x</label>
-          <input 
-            type="range" 
-            v-model="playbackSpeed" 
-            min="1" 
-            max="5" 
-            step="1"
-          >
+        <button 
+          class="control-button" 
+          :class="{ active: isPlaying && playbackSpeed === 2 }"
+          @click="setPlayback(true, 2)" 
+          aria-label="Play Speed 2x"
+        >
+          <img src="../assets/icon/speed2.svg" alt="Speed 2x" />
+        </button>
+        <button 
+          class="control-button" 
+          :class="{ active: isPlaying && playbackSpeed === 3 }"
+          @click="setPlayback(true, 3)" 
+          aria-label="Play Speed 3x"
+        >
+          <img src="../assets/icon/speed3.svg" alt="Speed 3x" />
+        </button>
+        <button 
+          class="control-button" 
+          :class="{ active: !isPlaying }"
+          @click="setPlayback(false, playbackSpeed)" 
+          aria-label="Pause"
+        >
+          <img src="../assets/icon/pause.svg" alt="Pause" />
+        </button>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div 
+              class="progress-fill" 
+              :style="{ width: `${progress}%` }"
+            ></div>
+          </div>
+          <div class="timestamp">{{ formattedTimestamp }}</div>
         </div>
       </div>
     </div>
@@ -38,6 +74,8 @@ import mapboxgl from 'mapbox-gl';
 import { animate } from 'popmotion';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { fetchTilesList } from '../services/api';
+import MapZoomControls from './MapZoomControls.vue';
+import MapLayerControls from './MapLayerControls.vue';
 
 // State
 const mapContainer = ref<HTMLElement | null>(null);
@@ -46,6 +84,7 @@ const isPlaying = ref(true);
 const playbackSpeed = ref(1);
 const currentTimestamp = ref('');
 const progress = ref(0);
+let map: mapboxgl.Map | null = null;
 
 // Layers
 let currentLayer: TileLayer | null = null;
@@ -68,13 +107,28 @@ const TRANSITION_SETTINGS = {
   }
 };
 
+// Add layer state
+const isFloodLayerActive = ref(true);
+const isWeatherLayerActive = ref(false);
+
+// Add startDate ref to store the first timestamp's date
+const startDate = ref<Date | null>(null);
+
 // Computed
 const formattedTimestamp = computed(() => {
   if (!currentTimestamp.value) return '';
   const match = currentTimestamp.value.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
   if (!match) return currentTimestamp.value;
+  
   const [_, year, month, day, hour, minute] = match;
-  return `${year}-${month}-${day} ${hour}:${minute}`;
+  const currentDate = new Date(Number(year), Number(month) - 1, Number(day));
+  
+  if (!startDate.value) return `${hour}:${minute} Day 1`;
+  
+  const diffTime = Math.abs(currentDate.getTime() - startDate.value.getTime()) +1;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return `${hour}:${minute} Day ${diffDays}`;
 });
 
 // Methods
@@ -132,7 +186,7 @@ const createTileLayer = (timestamp: string) => {
 
 const updateLayers = (index: number) => {
   try {
-    const newLayer = createTileLayer(timestamps[index]);
+    const newLayer = isFloodLayerActive.value ? createTileLayer(timestamps[index]) : null;
 
     if (previousLayer) {
       let startTime: number | null = null;
@@ -210,11 +264,24 @@ const togglePlayPause = () => {
   }
 };
 
-// Initialization
+// Add zoom methods
+const zoomIn = () => {
+  if (map) {
+    map.zoomIn();
+  }
+};
+
+const zoomOut = () => {
+  if (map) {
+    map.zoomOut();
+  }
+};
+
+// Modify initializeMap to store map instance
 const initializeMap = async () => {
   if (!mapContainer.value) return;
 
-  const map = new mapboxgl.Map({
+  map = new mapboxgl.Map({
     container: mapContainer.value,
     style: 'mapbox://styles/mapbox/satellite-v9',
     center: [147.356, -35.117],
@@ -238,6 +305,28 @@ const preloadFirstFrame = async (firstTimestamp: string) => {
   ]);
 };
 
+// Add layer toggle methods
+const toggleFloodLayer = () => {
+  isFloodLayerActive.value = !isFloodLayerActive.value;
+  updateLayers(currentTimeIndex);
+};
+
+const toggleWeatherLayer = () => {
+  isWeatherLayerActive.value = !isWeatherLayerActive.value;
+  updateLayers(currentTimeIndex);
+};
+
+const setPlayback = (playing: boolean, speed: number) => {
+  isPlaying.value = playing;
+  playbackSpeed.value = speed;
+  
+  if (playing) {
+    startAnimation();
+  } else {
+    animationInstance?.stop();
+  }
+};
+
 // Lifecycle
 onMounted(async () => {
   try {
@@ -247,6 +336,13 @@ onMounted(async () => {
 
     if (timestamps.length === 0) {
       throw new Error('No timestamps available');
+    }
+
+    // Set the start date from the first timestamp
+    const firstMatch = timestamps[0].match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
+    if (firstMatch) {
+      const [_, year, month, day] = firstMatch;
+      startDate.value = new Date(Number(year), Number(month) - 1, Number(day));
     }
 
     await preloadFirstFrame(timestamps[0]);
@@ -273,98 +369,134 @@ watch(playbackSpeed, (newSpeed) => {
 
 <style scoped>
 .map-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-}
-
-.control-panel {
-  position: absolute;
-  left: 50%;
-  top: 20px;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.2);
-  padding: 8px 25px 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  height: 50px;
-}
-
-button {
-  padding: 8px;
-  font-size: 2em;
-  cursor: pointer;
-  border: none;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.timestamp {
-  font-size: 1.2em;
-  font-weight: 500;
-  color: #000000;
-  min-width: 140px;
-}
-
-.speed-control {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.speed-control label {
-  font-size: 1.2em;
-  color: #000000;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-input[type="range"] {
-  width: 120px;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 4px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 2px;
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #000000;
-  transition: width 0.1s linear;
-}
-
-/* Add loading overlay */
-.loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.map-container > div:first-child {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0;
+  padding: 0;
+}
+
+.control-panel, .controls, .speed-control, button {
+  display: none;
+}
+
+.map-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.bottom-control-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #1E3D78;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.logos {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 260px;
+}
+
+.logo {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+.playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+  margin-right: 260px; /* Balance with logos width */
+}
+
+.control-button {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2em;
-  z-index: 1000;
+  border-radius: 8px;
+}
+
+.control-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.control-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.control-button.active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.control-button:active {
+  transform: scale(0.95);
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: 20px;
+  min-width: 400px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #FFFFFF;
+  transition: width 0.1s linear;
+}
+
+.timestamp {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #FFFFFF;
+  white-space: nowrap;
+  min-width: 100px;
 }
 </style>
