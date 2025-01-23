@@ -13,11 +13,33 @@
         @toggle-weather="toggleWeatherLayer"
       />
     </div>
+    <div class="legend">
+      <div class="legend-title">Water Level</div>
+      <div class="legend-gradient">
+        <div class="legend-content">
+          <div class="gradient-bar"></div>
+          <div class="gradient-labels">
+            <span>10m</span>
+            <span>5m</span>
+            <span>2m</span>
+            <span>1m</span>
+            <span>0m</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="bottom-control-bar">
       <div class="logos">
         <img src="../assets/icon/SES.svg" alt="SES Logo" class="logo" />
         <img src="../assets/icon/UTS.svg" alt="UTS Logo" class="logo" />
       </div>
+      <button 
+        class="inference-button" 
+        @click="handleInference"
+        :disabled="isInferenceRunning"
+      >
+        {{ isInferenceRunning ? 'Running Inference...' : 'Run Inference' }}
+      </button>
       <div class="playback-controls">
         <button 
           class="control-button" 
@@ -82,7 +104,7 @@ import { MapboxOverlay } from '@deck.gl/mapbox';
 import mapboxgl from 'mapbox-gl';
 import { animate } from 'popmotion';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
-import { fetchTilesList } from '../services/api';
+import { fetchTilesList, runInference } from '../services/api';
 import MapZoomControls from './MapZoomControls.vue';
 import MapLayerControls from './MapLayerControls.vue';
 
@@ -130,6 +152,9 @@ const cursorLng = ref<number | null>(null);
 // Add new state for scale
 const currentZoom = ref(12);
 const scaleWidth = ref(100);
+
+// Add new state for inference
+const isInferenceRunning = ref(false);
 
 // Computed
 const formattedTimestamp = computed(() => {
@@ -413,6 +438,28 @@ const setPlayback = (playing: boolean, speed: number) => {
   }
 };
 
+// Update the runInference method
+const handleInference = async () => {
+  try {
+    isInferenceRunning.value = true;
+    await runInference();
+    console.log('Inference completed successfully');
+    
+    // Refresh the tiles list after successful inference
+    const newTilesResponse = await fetchTilesList();
+    timestamps = newTilesResponse.message;
+    
+    // Optionally restart animation with new timestamps
+    if (isPlaying.value) {
+      startAnimation();
+    }
+  } catch (error) {
+    console.error('Error running inference:', error);
+  } finally {
+    isInferenceRunning.value = false;
+  }
+};
+
 // Lifecycle
 onMounted(async () => {
   try {
@@ -631,5 +678,91 @@ watch(playbackSpeed, (newSpeed) => {
 /* Remove the standalone scale-control styles */
 .scale-control {
   display: none;
+}
+
+.inference-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 20px;
+  white-space: nowrap;
+}
+
+.inference-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.inference-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.inference-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.legend {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  background: rgba(30, 61, 120, 0.8);
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  z-index: 1000;
+}
+
+.legend-title {
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.legend-gradient {
+  display: flex;
+  gap: 8px;
+}
+
+.legend-content {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.gradient-bar {
+  width: 20px;
+  height: 150px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, 
+    rgb(0, 0, 255) 0%,
+    rgb(0, 128, 255) 25%,
+    rgb(86, 180, 255) 50%,
+    rgb(173, 216, 230) 75%,
+    rgb(220, 238, 245) 100%
+  );
+}
+
+.gradient-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 0.8em;
+  font-weight: 500;
+  padding: 4px 0;
+}
+
+.gradient-labels span {
+  line-height: 1;
 }
 </style>

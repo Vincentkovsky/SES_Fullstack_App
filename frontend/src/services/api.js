@@ -16,3 +16,19 @@ export const fetchTileByCoordinates = async (timestamp, z, x, y) => {
         throw error; // Rethrow the error for handling by the caller
     }
 };
+
+export const runInference = async () => {
+    const response = await fetch('http://localhost:3000/api/run-inference', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Inference failed');
+    }
+
+    return response.json();
+};

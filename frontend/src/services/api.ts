@@ -3,6 +3,21 @@ export const fetchTilesList = async (): Promise<{ message: string[] }> => {
     return response.json();
 };
 
+export const runInference = async (): Promise<{ message: string }> => {
+    const response = await fetch('http://localhost:3000/api/run-inference', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Inference failed');
+    }
+
+    return response.json();
+};
 
 export const fetchTileByCoordinates = async (
     timestamp: string,
