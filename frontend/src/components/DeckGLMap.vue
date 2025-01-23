@@ -61,6 +61,15 @@
           <div class="timestamp">{{ formattedTimestamp }}</div>
         </div>
       </div>
+      <div class="right-controls">
+        <div class="coordinates">
+          {{ formattedCoordinates || 'Lat 0.00000°S Lon 0.00000°E' }}
+        </div>
+        <div class="scale-bar">
+          <div class="scale-distance">{{ scaleInfo.label }}</div>
+          <div class="scale-line" :style="{ width: `${scaleInfo.width}px` }"></div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -114,6 +123,14 @@ const isWeatherLayerActive = ref(false);
 // Add startDate ref to store the first timestamp's date
 const startDate = ref<Date | null>(null);
 
+// Add cursor position state
+const cursorLat = ref<number | null>(null);
+const cursorLng = ref<number | null>(null);
+
+// Add new state for scale
+const currentZoom = ref(12);
+const scaleWidth = ref(100);
+
 // Computed
 const formattedTimestamp = computed(() => {
   if (!currentTimestamp.value) return '';
@@ -129,6 +146,59 @@ const formattedTimestamp = computed(() => {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   
   return `${hour}:${minute} Day ${diffDays}`;
+});
+
+// Add computed for formatted coordinates
+const formattedCoordinates = computed(() => {
+  if (cursorLat.value === null || cursorLng.value === null) return '';
+  
+  const latDirection = cursorLat.value >= 0 ? 'N' : 'S';
+  const lngDirection = cursorLng.value >= 0 ? 'E' : 'W';
+  
+  return `Lat ${Math.abs(cursorLat.value).toFixed(5)}°${latDirection} Lon ${Math.abs(cursorLng.value).toFixed(5)}°${lngDirection}`;
+});
+
+// Update the scale computation
+const scaleInfo = computed(() => {
+  const metersPerPixel = 156543.03392 * Math.cos(cursorLat.value * Math.PI / 180) / Math.pow(2, currentZoom.value);
+  
+  // Find a nice round number for the scale
+  let distance = metersPerPixel * 100; // Start with 100px width
+  let width = 100;
+  
+  // Round to nice numbers
+  if (distance >= 1000) {
+    // For kilometers, round to 1, 2, 5, 10, 20, 50, 100, etc.
+    const km = distance / 1000;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(km)));
+    const normalized = km / magnitude;
+    
+    let roundedKm;
+    if (normalized >= 5) roundedKm = 5 * magnitude;
+    else if (normalized >= 2) roundedKm = 2 * magnitude;
+    else roundedKm = magnitude;
+    
+    width = (roundedKm * 1000) / metersPerPixel;
+    return {
+      width: Math.round(width),
+      label: `${roundedKm} km`
+    };
+  } else {
+    // For meters, round to 50, 100, 200, 500, etc.
+    const magnitude = Math.pow(10, Math.floor(Math.log10(distance)));
+    const normalized = distance / magnitude;
+    
+    let roundedMeters;
+    if (normalized >= 5) roundedMeters = 5 * magnitude;
+    else if (normalized >= 2) roundedMeters = 2 * magnitude;
+    else roundedMeters = magnitude;
+    
+    width = roundedMeters / metersPerPixel;
+    return {
+      width: Math.round(width),
+      label: `${roundedMeters} m`
+    };
+  }
 });
 
 // Methods
@@ -292,6 +362,22 @@ const initializeMap = async () => {
   deckOverlay = new MapboxOverlay({ layers: [] });
   map.addControl(deckOverlay);
 
+  // Initialize with center coordinates
+  cursorLat.value = -35.117;
+  cursorLng.value = 147.356;
+  currentZoom.value = map.getZoom();
+
+  // Add mouse move handler
+  map.on('mousemove', (e) => {
+    cursorLat.value = e.lngLat.lat;
+    cursorLng.value = e.lngLat.lng;
+  });
+
+  // Add zoom handler
+  map.on('zoom', () => {
+    currentZoom.value = map.getZoom();
+  });
+
   return map;
 };
 
@@ -412,14 +498,17 @@ watch(playbackSpeed, (newSpeed) => {
   z-index: 1000;
   display: flex;
   align-items: center;
-  padding: 0 40px;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .logos {
   display: flex;
   align-items: center;
   gap: 20px;
-  width: 260px;
+  min-width: 200px;
+  flex-shrink: 0;
 }
 
 .logo {
@@ -434,7 +523,8 @@ watch(playbackSpeed, (newSpeed) => {
   gap: 12px;
   flex: 1;
   justify-content: center;
-  margin-right: 260px; /* Balance with logos width */
+  margin: 0 20px;
+  min-width: 0; /* Allow container to shrink below min-content width */
 }
 
 .control-button {
@@ -473,9 +563,11 @@ watch(playbackSpeed, (newSpeed) => {
 .progress-container {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-left: 20px;
-  min-width: 400px;
+  gap: 12px;
+  margin-left: 12px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
 }
 
 .progress-bar {
@@ -498,5 +590,46 @@ watch(playbackSpeed, (newSpeed) => {
   color: #FFFFFF;
   white-space: nowrap;
   min-width: 100px;
+}
+
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.coordinates {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #FFFFFF;
+  white-space: nowrap;
+}
+
+.scale-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.scale-line {
+  height: 2px;
+  background: white;
+  transition: width 0.3s ease;
+}
+
+.scale-distance {
+  font-size: 0.8em;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+/* Remove the standalone scale-control styles */
+.scale-control {
+  display: none;
 }
 </style>
