@@ -14,7 +14,7 @@
       />
     </div>
     <div class="legend">
-      <div class="legend-title">Water Level</div>
+      <div class="legend-title">Flood</div>
       <div class="legend-gradient">
         <div class="legend-content">
           <div class="gradient-bar"></div>
@@ -33,45 +33,54 @@
         <img src="../assets/icon/SES.svg" alt="SES Logo" class="logo" />
         <img src="../assets/icon/UTS.svg" alt="UTS Logo" class="logo" />
       </div>
-      <button 
-        class="inference-button" 
-        @click="handleInference"
-        :disabled="isInferenceRunning"
-      >
-        {{ isInferenceRunning ? 'Running Inference...' : 'Run Inference' }}
-      </button>
       <div class="playback-controls">
         <button 
           class="control-button" 
-          :class="{ active: isPlaying && playbackSpeed === 1 }"
           @click="setPlayback(true, 1)" 
           aria-label="Play"
         >
-          <img src="../assets/icon/play_inactive.svg" alt="Play" />
+          <img 
+            :src="isPlaying && playbackSpeed === 1 
+              ? 'src/assets/icon/play activated.svg' 
+              : 'src/assets/icon/play.svg'" 
+            alt="Play" 
+          />
         </button>
         <button 
           class="control-button" 
-          :class="{ active: isPlaying && playbackSpeed === 2 }"
           @click="setPlayback(true, 2)" 
           aria-label="Play Speed 2x"
         >
-          <img src="../assets/icon/speed2.svg" alt="Speed 2x" />
+          <img 
+            :src="isPlaying && playbackSpeed === 2 
+              ? 'src/assets/icon/speed2 activated.svg' 
+              : 'src/assets/icon/speed2.svg'" 
+            alt="Speed 2x" 
+          />
         </button>
         <button 
           class="control-button" 
-          :class="{ active: isPlaying && playbackSpeed === 3 }"
           @click="setPlayback(true, 3)" 
           aria-label="Play Speed 3x"
         >
-          <img src="../assets/icon/speed3.svg" alt="Speed 3x" />
+          <img 
+            :src="isPlaying && playbackSpeed === 3 
+              ? 'src/assets/icon/speed3 activated.svg' 
+              : 'src/assets/icon/speed3.svg'" 
+            alt="Speed 3x" 
+          />
         </button>
         <button 
           class="control-button" 
-          :class="{ active: !isPlaying }"
           @click="setPlayback(false, playbackSpeed)" 
           aria-label="Pause"
         >
-          <img src="../assets/icon/pause.svg" alt="Pause" />
+          <img 
+            :src="!isPlaying 
+              ? 'src/assets/icon/pause activated.svg' 
+              : 'src/assets/icon/pause.svg'" 
+            alt="Pause" 
+          />
         </button>
         <div class="progress-container">
           <div class="progress-bar">
@@ -581,30 +590,20 @@ watch(playbackSpeed, (newSpeed) => {
   border: none;
   background: transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+}
+
+.control-button:active {
+  transform: scale(0.95);
 }
 
 .control-button img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-.control-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.control-button.active {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
-}
-
-.control-button:active {
-  transform: scale(0.95);
 }
 
 .progress-container {
@@ -627,7 +626,7 @@ watch(playbackSpeed, (newSpeed) => {
 
 .progress-fill {
   height: 100%;
-  background: #FFFFFF;
+  background: #F48703;
   transition: width 0.1s linear;
 }
 
@@ -680,46 +679,21 @@ watch(playbackSpeed, (newSpeed) => {
   display: none;
 }
 
+/* Remove inference button styles */
 .inference-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  padding: 0 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: white;
-  font-size: 0.9em;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-left: 20px;
-  white-space: nowrap;
-}
-
-.inference-button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.inference-button:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.inference-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  display: none;
 }
 
 .legend {
   position: absolute;
   bottom: 80px;
   right: 20px;
-  background: rgba(30, 61, 120, 0.8);
+  background: rgba(255, 255, 255, 0.2);
   padding: 12px;
   border-radius: 8px;
   color: white;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .legend-title {
