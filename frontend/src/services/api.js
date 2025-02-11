@@ -32,3 +32,17 @@ export const runInference = async () => {
 
     return response.json();
 };
+
+export const fetchGaugingData = async (startDate) => {
+    const url = new URL('http://localhost:3000/api/gauging');
+    url.searchParams.append('start_date', startDate);
+
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch gauging data');
+    }
+
+    return response.json();
+};
+

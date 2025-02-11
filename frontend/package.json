@@ -14,11 +14,15 @@
     "@deck.gl/layers": "^9.0.36",
     "@deck.gl/mapbox": "^9.0.36",
     "@tweenjs/tween.js": "^25.0.0",
+    "@types/chart.js": "^2.9.41",
     "@types/geojson": "^7946.0.14",
+    "chart.js": "^4.4.7",
     "luma.gl": "^7.3.2",
     "mapbox-gl": "^3.8.0",
     "popmotion": "^11.0.5",
-    "vue": "^3.5.12"
+    "shadcn-vue": "^0.11.3",
+    "vue": "^3.5.12",
+    "vue-chartjs": "^5.3.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",

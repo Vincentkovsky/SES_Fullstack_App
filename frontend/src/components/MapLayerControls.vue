@@ -48,11 +48,12 @@ const toggleWeatherLayer = () => emit('toggle-weather');
   display: flex;
   flex-direction: column;
   gap: 8px;
+  align-items: center;
 }
 
 .layer-button {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   padding: 0;
   border: none;
   background: transparent;

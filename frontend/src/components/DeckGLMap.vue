@@ -1,12 +1,24 @@
 <template>
   <div class="map-container">
+    <SettingsModal 
+      :is-open="isSettingsOpen" 
+      @close="isSettingsOpen = false"
+      @update-settings="handleSettingsUpdate"
+      @start-inference="handleInferenceStart"
+    />
     <div ref="mapContainer" style="width: 100%; height: 100vh;"></div>
     <div class="map-controls">
       <MapZoomControls
+        class="panel-button"
         @zoom-in="zoomIn"
         @zoom-out="zoomOut"
       />
+      <MapSettingsControl
+        class="panel-button"
+        @toggle-settings="toggleSettings"
+      />
       <MapLayerControls
+        class="panel-button"
         :is-flood-layer-active="isFloodLayerActive"
         :is-weather-layer-active="isWeatherLayerActive"
         @toggle-flood="toggleFloodLayer"
@@ -28,6 +40,11 @@
         </div>
       </div>
     </div>
+    <MapBasemapControl
+      class="basemap-control-container"
+      :is-satellite="isSatellite"
+      @toggle-basemap="toggleBasemap"
+    />
     <div class="bottom-control-bar">
       <div class="logos">
         <img src="../assets/icon/SES.svg" alt="SES Logo" class="logo" />
@@ -116,6 +133,9 @@ import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { fetchTilesList, runInference } from '../services/api';
 import MapZoomControls from './MapZoomControls.vue';
 import MapLayerControls from './MapLayerControls.vue';
+import MapSettingsControl from './MapSettingsControl.vue';
+import MapBasemapControl from './MapBasemapControl.vue';
+import SettingsModal from './SettingsModal.vue';
 
 // State
 const mapContainer = ref<HTMLElement | null>(null);
@@ -135,7 +155,7 @@ let timestamps: string[] = [];
 let currentTimeIndex = 0;
 
 // Constants
-const TRANSITION_DURATION = 1000;
+const TRANSITION_DURATION = 800;
 const FADE_DURATION = 300;
 
 // 添加平滑过渡控制
@@ -164,6 +184,12 @@ const scaleWidth = ref(100);
 
 // Add new state for inference
 const isInferenceRunning = ref(false);
+
+// Add new state for basemap
+const isSatellite = ref(true);
+
+// Add new state for settings
+const isSettingsOpen = ref(false);
 
 // Computed
 const formattedTimestamp = computed(() => {
@@ -507,6 +533,59 @@ watch(playbackSpeed, (newSpeed) => {
     startAnimation();
   }
 }, { flush: 'sync' });
+
+const toggleSettings = () => {
+  isSettingsOpen.value = !isSettingsOpen.value;
+};
+
+const handleSettingsUpdate = (newSettings: {
+  animationSpeed: string;
+  mapStyle: string;
+  showLegend: boolean;
+  showCoordinates: boolean;
+}) => {
+  // Update playback speed
+  setPlayback(isPlaying.value, parseInt(newSettings.animationSpeed));
+  
+  // Update map style
+  toggleBasemap(newSettings.mapStyle === 'satellite');
+  
+  // Update UI visibility
+  document.querySelector('.legend')?.classList.toggle('hidden', !newSettings.showLegend);
+  document.querySelector('.coordinates')?.classList.toggle('hidden', !newSettings.showCoordinates);
+};
+
+const handleInferenceStart = async (inferenceSettings: {
+  area: string;
+  window: string;
+}) => {
+  try {
+    isInferenceRunning.value = true;
+    await runInference();
+    console.log('Inference completed successfully');
+    
+    // Refresh the tiles list after successful inference
+    const newTilesResponse = await fetchTilesList();
+    timestamps = newTilesResponse.message;
+    
+    // Optionally restart animation with new timestamps
+    if (isPlaying.value) {
+      startAnimation();
+    }
+  } catch (error) {
+    console.error('Error running inference:', error);
+  } finally {
+    isInferenceRunning.value = false;
+  }
+};
+
+// Add the toggle function
+const toggleBasemap = (value: boolean) => {
+  isSatellite.value = value;
+  if (map) {
+    map.setStyle(value ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/streets-v12');
+  }
+};
 </script>
 
 <style scoped>
@@ -540,7 +619,7 @@ watch(playbackSpeed, (newSpeed) => {
   right: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 24px;
   z-index: 1000;
 }
 
@@ -738,5 +817,19 @@ watch(playbackSpeed, (newSpeed) => {
 
 .gradient-labels span {
   line-height: 1;
+}
+
+.panel-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: normal;
+  align-items: center;
+}
+
+.basemap-control-container {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  z-index: 1000;
 }
 </style>

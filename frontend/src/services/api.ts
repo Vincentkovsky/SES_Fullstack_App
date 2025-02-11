@@ -38,3 +38,25 @@ export const fetchTileByCoordinates = async (
       throw error; // Rethrow the error for handling by the caller
     }
   };
+
+export interface GaugingData {
+  site_id: string;
+  timeseries: Array<{
+    timestamp: string;
+    maxDepth: number;
+  }>;
+  total_records: number;
+}
+
+export const fetchGaugingData = async (startDate: string): Promise<GaugingData> => {
+  const url = new URL('http://localhost:3000/api/gauging');
+  url.searchParams.append('start_date', startDate);
+
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch gauging data');
+  }
+
+  return response.json();
+};
