@@ -50,32 +50,10 @@
                     </div>
                     <div class="graph-item">
                       <h4>Rainfall Forecast</h4>
-                      <div class="graph-placeholder">
-                        <div class="graph-axis y-axis">
-                          <span>50mm</span>
-                          <span>40mm</span>
-                          <span>30mm</span>
-                          <span>20mm</span>
-                          <span>10mm</span>
-                          <span>0mm</span>
-                        </div>
-                        <div class="graph-content rainfall-forecast">
-                          <!-- Placeholder for rainfall forecast graph -->
-                          <div class="graph-bars">
-                            <div class="bar" style="height: 40%"></div>
-                            <div class="bar" style="height: 60%"></div>
-                            <div class="bar" style="height: 30%"></div>
-                            <div class="bar" style="height: 80%"></div>
-                            <div class="bar" style="height: 20%"></div>
-                          </div>
-                        </div>
-                        <div class="graph-axis x-axis">
-                          <span>Day 1</span>
-                          <span>Day 2</span>
-                          <span>Day 3</span>
-                          <span>Day 4</span>
-                          <span>Day 5</span>
-                        </div>
+                      <div class="graph-content">
+                        <RainfallMap 
+                          :timestamp="currentTimestamp"
+                        />
                       </div>
                     </div>
                   </div>
@@ -90,9 +68,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, onMounted } from 'vue';
+import { ref, defineProps, defineEmits, onMounted, watch } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
-import { fetchGaugingData } from '../services/api.js';
+import RainfallMap from './RainfallMap.vue';
+import { fetchGaugingData, fetchRainfallData } from '../services/api.js';
 import type { GaugingData } from '../services/api';
 
 type Settings = {
@@ -132,6 +111,19 @@ const inferenceSettings = ref<InferenceSettings>({
 const gaugingData = ref<GaugingData | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+const currentTimestamp = ref<string>('');
+
+const timestamps = ref<string[]>([]);
+const rainfallData = ref<number[]>([]);
+
+const fetchRainfallForTimestamps = async (timestamps: string[]) => {
+  try {
+    const rainfallPromises = timestamps.map(timestamp => fetchRainfallData(timestamp));
+    rainfallData.value = await Promise.all(rainfallPromises);
+  } catch (error) {
+    console.error('Error fetching rainfall data:', error);
+  }
+};
 
 const fetchGaugeData = async () => {
   isLoading.value = true;
@@ -145,12 +137,17 @@ const fetchGaugeData = async () => {
     const day = date.getDate().toString().padStart(2, '0');
     const month = date.toLocaleString('en-US', { month: 'short' });
     const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    // const hours = date.getHours().toString().padStart(2, '0');
+    // const minutes = date.getMinutes().toString().padStart(2, '0');
     
-    const startDate = `${day}-${month}-${year} ${hours}:${minutes}`;
+    const startDate = `${day}-${month}-${year} ${String('00')}:${String('00')}`;
 
-    gaugingData.value = await fetchGaugingData(startDate);
+    const [gaugingResponse, rainfallResponse] = await Promise.all([
+      fetchGaugingData(startDate),
+      fetchRainfallForTimestamps(timestamps.value)
+    ]);
+
+    gaugingData.value = gaugingResponse;
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to fetch gauge data';
     console.error('Error fetching gauge data:', e);
@@ -161,6 +158,34 @@ const fetchGaugeData = async () => {
 
 onMounted(() => {
   fetchGaugeData();
+});
+
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen) {
+    try {
+      // Get date 7 days ago and format as dd-Mon-yyyy HH:mm
+      const date = new Date();
+      date.setDate(date.getDate() - 365);
+      
+      // Format the date components
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = date.toLocaleString('en-US', { month: 'short' });
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      const startDate = `${day}-${month}-${year} ${hours}:${minutes}`;
+
+      const [gaugingResponse, rainfallResponse] = await Promise.all([
+        fetchGaugingData(startDate),
+        fetchRainfallForTimestamps(timestamps.value)
+      ]);
+
+      gaugingData.value = gaugingResponse;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
 });
 
 const close = () => {
@@ -220,7 +245,7 @@ const startInference = () => {
 
 .settings-layout {
   display: flex;
-  min-height: 360px;
+  min-height: 320px;
 }
 
 .inference-panel {
@@ -375,7 +400,7 @@ const startInference = () => {
 .graph-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .graph-item {
@@ -389,7 +414,7 @@ const startInference = () => {
   font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .graph-placeholder {

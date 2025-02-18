@@ -1,166 +1,9 @@
-from flask import Flask, jsonify, send_file, abort, request
-from flask_cors import CORS
-import os
-import subprocess
-from typing import Tuple, Dict, Union, List, Optional
-import logging
-from datetime import datetime, timedelta
-import uuid
-from marshmallow import Schema, fields, ValidationError
-import requests
-from urllib.parse import urljoin
-import json
-
-app = Flask(__name__)
-
-# # 配置 CORS
-CORS(app, resources={
-    r"/*": {  # 匹配所有路由
-        "origins": "http://localhost:5173",  # 允许的前端地址
-        "methods": ["GET", "POST", "PUT", "DELETE"],  # 允许的 HTTP 方法
-        "allow_headers": ["Content-Type", "Authorization"],  # 允许的请求头
-    }
-})
-
-# 添加日志配置
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-def execute_inference_script() -> Tuple[Dict[str, str], int]:
-    """
-    执行推理脚本并返回结果
-    
-    Returns:
-        Tuple[Dict, int]: 包含执行结果和状态码的元组
-    """
-    # script_path = os.path.join(os.path.dirname(__file__), "../../cnnModel/run_inference.sh")
-
-    
-    script_path = "/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh"
-    
-    if not os.path.exists(script_path):
-        logger.error(f"Inference script not found at: {script_path}")
-        return {"error": "Inference script not found"}, 404
-    
-    try:
-        # 确保脚本有执行权限
-        os.chmod(script_path, 0o755)
-        print(f"Script path: {script_path}")
-        
-        # 执行脚本并捕获输出
-        result = subprocess.run(
-            [script_path],
-        )
-        print(f"Result: {result}")
-        
-        logger.info("Inference script executed successfully")
-        return {
-            "message": "Inference completed successfully",
-            "output": result.stdout
-        }, 200
-        
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Error executing inference script: {str(e)}")
-        return {
-            "error": "Inference script execution failed",
-            "details": e.stderr
-        }, 500
-    except Exception as e:
-        logger.error(f"Unexpected error during inference: {str(e)}")
-        return {
-            "error": "Unexpected error during inference",
-            "details": str(e)
-        }, 500
-
-@app.route('/api/run-inference', methods=['POST'])
-def run_inference():
-    """
-    API端点用于触发模型推理
-    """
-    response, status_code = execute_inference_script()
-    return jsonify(response), status_code
-
-@app.route('/api/test', methods=['GET'])
-def test():
-    return jsonify({"message": "Hello, World!"}), 200
-
-# 获取 timeseries_tiles 文件夹下的所有子文件夹名
-@app.route('/api/tilesList', methods=['GET'])
-def get_tiles_list():
-    tiles_path = os.path.join(os.path.dirname(__file__), "data/3di_res/timeseries_tiles")
-    try:
-        # 列出所有子文件夹并按字母顺序排序
-        directories = sorted(
-            name for name in os.listdir(tiles_path)
-            if os.path.isdir(os.path.join(tiles_path, name))
-        )
-        return jsonify({"message": directories}), 200
-    except Exception as error:
-        print(f"Error reading tiles directory: {error}")
-        return jsonify({"error": "Unable to retrieve tiles list"}), 500
-
-# 根据时间戳和坐标获取 tile
-@app.route('/api/tiles/<timestamp>/<z>/<x>/<y>', methods=['GET'])
-def get_tile_by_coordinates(timestamp, z, x, y):
-    tile_path = os.path.join(
-        os.path.dirname(__file__),
-        f"data/3di_res/timeseries_tiles/{timestamp}/{z}/{x}/{y}.png"
-    )
-    print("Backend API hit")
-    try:
-        if os.path.exists(tile_path):
-            # 如果文件存在，返回文件
-            print("Tile found")
-            return send_file(tile_path), 200
-        else:
-            # 如果文件不存在，返回 404
-            print("Tile not found")
-            return jsonify({"error": "Tile not found"}), 404
-    except Exception as error:
-        # 处理意外错误
-        print(f"Error retrieving tile: {error}")
-        return jsonify({"error": "Unable to retrieve tile"}), 500
-
 API_KEY = "74c101d12b334d09b854cee56563e545"
 WATERNSW_BASE_URL = "https://api.waternsw.com.au/water/"
 WATERNSW_GAUGING_ENDPOINT = "gauging-api"
 
-def get_cached_data(site_ids: List[str], start_date: str, end_date: Optional[str] = None) -> Optional[Dict]:
-    """Check if we have cached data for the given parameters"""
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
-    if not os.path.exists(data_dir):
-        return None
-
-    # Get all waternsw data files
-    files = [f for f in os.listdir(data_dir) if f.startswith('waternsw_data_')]
-    if not files:
-        return None
-
-    # Sort files by timestamp (newest first)
-    files.sort(reverse=True)
-
-    # Check the most recent file
-    latest_file = os.path.join(data_dir, files[0])
-    file_time = datetime.strptime(files[0].split('_')[2].split('.')[0], "%Y%m%d%H%M%S")
-
-    # If file is less than 5 minutes old, use it
-    if datetime.now() - file_time < timedelta(hours=5):
-        try:
-            with open(latest_file, 'r') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            return None
-
-    return None
-
 def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional[str] = None, 
                        page_number: int = 1, request_id: Optional[str] = None) -> Dict:
-    # Check cache first
-    cached_data = get_cached_data(site_ids, start_date, end_date)
-    if cached_data:
-        logger.info("Returning cached data")
-        return cached_data
-
     """
     Fetch gauging data from WaterNSW API
     
@@ -201,24 +44,7 @@ def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional
         logger.info(f"WaterNSW API Response: {response.status_code}")
         logger.info(f"Response Content: {response.text}")
         
-        data = response.json()
-        
-        # Create data directory if it doesn't exist
-        data_dir = os.path.join(os.path.dirname(__file__), "data")
-        os.makedirs(data_dir, exist_ok=True)
-        
-        # Generate filename with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"waternsw_data_{timestamp}.json"
-        filepath = os.path.join(data_dir, filename)
-        
-        # Save response to JSON file
-        with open(filepath, 'w') as f:
-            json.dump(data, f, indent=2)
-            
-        logger.info(f"WaterNSW data saved to {filepath}")
-        
-        return data
+        return response.json()
     except requests.RequestException as e:
         logger.error(f"Error fetching data from WaterNSW API: {str(e)}")
         if hasattr(e.response, 'text'):
@@ -331,7 +157,6 @@ def get_gauging_data():
                     logger.warning(f"Error parsing date: {e}, measure_date: {measure_date}, start_time: {start_time}")
                     continue
             
-            # Convert dictionary values to list and sort by timestamp
             timeseries_data = sorted(unique_data.values(), key=lambda x: x['timestamp'])
             
             response_data = {
@@ -339,19 +164,6 @@ def get_gauging_data():
                 'timeseries': timeseries_data,
                 'total_records': len(timeseries_data)
             }
-
-            # Save processed data to JSON file
-            data_dir = os.path.join(os.path.dirname(__file__), "data")
-            os.makedirs(data_dir, exist_ok=True)
-            
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            processed_filename = f"processed_waternsw_data_{timestamp}.json"
-            processed_filepath = os.path.join(data_dir, processed_filename)
-            
-            with open(processed_filepath, 'w') as f:
-                json.dump(response_data, f, indent=2)
-                
-            logger.info(f"Processed WaterNSW data saved to {processed_filepath}")
             
             return jsonify(response_data), 200
             
@@ -372,6 +184,3 @@ def get_gauging_data():
             'error': 'Internal server error',
             'message': 'An unexpected error occurred'
         }), 500
-
-if __name__ == '__main__':
-    app.run(debug=True, host='localhost', port=3000)

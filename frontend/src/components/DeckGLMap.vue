@@ -2,6 +2,7 @@
   <div class="map-container">
     <SettingsModal 
       :is-open="isSettingsOpen" 
+      :timestamps="timestamps"
       @close="isSettingsOpen = false"
       @update-settings="handleSettingsUpdate"
       @start-inference="handleInferenceStart"
@@ -190,6 +191,10 @@ const isSatellite = ref(true);
 
 // Add new state for settings
 const isSettingsOpen = ref(false);
+
+// Add weather layer state and source
+let weatherSource: mapboxgl.RasterTileSource | null = null;
+let weatherLayer: mapboxgl.Layer | null = null;
 
 // Computed
 const formattedTimestamp = computed(() => {
@@ -454,12 +459,62 @@ const preloadFirstFrame = async (firstTimestamp: string) => {
 // Add layer toggle methods
 const toggleFloodLayer = () => {
   isFloodLayerActive.value = !isFloodLayerActive.value;
+  
+  // Turn off weather layer when flood layer is active
+  if (isFloodLayerActive.value && isWeatherLayerActive.value) {
+    isWeatherLayerActive.value = false;
+    if (map?.getLayer('weather-layer')) {
+      map.removeLayer('weather-layer');
+    }
+    if (map?.getSource('weather')) {
+      map.removeSource('weather');
+    }
+  }
+
   updateLayers(currentTimeIndex);
 };
 
 const toggleWeatherLayer = () => {
   isWeatherLayerActive.value = !isWeatherLayerActive.value;
-  updateLayers(currentTimeIndex);
+  
+  if (isWeatherLayerActive.value) {
+    // Turn off flood layer when weather layer is active
+    isFloodLayerActive.value = false;
+    if (currentLayer) {
+      deckOverlay?.setProps({ layers: [] });
+    }
+
+    // Add weather layer if it doesn't exist
+    if (!map?.getSource('weather')) {
+      map?.addSource('weather', {
+        type: 'raster',
+        tiles: [
+          `http://maps.openweathermap.org/maps/2.0/weather/PR0/{z}/{x}/{y}?appid=${OPENWEATHERMAP_API_KEY}`
+        ],
+        tileSize: 256,
+        attribution: '© OpenWeatherMap'
+      });
+    }
+
+    if (!map?.getLayer('weather-layer')) {
+      map?.addLayer({
+        id: 'weather-layer',
+        type: 'raster',
+        source: 'weather',
+        paint: {
+          'raster-opacity': 0.8
+        }
+      });
+    }
+  } else {
+    // Remove weather layer
+    if (map?.getLayer('weather-layer')) {
+      map.removeLayer('weather-layer');
+    }
+    if (map?.getSource('weather')) {
+      map.removeSource('weather');
+    }
+  }
 };
 
 const setPlayback = (playing: boolean, speed: number) => {
@@ -586,6 +641,8 @@ const toggleBasemap = (value: boolean) => {
     map.setStyle(value ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/streets-v12');
   }
 };
+
+const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
 </script>
 
 <style scoped>
