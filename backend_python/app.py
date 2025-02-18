@@ -13,17 +13,20 @@ import json
 
 app = Flask(__name__)
 
-# # 配置 CORS
+# Configure CORS
 CORS(app, resources={
-    r"/*": {  # 匹配所有路由
-        "origins": "http://localhost:5173",  # 允许的前端地址
-        "methods": ["GET", "POST", "PUT", "DELETE"],  # 允许的 HTTP 方法
-        "allow_headers": ["Content-Type", "Authorization"],  # 允许的请求头
+    r"/*": {
+        "origins": "http://localhost:5173",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "allow_headers": ["Content-Type", "Authorization"],
     }
 })
 
-# 添加日志配置
-logging.basicConfig(level=logging.INFO)
+# Configure logging to only show errors
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 def execute_inference_script() -> Tuple[Dict[str, str], int]:
@@ -106,19 +109,12 @@ def get_tile_by_coordinates(timestamp, z, x, y):
         os.path.dirname(__file__),
         f"data/3di_res/timeseries_tiles/{timestamp}/{z}/{x}/{y}.png"
     )
-    print("Backend API hit")
     try:
         if os.path.exists(tile_path):
-            # 如果文件存在，返回文件
-            print("Tile found")
             return send_file(tile_path), 200
         else:
-            # 如果文件不存在，返回 404
-            print("Tile not found")
             return jsonify({"error": "Tile not found"}), 404
     except Exception as error:
-        # 处理意外错误
-        print(f"Error retrieving tile: {error}")
         return jsonify({"error": "Unable to retrieve tile"}), 500
 
 API_KEY = "74c101d12b334d09b854cee56563e545"
@@ -141,15 +137,25 @@ def get_cached_data(site_ids: List[str], start_date: str, end_date: Optional[str
 
     # Check the most recent file
     latest_file = os.path.join(data_dir, files[0])
-    file_time = datetime.strptime(files[0].split('_')[2].split('.')[0], "%Y%m%d%H%M%S")
+    try:
+        # Extract timestamp parts from filename (format: waternsw_data_YYYYMMDD_HHMMSS.json)
+        timestamp_str = files[0].split('_')[2].split('.')[0]
+        date_str = timestamp_str[:8]  # YYYYMMDD
+        time_str = timestamp_str[9:]  # HHMMSS
+        
+        # Parse the date and time parts
+        file_time = datetime.strptime(f"{date_str} {time_str}", "%Y%m%d %H%M%S")
 
-    # If file is less than 5 minutes old, use it
-    if datetime.now() - file_time < timedelta(hours=5):
-        try:
-            with open(latest_file, 'r') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            return None
+        # If file is less than 5 hours old, use it
+        if datetime.now() - file_time < timedelta(hours=5):
+            try:
+                with open(latest_file, 'r') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError):
+                return None
+    except (ValueError, IndexError) as e:
+        logger.warning(f"Error parsing cache file timestamp: {e}")
+        return None
 
     return None
 
@@ -158,22 +164,8 @@ def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional
     # Check cache first
     cached_data = get_cached_data(site_ids, start_date, end_date)
     if cached_data:
-        logger.info("Returning cached data")
         return cached_data
 
-    """
-    Fetch gauging data from WaterNSW API
-    
-    Args:
-        site_ids: List of site IDs
-        start_date: Start date in dd-Mon-yyyy HH:mm format
-        end_date: Optional end date in dd-Mon-yyyy HH:mm format
-        page_number: Page number for pagination
-        request_id: Request ID for pagination
-    
-    Returns:
-        Dict containing the API response
-    """
     url = urljoin(WATERNSW_BASE_URL, WATERNSW_GAUGING_ENDPOINT)
     
     params = {
@@ -197,10 +189,6 @@ def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         
-        # Log the response for debugging
-        logger.info(f"WaterNSW API Response: {response.status_code}")
-        logger.info(f"Response Content: {response.text}")
-        
         data = response.json()
         
         # Create data directory if it doesn't exist
@@ -215,8 +203,6 @@ def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional
         # Save response to JSON file
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
-            
-        logger.info(f"WaterNSW data saved to {filepath}")
         
         return data
     except requests.RequestException as e:

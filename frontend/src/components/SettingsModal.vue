@@ -129,18 +129,19 @@ const fetchGaugeData = async () => {
   isLoading.value = true;
   error.value = null;
   try {
-    // Get date 7 days ago and format as dd-Mon-yyyy HH:mm
+    // Get date 365 days ago
     const date = new Date();
     date.setDate(date.getDate() - 365);
     
     // Format the date components
     const day = date.getDate().toString().padStart(2, '0');
-    const month = date.toLocaleString('en-US', { month: 'short' });
+    // Ensure month is capitalized
+    const month = date.toLocaleString('en-US', { month: 'short' }).replace(/^[a-z]/, c => c.toUpperCase());
     const year = date.getFullYear();
-    // const hours = date.getHours().toString().padStart(2, '0');
-    // const minutes = date.getMinutes().toString().padStart(2, '0');
+    const hours = '00';
+    const minutes = '00';
     
-    const startDate = `${day}-${month}-${year} ${String('00')}:${String('00')}`;
+    const startDate = `${day}-${month}-${year} ${hours}:${minutes}`;
 
     const [gaugingResponse, rainfallResponse] = await Promise.all([
       fetchGaugingData(startDate),
@@ -163,16 +164,17 @@ onMounted(() => {
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
     try {
-      // Get date 7 days ago and format as dd-Mon-yyyy HH:mm
+      // Get date 365 days ago
       const date = new Date();
       date.setDate(date.getDate() - 365);
       
       // Format the date components
       const day = date.getDate().toString().padStart(2, '0');
-      const month = date.toLocaleString('en-US', { month: 'short' });
+      // Ensure month is capitalized
+      const month = date.toLocaleString('en-US', { month: 'short' }).replace(/^[a-z]/, c => c.toUpperCase());
       const year = date.getFullYear();
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const hours = '00';
+      const minutes = '00';
       
       const startDate = `${day}-${month}-${year} ${hours}:${minutes}`;
 

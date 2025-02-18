@@ -27,7 +27,7 @@ const initializeMap = () => {
     container: mapContainer.value,
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [147.356, -35.117], // Wagga Wagga coordinates
-    zoom: 8,
+    zoom: 1,
     accessToken: MAPBOX_ACCESS_TOKEN
   });
 
@@ -40,18 +40,14 @@ const initializeMap = () => {
     }
 
     try {
-      console.log('Adding weather source...');
       map.addSource('weather', {
         type: 'raster',
         tiles: [
-          `https://tile.openweathermap.org/map/PR0/{z}/{x}/{y}?appid=${OPENWEATHERMAP_API_KEY}`
+        `http://maps.openweathermap.org/maps/2.0/weather/PR0/{z}/{x}/{y}?appid=${OPENWEATHERMAP_API_KEY}`
         ],
         tileSize: 256,
         attribution: '© OpenWeatherMap'
       });
-      console.log('Weather source added successfully');
-
-      console.log('Adding weather layer...');
       map.addLayer({
         id: 'weather-layer',
         type: 'raster',
@@ -60,17 +56,6 @@ const initializeMap = () => {
           'raster-opacity': 0.8
         }
       }, 'road-label'); // Add before labels
-      console.log('Weather layer added successfully');
-
-      // Test if the layer exists
-      const hasLayer = map.getLayer('weather-layer');
-      console.log('Weather layer exists:', !!hasLayer);
-
-      // Log the tile URL to verify it's correct
-      console.log('Tile URL example:', `https://tile.openweathermap.org/map/precipitation_new/8/8/8.png?appid=${OPENWEATHERMAP_API_KEY}`);
-
-      // Check network requests for tiles
-      console.log('Check Network tab for tile requests to OpenWeatherMap');
     } catch (error) {
       console.error('Error adding weather layer:', error);
     }

@@ -459,6 +459,8 @@ const preloadFirstFrame = async (firstTimestamp: string) => {
 // Add layer toggle methods
 const toggleFloodLayer = () => {
   isFloodLayerActive.value = !isFloodLayerActive.value;
+  map?.setZoom(12);
+  map?.setCenter([147.356, -35.117]);
   
   // Turn off weather layer when flood layer is active
   if (isFloodLayerActive.value && isWeatherLayerActive.value) {
@@ -475,6 +477,9 @@ const toggleFloodLayer = () => {
 };
 
 const toggleWeatherLayer = () => {
+  map?.setZoom(2);
+  map?.setCenter([147.356, -35.117]);
+  
   isWeatherLayerActive.value = !isWeatherLayerActive.value;
   
   if (isWeatherLayerActive.value) {
