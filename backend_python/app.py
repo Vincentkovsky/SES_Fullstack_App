@@ -196,7 +196,7 @@ def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional
         os.makedirs(data_dir, exist_ok=True)
         
         # Generate filename with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = start_date
         filename = f"waternsw_data_{timestamp}.json"
         filepath = os.path.join(data_dir, filename)
         
@@ -330,7 +330,7 @@ def get_gauging_data():
             data_dir = os.path.join(os.path.dirname(__file__), "data")
             os.makedirs(data_dir, exist_ok=True)
             
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = start_date
             processed_filename = f"processed_waternsw_data_{timestamp}.json"
             processed_filepath = os.path.join(data_dir, processed_filename)
             
