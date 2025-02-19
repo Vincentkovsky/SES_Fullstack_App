@@ -30,15 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def execute_inference_script() -> Tuple[Dict[str, str], int]:
-    """
-    执行推理脚本并返回结果
-    
-    Returns:
-        Tuple[Dict, int]: 包含执行结果和状态码的元组
-    """
-    # script_path = os.path.join(os.path.dirname(__file__), "../../cnnModel/run_inference.sh")
-
-    
+    """Execute inference script and return results with timestamp"""
     script_path = "/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh"
     
     if not os.path.exists(script_path):
@@ -46,22 +38,37 @@ def execute_inference_script() -> Tuple[Dict[str, str], int]:
         return {"error": "Inference script not found"}, 404
     
     try:
-        # 确保脚本有执行权限
-        os.chmod(script_path, 0o755)
-        print(f"Script path: {script_path}")
+        # Generate current timestamp
+        start_tmp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # 执行脚本并捕获输出
+        # Ensure script has execution permissions
+        os.chmod(script_path, 0o755)
+        
+        # Execute script with timestamp parameter
         result = subprocess.run(
             [script_path],
+            env={
+                **os.environ,
+                'START_TMP': start_tmp  # Pass as environment variable
+            },
+            capture_output=True,
+            text=True,
+            shell=True  # Enable shell to modify the script inline
         )
-        print(f"Result: {result}")
         
-        logger.info("Inference script executed successfully")
-        return {
-            "message": "Inference completed successfully",
-            "output": result.stdout
-        }, 200
-        
+        if result.returncode == 0:
+            return {
+                "message": "Inference completed successfully",
+                "timestamp": start_tmp,
+                "output": result.stdout
+            }, 200
+        else:
+            logger.error(f"Inference script failed with return code {result.returncode}")
+            return {
+                "error": "Inference script execution failed",
+                "details": result.stderr
+            }, 500
+            
     except subprocess.CalledProcessError as e:
         logger.error(f"Error executing inference script: {str(e)}")
         return {
