@@ -43,14 +43,31 @@ export interface GaugingData {
   site_id: string;
   timeseries: Array<{
     timestamp: string;
-    maxDepth: number;
+    waterLevel: number;
+    flowRate: number;
   }>;
   total_records: number;
 }
 
-export const fetchGaugingData = async (startDate: string): Promise<GaugingData> => {
+export const fetchGaugingData = async (startDate: string, endDate: string): Promise<GaugingData> => {
   const url = new URL('http://localhost:3000/api/gauging');
-  url.searchParams.append('start_date', startDate);
+  
+  // Format dates as dd-MMM-yyyy HH:mm
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).replace(',', '');
+  };
+
+  url.searchParams.append('start_date', formatDate(startDate));
+  url.searchParams.append('end_date', formatDate(endDate));
+  url.searchParams.append('frequency', 'Instantaneous');
 
   const response = await fetch(url.toString());
   if (!response.ok) {

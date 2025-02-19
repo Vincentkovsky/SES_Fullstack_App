@@ -126,74 +126,58 @@ def get_tile_by_coordinates(timestamp, z, x, y):
 
 API_KEY = "74c101d12b334d09b854cee56563e545"
 WATERNSW_BASE_URL = "https://api.waternsw.com.au/water/"
-WATERNSW_GAUGING_ENDPOINT = "gauging-api"
+WATERNSW_SURFACE_WATER_ENDPOINT = "surface-water-data-api_download"
 
-def get_cached_data(site_ids: List[str], start_date: str, end_date: Optional[str] = None) -> Optional[Dict]:
-    """Check if we have cached data for the given parameters"""
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
-    if not os.path.exists(data_dir):
-        return None
+class SurfaceWaterRequestSchema(Schema):
+    """Schema for validating surface water API request parameters"""
+    page_number = fields.Integer(required=False, validate=lambda n: n >= 1, default=1)
+    data_type = fields.String(required=False, default="autoqc")
+    frequency = fields.String(required=False, default="instantaneous")
+    site_id = fields.String(required=False, default="410001")
+    start_date = fields.String(required=True)
+    end_date = fields.String(required=True)
+    variable = fields.String(required=False, default="streamwaterlevel,flowrate")
 
-    # Get all waternsw data files
-    files = [f for f in os.listdir(data_dir) if f.startswith('waternsw_data_')]
-    if not files:
-        return None
-
-    # Sort files by timestamp (newest first)
-    files.sort(reverse=True)
-
-    # Check the most recent file
-    latest_file = os.path.join(data_dir, files[0])
-    try:
-        # Extract timestamp parts from filename (format: waternsw_data_YYYYMMDD_HHMMSS.json)
-        timestamp_str = files[0].split('_')[2].split('.')[0]
-        date_str = timestamp_str[:8]  # YYYYMMDD
-        time_str = timestamp_str[9:]  # HHMMSS
-        
-        # Parse the date and time parts
-        file_time = datetime.strptime(f"{date_str} {time_str}", "%Y%m%d %H%M%S")
-
-        # If file is less than 5 hours old, use it
-        if datetime.now() - file_time < timedelta(hours=5):
-            try:
-                with open(latest_file, 'r') as f:
-                    return json.load(f)
-            except (json.JSONDecodeError, IOError):
-                return None
-    except (ValueError, IndexError) as e:
-        logger.warning(f"Error parsing cache file timestamp: {e}")
-        return None
-
-    return None
-
-def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional[str] = None, 
-                       page_number: int = 1, request_id: Optional[str] = None) -> Dict:
-    # Check cache first
-    cached_data = get_cached_data(site_ids, start_date, end_date)
-    if cached_data:
-        return cached_data
-
-    url = urljoin(WATERNSW_BASE_URL, WATERNSW_GAUGING_ENDPOINT)
+def fetch_surface_water_data(site_id: str = "410001", 
+                           start_date: Optional[str] = None,
+                           end_date: Optional[str] = None,
+                           frequency: str = "Instantaneous",
+                           page_number: int = 1) -> Dict:
+    """
+    Fetch surface water data from WaterNSW API
+    
+    Args:
+        site_id: Site ID (default: 410001)
+        start_date: Start date in dd-MMM-yyyy HH:mm format (e.g., "24-Mar-2024 00:00")
+        end_date: End date in dd-MMM-yyyy HH:mm format (e.g., "24-Mar-2024 01:00")
+        frequency: Data frequency (Instantaneous or Latest)
+        page_number: Page number for pagination
+    """
+    url = urljoin(WATERNSW_BASE_URL, WATERNSW_SURFACE_WATER_ENDPOINT)
     
     params = {
-        'SiteID': ','.join(site_ids),
-        'StartDate': start_date,
-        'PageNumber': page_number
+        'siteId': site_id,
+        'frequency': frequency,
+        'dataType': 'AutoQC',
+        'pageNumber': page_number,
+        'startDate': start_date,
+        'endDate': end_date
     }
     
-    if end_date:
-        params['EndDate'] = end_date
-    if request_id:
-        params['RequestID'] = request_id
-        
     headers = {
         'Ocp-Apim-Subscription-Key': API_KEY,
-        'Cache-Control': 'no-cache',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
     }
     
     try:
+        logger.info(f"Requesting WaterNSW API with params: {params}")
         response = requests.get(url, params=params, headers=headers)
+        
+        if response.status_code == 401:
+            logger.error("Authentication failed with WaterNSW API. Check API key.")
+            raise Exception("Authentication failed with WaterNSW API. Please check API key configuration.")
+            
         response.raise_for_status()
         
         data = response.json()
@@ -203,7 +187,7 @@ def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional
         os.makedirs(data_dir, exist_ok=True)
         
         # Generate filename with timestamp
-        timestamp = start_date
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"waternsw_data_{timestamp}.json"
         filepath = os.path.join(data_dir, filename)
         
@@ -214,137 +198,82 @@ def fetch_waternsw_data(site_ids: List[str], start_date: str, end_date: Optional
         return data
     except requests.RequestException as e:
         logger.error(f"Error fetching data from WaterNSW API: {str(e)}")
-        if hasattr(e.response, 'text'):
+        if hasattr(e, 'response') and e.response is not None:
             logger.error(f"Response content: {e.response.text}")
         raise Exception(f"Failed to fetch data from WaterNSW: {str(e)}")
-
-class GaugingRequestSchema(Schema):
-    """Schema for validating gauging API request parameters"""
-    api_key = fields.String(required=True, validate=lambda x: x == API_KEY)
-    site_id = fields.String(required=True)
-    start_date = fields.String(required=True)
-    end_date = fields.String(required=False)
-    page_number = fields.Integer(required=False, validate=lambda n: n >= 1)
-    request_id = fields.UUID(required=False)
-
-def validate_date_format(date_str: str) -> bool:
-    """Validate if the date string matches the required format (dd-Mon-yyyy HH:mm)"""
-    try:
-        datetime.strptime(date_str, '%d-%b-%Y %H:%M')
-        return True
-    except ValueError:
-        return False
-
-def validate_site_ids(site_ids: List[str]) -> bool:
-    """Validate if the number of site IDs is within the limit"""
-    return len(site_ids) <= 20
+    except Exception as e:
+        logger.error(f"Unexpected error while fetching data: {str(e)}")
+        raise
 
 @app.route('/api/gauging', methods=['GET'])
 def get_gauging_data():
     """
-    Fetch gauging data and return timeseries of MaxDepth values.
+    Fetch surface water data and return timeseries.
     
     Query Parameters:
-    - start_date: String (required) - Start date in dd-Mon-yyyy HH:mm format
-    - end_date: String (optional) - End date in dd-Mon-yyyy HH:mm format
+    - start_date: String (optional) - Start date in dd-MMM-yyyy HH:mm format
+    - end_date: String (optional) - End date in dd-MMM-yyyy HH:mm format
+    - frequency: String (optional) - Data frequency (instantaneous or latest)
     - page_number: Integer (optional) - Page number for pagination (min value: 1)
-    - request_id: UUID (required when page_number > 1) - Request identifier
     
     Returns:
-        JSON response with timeseries MaxDepth data
+        JSON response with timeseries data
     """
     try:
-        # Use fixed values for api_key and site_id
-        site_ids = ['410001']  # Fixed site ID
-        
-        # Get remaining query parameters
+        # Get query parameters
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
+        frequency = request.args.get('frequency', 'instantaneous')
         page_number = request.args.get('page_number', type=int, default=1)
-        request_id = request.args.get('request_id')
+        site_id = '410001'  # Fixed site ID for Wagga Wagga
 
-        # Validate required parameters
-        if not start_date:
-            return jsonify({
-                'error': 'Missing required parameters',
-                'message': 'start_date is required'
-            }), 400
-
-        # Validate date formats
-        if not validate_date_format(start_date):
-            return jsonify({
-                'error': 'Invalid start_date format',
-                'message': 'Date format should be dd-Mon-yyyy HH:mm (e.g., 08-Jan-2021 08:30)'
-            }), 400
-
-        if end_date and not validate_date_format(end_date):
-            return jsonify({
-                'error': 'Invalid end_date format',
-                'message': 'Date format should be dd-Mon-yyyy HH:mm (e.g., 08-Jan-2021 08:30)'
-            }), 400
-
-        # Validate request_id when page_number > 1
-        if page_number > 1 and not request_id:
-            return jsonify({
-                'error': 'Missing request_id',
-                'message': 'request_id is required when page_number is greater than 1'
-            }), 400
-
-        # Fetch real data from WaterNSW API
+        # Fetch data from WaterNSW API
         try:
-            waternsw_data = fetch_waternsw_data(
-                site_ids=site_ids,
+            waternsw_data = fetch_surface_water_data(
+                site_id=site_id,
                 start_date=start_date,
                 end_date=end_date,
-                page_number=page_number,
-                request_id=request_id
+                frequency=frequency,
+                page_number=page_number
             )
             
             # Transform the data into timeseries format
-            unique_data = {}  # Use dictionary to track unique entries
-            for gauging in waternsw_data.get('gaugings', []):
+            timeseries_data = []
+            for record in waternsw_data.get('data', []):
                 try:
-                    # Extract date and time components
-                    measure_date = gauging.get('MeasureDate', '')
-                    start_time = gauging.get('StartTime', '')
-                    max_depth = gauging.get('MaxDepth', 0)
+                    timestamp = record.get('timestamp')
+                    water_level = record.get('streamwaterlevel', {}).get('value')
+                    flow_rate = record.get('flowrate', {}).get('value')
                     
-                    if measure_date and start_time:
-                        # Parse the date components
-                        date_obj = datetime.strptime(f"{measure_date} {start_time}", "%d-%b-%Y %H:%M:%S" if ":00" in start_time else "%d-%b-%Y %H:%M")
-                        timestamp = date_obj.isoformat()
-                        
-                        # Only add if timestamp doesn't exist or if the MaxDepth is different
-                        if timestamp not in unique_data or unique_data[timestamp]['maxDepth'] != max_depth:
-                            unique_data[timestamp] = {
-                                'timestamp': timestamp,
-                                'maxDepth': max_depth
-                            }
+                    if timestamp:
+                        timeseries_data.append({
+                            'timestamp': timestamp,
+                            'waterLevel': water_level,
+                            'flowRate': flow_rate
+                        })
                 except (ValueError, TypeError) as e:
-                    logger.warning(f"Error parsing date: {e}, measure_date: {measure_date}, start_time: {start_time}")
+                    logger.warning(f"Error parsing record: {e}")
                     continue
             
-            # Convert dictionary values to list and sort by timestamp
-            timeseries_data = sorted(unique_data.values(), key=lambda x: x['timestamp'])
+            # Sort by timestamp
+            timeseries_data.sort(key=lambda x: x['timestamp'])
             
             response_data = {
-                'site_id': site_ids[0],
+                'site_id': site_id,
                 'timeseries': timeseries_data,
                 'total_records': len(timeseries_data)
             }
 
-            # Save processed data to JSON file
+            # Save processed data
             data_dir = os.path.join(os.path.dirname(__file__), "data")
             os.makedirs(data_dir, exist_ok=True)
             
-            timestamp = start_date
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             processed_filename = f"processed_waternsw_data_{timestamp}.json"
             processed_filepath = os.path.join(data_dir, processed_filename)
             
             with open(processed_filepath, 'w') as f:
                 json.dump(response_data, f, indent=2)
-                
-            logger.info(f"Processed WaterNSW data saved to {processed_filepath}")
             
             return jsonify(response_data), 200
             
@@ -360,10 +289,29 @@ def get_gauging_data():
             'message': str(e)
         }), 400
     except Exception as e:
-        logger.error(f"Error in gauging API: {str(e)}")
+        logger.error(f"Error in surface water API: {str(e)}")
         return jsonify({
             'error': 'Internal server error',
             'message': 'An unexpected error occurred'
+        }), 500
+
+@app.route('/api/test-waternsw', methods=['GET'])
+def test_waternsw():
+    """Test the WaterNSW API connection"""
+    try:
+        # Try to fetch the latest reading
+        data = fetch_surface_water_data(
+            site_id="410001",
+            frequency="latest"
+        )
+        return jsonify({
+            "message": "WaterNSW API connection successful",
+            "data": data
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "error": "WaterNSW API connection failed",
+            "message": str(e)
         }), 500
 
 if __name__ == '__main__':

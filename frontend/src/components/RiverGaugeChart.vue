@@ -1,5 +1,21 @@
 <template>
   <div class="chart-container">
+    <div class="tabs">
+      <button 
+        class="tab-button" 
+        :class="{ active: activeTab === 'waterLevel' }"
+        @click="activeTab = 'waterLevel'"
+      >
+        Water Level
+      </button>
+      <button 
+        class="tab-button" 
+        :class="{ active: activeTab === 'flowRate' }"
+        @click="activeTab = 'flowRate'"
+      >
+        Flow Rate
+      </button>
+    </div>
     <Line
       v-if="chartData"
       :data="chartData"
@@ -9,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -38,6 +54,8 @@ const props = defineProps<{
   gaugingData: GaugingData | null;
 }>();
 
+const activeTab = ref<'waterLevel' | 'flowRate'>('waterLevel');
+
 const chartData = computed(() => {
   if (!props.gaugingData) return null;
 
@@ -53,31 +71,35 @@ const chartData = computed(() => {
     });
   });
 
-  const depths = props.gaugingData.timeseries.map(item => item.maxDepth);
+  const values = props.gaugingData.timeseries.map(item => 
+    activeTab.value === 'waterLevel' ? item.waterLevel : item.flowRate
+  );
+
+  const label = activeTab.value === 'waterLevel' ? 'Water Level (m)' : 'Flow Rate (ML/day)';
+  const color = activeTab.value === 'waterLevel' ? '59, 130, 246' : '234, 88, 12'; // Blue for water level, Orange for flow rate
 
   return {
     labels: timestamps,
     datasets: [
       {
-        label: 'River Depth (m)',
-        data: depths,
-        borderColor: 'rgba(59, 130, 246, 0.8)',
+        label,
+        data: values,
+        borderColor: `rgba(${color}, 0.8)`,
         backgroundColor: (context: ScriptableContext<'line'>) => {
           const chart = context.chart;
           const { ctx, chartArea } = chart;
-          if (!chartArea) return 'rgba(59, 130, 246, 0.1)';  // Fallback color
+          if (!chartArea) return `rgba(${color}, 0.1)`;
           
-          // Create gradient from top of chart area to bottom
           const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');   // More opaque blue at top
-          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');  // Almost transparent at bottom
+          gradient.addColorStop(0, `rgba(${color}, 0.4)`);
+          gradient.addColorStop(1, `rgba(${color}, 0.05)`);
           return gradient;
         },
         borderWidth: 2,
         tension: 0.4,
         pointRadius: 0,
         pointHoverRadius: 6,
-        pointHoverBackgroundColor: '#3B82F6',
+        pointHoverBackgroundColor: activeTab.value === 'waterLevel' ? '#3B82F6' : '#EA580C',
         pointHoverBorderColor: 'white',
         pointHoverBorderWidth: 2,
         fill: true
@@ -86,7 +108,7 @@ const chartData = computed(() => {
   };
 });
 
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -97,7 +119,12 @@ const chartOptions = {
       mode: 'index' as const,
       intersect: false,
       callbacks: {
-        label: (context: any) => `Depth: ${context.raw.toFixed(2)}m`
+        label: (context: any) => {
+          const value = context.raw.toFixed(2);
+          return activeTab.value === 'waterLevel' 
+            ? `Water Level: ${value}m`
+            : `Flow Rate: ${value}ML/day`;
+        }
       }
     }
   },
@@ -106,7 +133,7 @@ const chartOptions = {
       beginAtZero: true,
       title: {
         display: true,
-        text: 'Depth (m)'
+        text: activeTab.value === 'waterLevel' ? 'Water Level (m)' : 'Flow Rate (ML/day)'
       },
       grid: {
         color: 'rgba(0, 0, 0, 0.05)',
@@ -129,12 +156,42 @@ const chartOptions = {
       tension: 0.4
     }
   }
-};
+}));
 </script>
 
 <style scoped>
 .chart-container {
-  height: 160px;
+  height: 200px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  background-color: #f9fafb;
+}
+
+.tab-button.active {
+  background-color: #f3f4f6;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #1f2937;
 }
 </style> 
