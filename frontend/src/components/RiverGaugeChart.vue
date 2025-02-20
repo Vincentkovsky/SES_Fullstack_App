@@ -1,21 +1,5 @@
 <template>
   <div class="chart-container">
-    <div class="tabs">
-      <button 
-        class="tab-button" 
-        :class="{ active: activeTab === 'waterLevel' }"
-        @click="activeTab = 'waterLevel'"
-      >
-        Water Level
-      </button>
-      <button 
-        class="tab-button" 
-        :class="{ active: activeTab === 'flowRate' }"
-        @click="activeTab = 'flowRate'"
-      >
-        Flow Rate
-      </button>
-    </div>
     <Line
       v-if="chartData"
       :data="chartData"
@@ -25,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -54,8 +38,6 @@ const props = defineProps<{
   gaugingData: GaugingData | null;
 }>();
 
-const activeTab = ref<'waterLevel' | 'flowRate'>('waterLevel');
-
 const chartData = computed(() => {
   if (!props.gaugingData) return null;
 
@@ -71,18 +53,14 @@ const chartData = computed(() => {
     });
   });
 
-  const values = props.gaugingData.timeseries.map(item => 
-    activeTab.value === 'waterLevel' ? item.waterLevel : item.flowRate
-  );
-
-  const label = activeTab.value === 'waterLevel' ? 'Water Level (m)' : 'Flow Rate (ML/day)';
-  const color = activeTab.value === 'waterLevel' ? '59, 130, 246' : '234, 88, 12'; // Blue for water level, Orange for flow rate
+  const values = props.gaugingData.timeseries.map(item => item.waterLevel);
+  const color = '59, 130, 246'; // Blue for water level
 
   return {
     labels: timestamps,
     datasets: [
       {
-        label,
+        label: 'Water Level (m)',
         data: values,
         borderColor: `rgba(${color}, 0.8)`,
         backgroundColor: (context: ScriptableContext<'line'>) => {
@@ -99,7 +77,7 @@ const chartData = computed(() => {
         tension: 0.4,
         pointRadius: 0,
         pointHoverRadius: 6,
-        pointHoverBackgroundColor: activeTab.value === 'waterLevel' ? '#3B82F6' : '#EA580C',
+        pointHoverBackgroundColor: '#3B82F6',
         pointHoverBorderColor: 'white',
         pointHoverBorderWidth: 2,
         fill: true
@@ -121,9 +99,7 @@ const chartOptions = computed(() => ({
       callbacks: {
         label: (context: any) => {
           const value = context.raw.toFixed(2);
-          return activeTab.value === 'waterLevel' 
-            ? `Water Level: ${value}m`
-            : `Flow Rate: ${value}ML/day`;
+          return `Water Level: ${value}m`;
         }
       }
     }
@@ -133,7 +109,7 @@ const chartOptions = computed(() => ({
       beginAtZero: true,
       title: {
         display: true,
-        text: activeTab.value === 'waterLevel' ? 'Water Level (m)' : 'Flow Rate (ML/day)'
+        text: 'Water Level (m)'
       },
       grid: {
         color: 'rgba(0, 0, 0, 0.05)',
@@ -165,33 +141,5 @@ const chartOptions = computed(() => ({
   width: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.tab-button {
-  padding: 0.5rem 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #4b5563;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.tab-button:hover {
-  background-color: #f9fafb;
-}
-
-.tab-button.active {
-  background-color: #f3f4f6;
-  border-color: rgba(0, 0, 0, 0.2);
-  color: #1f2937;
 }
 </style> 

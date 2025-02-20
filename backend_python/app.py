@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import uuid
 from marshmallow import Schema, fields, ValidationError
 import requests
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlencode
 import json
 
 app = Flask(__name__)
@@ -139,8 +139,8 @@ class SurfaceWaterRequestSchema(Schema):
     variable = fields.String(required=False, default="streamwaterlevel,flowrate")
 
 def fetch_surface_water_data(site_id: str = "410001", 
-                           start_date: Optional[str] = None,
-                           end_date: Optional[str] = None,
+                           start_date: str = "2024-03-24 00:00",
+                           end_date: str = "2024-03-24 01:00",
                            frequency: str = "Instantaneous",
                            page_number: int = 1) -> Dict:
     """
@@ -164,11 +164,30 @@ def fetch_surface_water_data(site_id: str = "410001",
         'endDate': end_date
     }
     
+    
     headers = {
         'Ocp-Apim-Subscription-Key': API_KEY,
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache',
+        'Accept': 'application/json'
     }
+    
+    # Print request information
+    print("\n=== WaterNSW API Request Information ===")
+    print(f"Base URL: {url}")
+    print("\nParameters:")
+    for key, value in params.items():
+        print(f"  {key}: {value}")
+    print("\nHeaders:")
+    for key, value in headers.items():
+        if key == 'Ocp-Apim-Subscription-Key':
+            print(f"  {key}: ****")  # Hide API key
+        else:
+            print(f"  {key}: {value}")
+    
+    # Construct and print full URL with parameters
+    full_url = f"{url}?{urlencode(params)}"
+    print(f"\nFull URL: {full_url}")
+    print("=====================================\n")
     
     try:
         logger.info(f"Requesting WaterNSW API with params: {params}")
@@ -263,6 +282,7 @@ def get_gauging_data():
                 'timeseries': timeseries_data,
                 'total_records': len(timeseries_data)
             }
+
 
             # Save processed data
             data_dir = os.path.join(os.path.dirname(__file__), "data")

@@ -71,7 +71,7 @@
 import { ref, defineProps, defineEmits, onMounted, watch } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchRainfallData } from '../services/api.js';
+import { fetchGaugingData } from '../services/api.js';
 import type { GaugingData } from '../services/api';
 
 type Settings = {
@@ -87,7 +87,8 @@ type InferenceSettings = {
 };
 
 const props = defineProps<{
-  isOpen: boolean
+  isOpen: boolean;
+  timestamps: string[];
 }>();
 
 const emit = defineEmits<{
@@ -113,40 +114,42 @@ const isLoading = ref(false);
 const error = ref<string | null>(null);
 const currentTimestamp = ref<string>('');
 
-const timestamps = ref<string[]>([]);
-const rainfallData = ref<number[]>([]);
-
-const fetchRainfallForTimestamps = async (timestamps: string[]) => {
-  try {
-    const rainfallPromises = timestamps.map(timestamp => fetchRainfallData(timestamp));
-    rainfallData.value = await Promise.all(rainfallPromises);
-  } catch (error) {
-    console.error('Error fetching rainfall data:', error);
-  }
+// Helper function to convert timestamp to API date format
+const formatDateFromTimestamp = (timestamp: string): string => {
+  const match = timestamp.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
+  if (!match) return '';
+  
+  const [_, year, month, day, hour, minute] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  const monthStr = date.toLocaleString('en-US', { month: 'short' });
+  
+  return `${day}-${monthStr}-${year} ${hour}:${minute}`;
 };
 
 const fetchGaugeData = async () => {
+  if (!props.timestamps.length) return;
+  
   isLoading.value = true;
   error.value = null;
   try {
-    // Get date 365 days ago
-    const date = new Date();
-    date.setDate(date.getDate() - 365);
-    
-    // Format the date components
-    const day = date.getDate().toString().padStart(2, '0');
-    // Ensure month is capitalized
-    const month = date.toLocaleString('en-US', { month: 'short' }).replace(/^[a-z]/, c => c.toUpperCase());
-    const year = date.getFullYear();
-    const hours = '00';
-    const minutes = '00';
-    
-    const startDate = `${day}-${month}-${year} ${hours}:${minutes}`;
+    const startDate = formatDateFromTimestamp(props.timestamps[0]);
+    const endDate = formatDateFromTimestamp(props.timestamps[props.timestamps.length - 1]);
 
-    const [gaugingResponse, rainfallResponse] = await Promise.all([
-      fetchGaugingData(startDate),
-      fetchRainfallForTimestamps(timestamps.value)
-    ]);
+    console.log('Fetching gauge data with parameters:', {
+      startDate,
+      endDate,
+      firstTimestamp: props.timestamps[0],
+      lastTimestamp: props.timestamps[props.timestamps.length - 1]
+    });
+
+    const gaugingResponse = await fetchGaugingData(startDate, endDate);
+    console.log('Gauge API Response:', {
+      fullResponse: gaugingResponse,
+      siteId: gaugingResponse.site_id,
+      totalRecords: gaugingResponse.total_records,
+      sampleData: gaugingResponse.timeseries?.[0],
+      timeseriesLength: gaugingResponse.timeseries?.length
+    });
 
     gaugingData.value = gaugingResponse;
   } catch (e) {
@@ -158,30 +161,32 @@ const fetchGaugeData = async () => {
 };
 
 onMounted(() => {
-  fetchGaugeData();
+  if (props.isOpen) {
+    fetchGaugeData();
+  }
 });
 
 watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen) {
+  if (isOpen && props.timestamps.length) {
     try {
-      // Get date 365 days ago
-      const date = new Date();
-      date.setDate(date.getDate() - 365);
-      
-      // Format the date components
-      const day = date.getDate().toString().padStart(2, '0');
-      // Ensure month is capitalized
-      const month = date.toLocaleString('en-US', { month: 'short' }).replace(/^[a-z]/, c => c.toUpperCase());
-      const year = date.getFullYear();
-      const hours = '00';
-      const minutes = '00';
-      
-      const startDate = `${day}-${month}-${year} ${hours}:${minutes}`;
+      const startDate = formatDateFromTimestamp(props.timestamps[0]);
+      const endDate = formatDateFromTimestamp(props.timestamps[props.timestamps.length - 1]);
 
-      const [gaugingResponse, rainfallResponse] = await Promise.all([
-        fetchGaugingData(startDate),
-        fetchRainfallForTimestamps(timestamps.value)
-      ]);
+      console.log('Watch handler - Fetching gauge data with parameters:', {
+        startDate,
+        endDate,
+        firstTimestamp: props.timestamps[0],
+        lastTimestamp: props.timestamps[props.timestamps.length - 1]
+      });
+
+      const gaugingResponse = await fetchGaugingData(startDate, endDate);
+      console.log('Watch handler - Gauge API Response:', {
+        fullResponse: gaugingResponse,
+        siteId: gaugingResponse.site_id,
+        totalRecords: gaugingResponse.total_records,
+        sampleData: gaugingResponse.timeseries?.[0],
+        timeseriesLength: gaugingResponse.timeseries?.length
+      });
 
       gaugingData.value = gaugingResponse;
     } catch (error) {
