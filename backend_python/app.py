@@ -171,23 +171,6 @@ def fetch_surface_water_data(site_id: str = "410001",
         'Accept': 'application/json'
     }
     
-    # Print request information
-    print("\n=== WaterNSW API Request Information ===")
-    print(f"Base URL: {url}")
-    print("\nParameters:")
-    for key, value in params.items():
-        print(f"  {key}: {value}")
-    print("\nHeaders:")
-    for key, value in headers.items():
-        if key == 'Ocp-Apim-Subscription-Key':
-            print(f"  {key}: ****")  # Hide API key
-        else:
-            print(f"  {key}: {value}")
-    
-    # Construct and print full URL with parameters
-    full_url = f"{url}?{urlencode(params)}"
-    print(f"\nFull URL: {full_url}")
-    print("=====================================\n")
     
     try:
         logger.info(f"Requesting WaterNSW API with params: {params}")
@@ -257,32 +240,45 @@ def get_gauging_data():
             )
             
             # Transform the data into timeseries format
-            timeseries_data = []
-            for record in waternsw_data.get('data', []):
+            timeseries_data = {}
+            for record in waternsw_data.get('records', []):
                 try:
-                    timestamp = record.get('timestamp')
-                    water_level = record.get('streamwaterlevel', {}).get('value')
-                    flow_rate = record.get('flowrate', {}).get('value')
-                    
-                    if timestamp:
-                        timeseries_data.append({
+                    timestamp = record.get('timeStamp')
+                    if not timestamp:
+                        continue
+
+                    # Initialize the timestamp entry if it doesn't exist
+                    if timestamp not in timeseries_data:
+                        timeseries_data[timestamp] = {
                             'timestamp': timestamp,
-                            'waterLevel': water_level,
-                            'flowRate': flow_rate
-                        })
+                            'waterLevel': None,
+                            'flowRate': None
+                        }
+                    
+                    # Update the appropriate measurement based on variableName
+                    variable_name = record.get('variableName')
+                    value = record.get('value')
+                    
+                    if variable_name == 'StreamWaterLevel':
+                        timeseries_data[timestamp]['waterLevel'] = value
+                    elif variable_name == 'FlowRate':
+                        timeseries_data[timestamp]['flowRate'] = value
+
                 except (ValueError, TypeError) as e:
                     logger.warning(f"Error parsing record: {e}")
                     continue
             
-            # Sort by timestamp
-            timeseries_data.sort(key=lambda x: x['timestamp'])
+            # Convert dictionary to sorted list
+            sorted_timeseries = sorted(
+                timeseries_data.values(),
+                key=lambda x: x['timestamp']
+            )
             
             response_data = {
                 'site_id': site_id,
-                'timeseries': timeseries_data,
-                'total_records': len(timeseries_data)
+                'timeseries': sorted_timeseries,
+                'total_records': len(sorted_timeseries)
             }
-
 
             # Save processed data
             data_dir = os.path.join(os.path.dirname(__file__), "data")
