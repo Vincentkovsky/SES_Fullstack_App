@@ -543,6 +543,7 @@ const handleInference = async () => {
     // Refresh the tiles list after successful inference
     const newTilesResponse = await fetchTilesList();
     timestamps = newTilesResponse.message;
+    console.log("timestamps", timestamps);
     
     // Optionally restart animation with new timestamps
     if (isPlaying.value) {

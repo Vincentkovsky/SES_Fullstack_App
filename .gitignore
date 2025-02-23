@@ -54,3 +54,5 @@ timeseries_tiles/
 *.nc
 *.zip
 *.tif
+
+*.json
