@@ -27,7 +27,7 @@ const initializeMap = () => {
     container: mapContainer.value,
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [147.356, -35.117], // Wagga Wagga coordinates
-    zoom: 1,
+    zoom: 6,
     accessToken: MAPBOX_ACCESS_TOKEN
   });
 

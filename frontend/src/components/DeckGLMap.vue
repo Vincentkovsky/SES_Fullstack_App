@@ -187,7 +187,7 @@ const scaleWidth = ref(100);
 const isInferenceRunning = ref(false);
 
 // Add new state for basemap
-const isSatellite = ref(true);
+const isSatellite = ref(false);
 
 // Add new state for settings
 const isSettingsOpen = ref(false);
@@ -418,7 +418,7 @@ const initializeMap = async () => {
 
   map = new mapboxgl.Map({
     container: mapContainer.value,
-    style: 'mapbox://styles/mapbox/satellite-v9',
+    style: 'mapbox://styles/mapbox/streets-v12',
     center: [147.356, -35.117],
     zoom: 12,
     accessToken: 'pk.eyJ1IjoidmluY2VudDEyOCIsImEiOiJjbHo4ZHhtcWswMXh0MnBvbW5vM2o0d2djIn0.Qj9VErbIh7yNL-DjTnAUFA'
@@ -477,7 +477,7 @@ const toggleFloodLayer = () => {
 };
 
 const toggleWeatherLayer = () => {
-  map?.setZoom(2);
+  map?.setZoom(6);
   map?.setCenter([147.356, -35.117]);
   
   isWeatherLayerActive.value = !isWeatherLayerActive.value;
