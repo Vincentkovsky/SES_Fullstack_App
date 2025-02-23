@@ -114,17 +114,6 @@ const isLoading = ref(false);
 const error = ref<string | null>(null);
 const currentTimestamp = ref<string>('');
 
-// Helper function to convert timestamp to API date format
-const formatDateFromTimestamp = (timestamp: string): string => {
-  const match = timestamp.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
-  if (!match) return '';
-  
-  const [_, year, month, day, hour, minute] = match;
-  const date = new Date(Number(year), Number(month) - 1, Number(day));
-  const monthStr = date.toLocaleString('en-US', { month: 'short' });
-  
-  return `${day}-${monthStr}-${year} ${hour}:${minute}`;
-};
 
 const fetchGaugeData = async () => {
   if (!props.timestamps.length) return;
@@ -132,24 +121,27 @@ const fetchGaugeData = async () => {
   isLoading.value = true;
   error.value = null;
   try {
-    const startDate = formatDateFromTimestamp(props.timestamps[0]);
-    const endDate = formatDateFromTimestamp(props.timestamps[props.timestamps.length - 1]);
-
-    console.log('Fetching gauge data with parameters:', {
-      startDate,
-      endDate,
-      firstTimestamp: props.timestamps[0],
-      lastTimestamp: props.timestamps[props.timestamps.length - 1]
-    });
+    // Default to last 24 hours if no timestamps
+    const now = new Date();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 10);
+        
+        // Format dates as "dd-Mon-yyyy hh:mm"
+        const formatDate = (date: Date) => {
+          const day = date.getDate().toString().padStart(2, '0');
+          const month = date.toLocaleString('en-US', { month: 'short' });
+          const year = date.getFullYear();
+          const hours = date.getHours().toString().padStart(2, '0');
+          const minutes = date.getMinutes().toString().padStart(2, '0');
+          
+          return `${day}-${month}-${year} ${"00"}:${"00"}`;
+        };
+        
+        const startDate = formatDate(yesterday);
+        const endDate = formatDate(now);
 
     const gaugingResponse = await fetchGaugingData(startDate, endDate);
-    console.log('Gauge API Response:', {
-      fullResponse: gaugingResponse,
-      siteId: gaugingResponse.site_id,
-      totalRecords: gaugingResponse.total_records,
-      sampleData: gaugingResponse.timeseries?.[0],
-      timeseriesLength: gaugingResponse.timeseries?.length
-    });
+   
 
     gaugingData.value = gaugingResponse;
   } catch (e) {
@@ -167,27 +159,31 @@ onMounted(() => {
 });
 
 watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen && props.timestamps.length) {
+  if (isOpen) {
     try {
-      const startDate = formatDateFromTimestamp(props.timestamps[0]);
-      const endDate = formatDateFromTimestamp(props.timestamps[props.timestamps.length - 1]);
+      
+      
+        // Default to last 24 hours if no timestamps
+        const now = new Date();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 10);
+        
+        // Format dates as "dd-Mon-yyyy hh:mm"
+        const formatDate = (date: Date) => {
+          const day = date.getDate().toString().padStart(2, '0');
+          const month = date.toLocaleString('en-US', { month: 'short' });
+          const year = date.getFullYear();
+          const hours = date.getHours().toString().padStart(2, '0');
+          const minutes = date.getMinutes().toString().padStart(2, '0');
+          
+          return `${day}-${month}-${year} ${"00"}:${"00"}`;
+        };
+        
+        const startDate = formatDate(yesterday);
+        const endDate = formatDate(now);
 
-      console.log('Watch handler - Fetching gauge data with parameters:', {
-        startDate,
-        endDate,
-        firstTimestamp: props.timestamps[0],
-        lastTimestamp: props.timestamps[props.timestamps.length - 1]
-      });
 
       const gaugingResponse = await fetchGaugingData(startDate, endDate);
-      console.log('Watch handler - Gauge API Response:', {
-        fullResponse: gaugingResponse,
-        siteId: gaugingResponse.site_id,
-        totalRecords: gaugingResponse.total_records,
-        sampleData: gaugingResponse.timeseries?.[0],
-        timeseriesLength: gaugingResponse.timeseries?.length
-      });
-
       gaugingData.value = gaugingResponse;
     } catch (error) {
       console.error('Error fetching data:', error);

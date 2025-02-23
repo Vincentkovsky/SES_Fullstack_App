@@ -1,0 +1,4627 @@
+{
+  "records": [
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 12:45",
+      "variableName": "Conductivity",
+      "value": 146.87,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:00",
+      "variableName": "Conductivity",
+      "value": 146.408,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:15",
+      "variableName": "Conductivity",
+      "value": 146.043,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:30",
+      "variableName": "Conductivity",
+      "value": 145.439,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:45",
+      "variableName": "Conductivity",
+      "value": 145.96,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:00",
+      "variableName": "Conductivity",
+      "value": 143.181,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:15",
+      "variableName": "Conductivity",
+      "value": 142.941,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:30",
+      "variableName": "Conductivity",
+      "value": 141.864,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:45",
+      "variableName": "Conductivity",
+      "value": 141.983,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:00",
+      "variableName": "Conductivity",
+      "value": 141.31,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:15",
+      "variableName": "Conductivity",
+      "value": 140.671,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:30",
+      "variableName": "Conductivity",
+      "value": 141.548,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:45",
+      "variableName": "Conductivity",
+      "value": 141.916,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:00",
+      "variableName": "Conductivity",
+      "value": 141.067,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:15",
+      "variableName": "Conductivity",
+      "value": 141.663,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:30",
+      "variableName": "Conductivity",
+      "value": 140.746,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:45",
+      "variableName": "Conductivity",
+      "value": 140.828,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:00",
+      "variableName": "Conductivity",
+      "value": 141.451,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:15",
+      "variableName": "Conductivity",
+      "value": 140.586,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:30",
+      "variableName": "Conductivity",
+      "value": 140.91,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:45",
+      "variableName": "Conductivity",
+      "value": 141.126,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:00",
+      "variableName": "Conductivity",
+      "value": 140.91,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:15",
+      "variableName": "Conductivity",
+      "value": 141.152,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:30",
+      "variableName": "Conductivity",
+      "value": 140.854,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:45",
+      "variableName": "Conductivity",
+      "value": 140.88,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:00",
+      "variableName": "Conductivity",
+      "value": 140.366,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:15",
+      "variableName": "Conductivity",
+      "value": 140.392,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:30",
+      "variableName": "Conductivity",
+      "value": 140.634,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:45",
+      "variableName": "Conductivity",
+      "value": 140.876,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:00",
+      "variableName": "Conductivity",
+      "value": 141.883,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:15",
+      "variableName": "Conductivity",
+      "value": 141.483,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:30",
+      "variableName": "Conductivity",
+      "value": 141.44,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:45",
+      "variableName": "Conductivity",
+      "value": 141.472,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:00",
+      "variableName": "Conductivity",
+      "value": 141.072,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:15",
+      "variableName": "Conductivity",
+      "value": 140.888,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:30",
+      "variableName": "Conductivity",
+      "value": 140.703,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:45",
+      "variableName": "Conductivity",
+      "value": 140.117,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:00",
+      "variableName": "Conductivity",
+      "value": 139.314,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:15",
+      "variableName": "Conductivity",
+      "value": 139.672,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:30",
+      "variableName": "Conductivity",
+      "value": 139.41,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:45",
+      "variableName": "Conductivity",
+      "value": 139.583,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:00",
+      "variableName": "Conductivity",
+      "value": 139.865,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:15",
+      "variableName": "Conductivity",
+      "value": 139.059,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:30",
+      "variableName": "Conductivity",
+      "value": 140.288,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:45",
+      "variableName": "Conductivity",
+      "value": 140.134,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:00",
+      "variableName": "Conductivity",
+      "value": 140.634,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:15",
+      "variableName": "Conductivity",
+      "value": 140.34,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:30",
+      "variableName": "Conductivity",
+      "value": 140.078,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:45",
+      "variableName": "Conductivity",
+      "value": 140.001,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:00",
+      "variableName": "Conductivity",
+      "value": 139.629,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:15",
+      "variableName": "Conductivity",
+      "value": 138.166,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:30",
+      "variableName": "Conductivity",
+      "value": 139.648,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:45",
+      "variableName": "Conductivity",
+      "value": 139.712,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:00",
+      "variableName": "Conductivity",
+      "value": 139.667,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:15",
+      "variableName": "Conductivity",
+      "value": 139.172,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:30",
+      "variableName": "Conductivity",
+      "value": 138.13,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:45",
+      "variableName": "Conductivity",
+      "value": 138.508,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:00",
+      "variableName": "Conductivity",
+      "value": 138.315,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:15",
+      "variableName": "Conductivity",
+      "value": 139.35,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:30",
+      "variableName": "Conductivity",
+      "value": 139.536,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:45",
+      "variableName": "Conductivity",
+      "value": 138.602,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:00",
+      "variableName": "Conductivity",
+      "value": 137.119,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:15",
+      "variableName": "Conductivity",
+      "value": 138.593,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:30",
+      "variableName": "Conductivity",
+      "value": 138.863,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:45",
+      "variableName": "Conductivity",
+      "value": 139.068,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:00",
+      "variableName": "Conductivity",
+      "value": 138.802,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:15",
+      "variableName": "Conductivity",
+      "value": 138.646,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:30",
+      "variableName": "Conductivity",
+      "value": 138.819,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:45",
+      "variableName": "Conductivity",
+      "value": 138.804,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:00",
+      "variableName": "Conductivity",
+      "value": 137.767,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:15",
+      "variableName": "Conductivity",
+      "value": 139.04,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:30",
+      "variableName": "Conductivity",
+      "value": 138.663,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:45",
+      "variableName": "Conductivity",
+      "value": 137.625,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:00",
+      "variableName": "Conductivity",
+      "value": 138.348,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:15",
+      "variableName": "Conductivity",
+      "value": 138.821,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:30",
+      "variableName": "Conductivity",
+      "value": 138.632,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:45",
+      "variableName": "Conductivity",
+      "value": 138.553,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:00",
+      "variableName": "Conductivity",
+      "value": 138.112,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:15",
+      "variableName": "Conductivity",
+      "value": 137.86,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:30",
+      "variableName": "Conductivity",
+      "value": 138.159,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:45",
+      "variableName": "Conductivity",
+      "value": 137.877,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:00",
+      "variableName": "Conductivity",
+      "value": 137.814,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:15",
+      "variableName": "Conductivity",
+      "value": 137.61,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:30",
+      "variableName": "Conductivity",
+      "value": 137.485,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:45",
+      "variableName": "Conductivity",
+      "value": 137.579,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:00",
+      "variableName": "Conductivity",
+      "value": 137.203,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:15",
+      "variableName": "Conductivity",
+      "value": 137.194,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:30",
+      "variableName": "Conductivity",
+      "value": 137.069,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:45",
+      "variableName": "Conductivity",
+      "value": 136.809,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:00",
+      "variableName": "Conductivity",
+      "value": 136.222,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:15",
+      "variableName": "Conductivity",
+      "value": 134.739,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:30",
+      "variableName": "Conductivity",
+      "value": 131.69,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:45",
+      "variableName": "Conductivity",
+      "value": 130.283,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:00",
+      "variableName": "Conductivity",
+      "value": 129.807,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:15",
+      "variableName": "Conductivity",
+      "value": 126.778,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:30",
+      "variableName": "Conductivity",
+      "value": 126.544,
+      "unitOfMeasure": "\u00b5S/cm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 12:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 134.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 134.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 133.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 133.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 134.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 131.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 131.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 129.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 131.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 131.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.9,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 129.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 129.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 131.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 130.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 129.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 129.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 127.9,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 129.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 129.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.9,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 128.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 127.9,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 127.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 127.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 127.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.6,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 126.0,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.4,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.3,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.2,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 125.1,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 124.7,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 123.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 120.9,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:45",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 119.8,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:00",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 119.5,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:15",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 116.9,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:30",
+      "variableName": "ElectricalConductivityUncorrected",
+      "value": 116.9,
+      "unitOfMeasure": "msm",
+      "qualityCode": "135"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 12:45",
+      "variableName": "FlowRate",
+      "value": 7787.525,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:00",
+      "variableName": "FlowRate",
+      "value": 7787.525,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:15",
+      "variableName": "FlowRate",
+      "value": 7781.977,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:30",
+      "variableName": "FlowRate",
+      "value": 7765.341,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:45",
+      "variableName": "FlowRate",
+      "value": 7759.798,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:00",
+      "variableName": "FlowRate",
+      "value": 7759.798,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:15",
+      "variableName": "FlowRate",
+      "value": 7748.714,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:30",
+      "variableName": "FlowRate",
+      "value": 7748.714,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:45",
+      "variableName": "FlowRate",
+      "value": 7743.174,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:00",
+      "variableName": "FlowRate",
+      "value": 7737.635,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:15",
+      "variableName": "FlowRate",
+      "value": 7737.635,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:30",
+      "variableName": "FlowRate",
+      "value": 7721.023,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:45",
+      "variableName": "FlowRate",
+      "value": 7709.954,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:00",
+      "variableName": "FlowRate",
+      "value": 7704.421,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:15",
+      "variableName": "FlowRate",
+      "value": 7698.89,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:30",
+      "variableName": "FlowRate",
+      "value": 7687.829,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:45",
+      "variableName": "FlowRate",
+      "value": 7687.829,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:00",
+      "variableName": "FlowRate",
+      "value": 7687.829,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:15",
+      "variableName": "FlowRate",
+      "value": 7671.246,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:30",
+      "variableName": "FlowRate",
+      "value": 7665.72,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:45",
+      "variableName": "FlowRate",
+      "value": 7660.195,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:00",
+      "variableName": "FlowRate",
+      "value": 7654.672,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:15",
+      "variableName": "FlowRate",
+      "value": 7649.149,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:30",
+      "variableName": "FlowRate",
+      "value": 7643.628,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:45",
+      "variableName": "FlowRate",
+      "value": 7643.628,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:00",
+      "variableName": "FlowRate",
+      "value": 7643.628,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:15",
+      "variableName": "FlowRate",
+      "value": 7627.069,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:30",
+      "variableName": "FlowRate",
+      "value": 7621.552,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:45",
+      "variableName": "FlowRate",
+      "value": 7621.552,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:00",
+      "variableName": "FlowRate",
+      "value": 7616.036,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:15",
+      "variableName": "FlowRate",
+      "value": 7616.036,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:30",
+      "variableName": "FlowRate",
+      "value": 7605.006,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:45",
+      "variableName": "FlowRate",
+      "value": 7599.493,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:00",
+      "variableName": "FlowRate",
+      "value": 7593.981,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:15",
+      "variableName": "FlowRate",
+      "value": 7588.47,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:30",
+      "variableName": "FlowRate",
+      "value": 7588.47,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:45",
+      "variableName": "FlowRate",
+      "value": 7582.96,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:00",
+      "variableName": "FlowRate",
+      "value": 7577.451,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:15",
+      "variableName": "FlowRate",
+      "value": 7571.943,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:30",
+      "variableName": "FlowRate",
+      "value": 7566.436,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:45",
+      "variableName": "FlowRate",
+      "value": 7571.943,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:00",
+      "variableName": "FlowRate",
+      "value": 7560.93,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:15",
+      "variableName": "FlowRate",
+      "value": 7555.426,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:30",
+      "variableName": "FlowRate",
+      "value": 7555.426,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:45",
+      "variableName": "FlowRate",
+      "value": 7549.922,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:00",
+      "variableName": "FlowRate",
+      "value": 7544.419,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:15",
+      "variableName": "FlowRate",
+      "value": 7538.918,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:30",
+      "variableName": "FlowRate",
+      "value": 7544.419,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:45",
+      "variableName": "FlowRate",
+      "value": 7538.918,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:00",
+      "variableName": "FlowRate",
+      "value": 7538.918,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:15",
+      "variableName": "FlowRate",
+      "value": 7527.917,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:30",
+      "variableName": "FlowRate",
+      "value": 7527.917,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:45",
+      "variableName": "FlowRate",
+      "value": 7516.922,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:00",
+      "variableName": "FlowRate",
+      "value": 7522.419,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:15",
+      "variableName": "FlowRate",
+      "value": 7511.425,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:30",
+      "variableName": "FlowRate",
+      "value": 7511.425,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:45",
+      "variableName": "FlowRate",
+      "value": 7511.425,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:00",
+      "variableName": "FlowRate",
+      "value": 7511.425,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:15",
+      "variableName": "FlowRate",
+      "value": 7511.425,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:30",
+      "variableName": "FlowRate",
+      "value": 7505.93,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:45",
+      "variableName": "FlowRate",
+      "value": 7500.436,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:00",
+      "variableName": "FlowRate",
+      "value": 7500.436,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:15",
+      "variableName": "FlowRate",
+      "value": 7494.942,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:30",
+      "variableName": "FlowRate",
+      "value": 7500.436,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:45",
+      "variableName": "FlowRate",
+      "value": 7500.436,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:00",
+      "variableName": "FlowRate",
+      "value": 7489.45,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:15",
+      "variableName": "FlowRate",
+      "value": 7483.959,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:30",
+      "variableName": "FlowRate",
+      "value": 7489.45,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:45",
+      "variableName": "FlowRate",
+      "value": 7483.959,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:00",
+      "variableName": "FlowRate",
+      "value": 7478.469,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:15",
+      "variableName": "FlowRate",
+      "value": 7472.98,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:30",
+      "variableName": "FlowRate",
+      "value": 7472.98,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:45",
+      "variableName": "FlowRate",
+      "value": 7467.492,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:00",
+      "variableName": "FlowRate",
+      "value": 7462.005,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:15",
+      "variableName": "FlowRate",
+      "value": 7462.005,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:30",
+      "variableName": "FlowRate",
+      "value": 7451.035,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:45",
+      "variableName": "FlowRate",
+      "value": 7451.035,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:00",
+      "variableName": "FlowRate",
+      "value": 7451.035,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:15",
+      "variableName": "FlowRate",
+      "value": 7451.035,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:30",
+      "variableName": "FlowRate",
+      "value": 7445.551,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:45",
+      "variableName": "FlowRate",
+      "value": 7440.068,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:00",
+      "variableName": "FlowRate",
+      "value": 7440.068,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:15",
+      "variableName": "FlowRate",
+      "value": 7440.068,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:30",
+      "variableName": "FlowRate",
+      "value": 7440.068,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:45",
+      "variableName": "FlowRate",
+      "value": 7445.551,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:00",
+      "variableName": "FlowRate",
+      "value": 7440.068,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:15",
+      "variableName": "FlowRate",
+      "value": 7451.035,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:30",
+      "variableName": "FlowRate",
+      "value": 7456.519,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:45",
+      "variableName": "FlowRate",
+      "value": 7445.551,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:00",
+      "variableName": "FlowRate",
+      "value": 7451.035,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:15",
+      "variableName": "FlowRate",
+      "value": 7445.551,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:30",
+      "variableName": "FlowRate",
+      "value": 7445.551,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:45",
+      "variableName": "FlowRate",
+      "value": 7445.551,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:00",
+      "variableName": "FlowRate",
+      "value": 7434.587,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:15",
+      "variableName": "FlowRate",
+      "value": 7434.587,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:30",
+      "variableName": "FlowRate",
+      "value": 7429.106,
+      "unitOfMeasure": "ML/day",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 12:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.901,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.901,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.9,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.897,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.896,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.896,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.894,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.894,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.893,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.892,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.892,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.889,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.887,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.886,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.885,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.883,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.883,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.883,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.88,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.879,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.878,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.877,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.876,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.875,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.875,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.875,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.872,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.871,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.871,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.87,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.87,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.868,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.867,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.866,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.865,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.865,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.864,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.863,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.862,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.861,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.862,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.86,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.859,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.859,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.858,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.857,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.856,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.857,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.856,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.856,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.854,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.854,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.852,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.853,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.851,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.851,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.851,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.851,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.851,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.85,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.849,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.849,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.848,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.849,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.849,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.847,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.846,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.847,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.846,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.845,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.844,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.844,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.843,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.842,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.842,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.84,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.84,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.84,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.84,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.839,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.838,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.838,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.838,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.838,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.839,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.838,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.84,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.841,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.839,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.84,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.839,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.839,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:45",
+      "variableName": "StreamWaterLevel",
+      "value": 1.839,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:00",
+      "variableName": "StreamWaterLevel",
+      "value": 1.837,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:15",
+      "variableName": "StreamWaterLevel",
+      "value": 1.837,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:30",
+      "variableName": "StreamWaterLevel",
+      "value": 1.836,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 12:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.951,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.951,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.95,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.947,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.946,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.946,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.944,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.944,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.943,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.942,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.942,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.939,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.937,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.936,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.935,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.933,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.933,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.933,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.93,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.929,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.928,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.927,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.926,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.925,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.925,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.925,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.922,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.921,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.921,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.92,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.92,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.918,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.917,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.916,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.915,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.915,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.914,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.913,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.912,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.911,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.912,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.91,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.909,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.909,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.908,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.907,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.906,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.907,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.906,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.906,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.904,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.904,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.902,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.903,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.901,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.901,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.901,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.901,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.901,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.9,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.899,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.899,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.898,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.899,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.899,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.897,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.896,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.897,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.896,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.895,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.894,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.894,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.893,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.892,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.892,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.89,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.89,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.89,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.89,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.889,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.888,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.888,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.888,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.888,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.889,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.888,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.89,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.891,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.889,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.89,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.889,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.889,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:45",
+      "variableName": "WaterLevelAHD",
+      "value": 171.889,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:00",
+      "variableName": "WaterLevelAHD",
+      "value": 171.887,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:15",
+      "variableName": "WaterLevelAHD",
+      "value": 171.887,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:30",
+      "variableName": "WaterLevelAHD",
+      "value": 171.886,
+      "unitOfMeasure": "m",
+      "qualityCode": "125"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 12:45",
+      "variableName": "WaterTemperature",
+      "value": 20.72,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:00",
+      "variableName": "WaterTemperature",
+      "value": 20.77,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:15",
+      "variableName": "WaterTemperature",
+      "value": 20.82,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:30",
+      "variableName": "WaterTemperature",
+      "value": 20.87,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 13:45",
+      "variableName": "WaterTemperature",
+      "value": 20.91,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:00",
+      "variableName": "WaterTemperature",
+      "value": 20.96,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:15",
+      "variableName": "WaterTemperature",
+      "value": 21.0,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:30",
+      "variableName": "WaterTemperature",
+      "value": 21.03,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 14:45",
+      "variableName": "WaterTemperature",
+      "value": 21.06,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:00",
+      "variableName": "WaterTemperature",
+      "value": 21.1,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:15",
+      "variableName": "WaterTemperature",
+      "value": 21.13,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:30",
+      "variableName": "WaterTemperature",
+      "value": 21.16,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 15:45",
+      "variableName": "WaterTemperature",
+      "value": 21.18,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:00",
+      "variableName": "WaterTemperature",
+      "value": 21.21,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:15",
+      "variableName": "WaterTemperature",
+      "value": 21.23,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:30",
+      "variableName": "WaterTemperature",
+      "value": 21.25,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 16:45",
+      "variableName": "WaterTemperature",
+      "value": 21.26,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:00",
+      "variableName": "WaterTemperature",
+      "value": 21.27,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:15",
+      "variableName": "WaterTemperature",
+      "value": 21.27,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:30",
+      "variableName": "WaterTemperature",
+      "value": 21.27,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 17:45",
+      "variableName": "WaterTemperature",
+      "value": 21.27,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:00",
+      "variableName": "WaterTemperature",
+      "value": 21.27,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:15",
+      "variableName": "WaterTemperature",
+      "value": 21.26,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:30",
+      "variableName": "WaterTemperature",
+      "value": 21.25,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 18:45",
+      "variableName": "WaterTemperature",
+      "value": 21.24,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:00",
+      "variableName": "WaterTemperature",
+      "value": 21.23,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:15",
+      "variableName": "WaterTemperature",
+      "value": 21.22,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:30",
+      "variableName": "WaterTemperature",
+      "value": 21.21,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 19:45",
+      "variableName": "WaterTemperature",
+      "value": 21.2,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:00",
+      "variableName": "WaterTemperature",
+      "value": 21.19,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:15",
+      "variableName": "WaterTemperature",
+      "value": 21.18,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:30",
+      "variableName": "WaterTemperature",
+      "value": 21.16,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 20:45",
+      "variableName": "WaterTemperature",
+      "value": 21.15,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:00",
+      "variableName": "WaterTemperature",
+      "value": 21.14,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:15",
+      "variableName": "WaterTemperature",
+      "value": 21.13,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:30",
+      "variableName": "WaterTemperature",
+      "value": 21.12,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 21:45",
+      "variableName": "WaterTemperature",
+      "value": 21.1,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:00",
+      "variableName": "WaterTemperature",
+      "value": 21.08,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:15",
+      "variableName": "WaterTemperature",
+      "value": 21.07,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:30",
+      "variableName": "WaterTemperature",
+      "value": 21.05,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 22:45",
+      "variableName": "WaterTemperature",
+      "value": 21.03,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:00",
+      "variableName": "WaterTemperature",
+      "value": 21.01,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:15",
+      "variableName": "WaterTemperature",
+      "value": 20.99,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:30",
+      "variableName": "WaterTemperature",
+      "value": 20.98,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "19-Feb-2025 23:45",
+      "variableName": "WaterTemperature",
+      "value": 20.96,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:00",
+      "variableName": "WaterTemperature",
+      "value": 20.94,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:15",
+      "variableName": "WaterTemperature",
+      "value": 20.93,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:30",
+      "variableName": "WaterTemperature",
+      "value": 20.91,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 00:45",
+      "variableName": "WaterTemperature",
+      "value": 20.9,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:00",
+      "variableName": "WaterTemperature",
+      "value": 20.88,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:15",
+      "variableName": "WaterTemperature",
+      "value": 20.86,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:30",
+      "variableName": "WaterTemperature",
+      "value": 20.84,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 01:45",
+      "variableName": "WaterTemperature",
+      "value": 20.82,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:00",
+      "variableName": "WaterTemperature",
+      "value": 20.8,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:15",
+      "variableName": "WaterTemperature",
+      "value": 20.78,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:30",
+      "variableName": "WaterTemperature",
+      "value": 20.76,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 02:45",
+      "variableName": "WaterTemperature",
+      "value": 20.74,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:00",
+      "variableName": "WaterTemperature",
+      "value": 20.73,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:15",
+      "variableName": "WaterTemperature",
+      "value": 20.71,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:30",
+      "variableName": "WaterTemperature",
+      "value": 20.68,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 03:45",
+      "variableName": "WaterTemperature",
+      "value": 20.66,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:00",
+      "variableName": "WaterTemperature",
+      "value": 20.64,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:15",
+      "variableName": "WaterTemperature",
+      "value": 20.62,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:30",
+      "variableName": "WaterTemperature",
+      "value": 20.6,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 04:45",
+      "variableName": "WaterTemperature",
+      "value": 20.57,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:00",
+      "variableName": "WaterTemperature",
+      "value": 20.55,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:15",
+      "variableName": "WaterTemperature",
+      "value": 20.53,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:30",
+      "variableName": "WaterTemperature",
+      "value": 20.51,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 05:45",
+      "variableName": "WaterTemperature",
+      "value": 20.48,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:00",
+      "variableName": "WaterTemperature",
+      "value": 20.46,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:15",
+      "variableName": "WaterTemperature",
+      "value": 20.44,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:30",
+      "variableName": "WaterTemperature",
+      "value": 20.42,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 06:45",
+      "variableName": "WaterTemperature",
+      "value": 20.4,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:00",
+      "variableName": "WaterTemperature",
+      "value": 20.38,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:15",
+      "variableName": "WaterTemperature",
+      "value": 20.37,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:30",
+      "variableName": "WaterTemperature",
+      "value": 20.36,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 07:45",
+      "variableName": "WaterTemperature",
+      "value": 20.35,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:00",
+      "variableName": "WaterTemperature",
+      "value": 20.35,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:15",
+      "variableName": "WaterTemperature",
+      "value": 20.36,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:30",
+      "variableName": "WaterTemperature",
+      "value": 20.37,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 08:45",
+      "variableName": "WaterTemperature",
+      "value": 20.39,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:00",
+      "variableName": "WaterTemperature",
+      "value": 20.41,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:15",
+      "variableName": "WaterTemperature",
+      "value": 20.44,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:30",
+      "variableName": "WaterTemperature",
+      "value": 20.48,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 09:45",
+      "variableName": "WaterTemperature",
+      "value": 20.52,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:00",
+      "variableName": "WaterTemperature",
+      "value": 20.57,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:15",
+      "variableName": "WaterTemperature",
+      "value": 20.61,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:30",
+      "variableName": "WaterTemperature",
+      "value": 20.66,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 10:45",
+      "variableName": "WaterTemperature",
+      "value": 20.72,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:00",
+      "variableName": "WaterTemperature",
+      "value": 20.78,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:15",
+      "variableName": "WaterTemperature",
+      "value": 20.84,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:30",
+      "variableName": "WaterTemperature",
+      "value": 20.91,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 11:45",
+      "variableName": "WaterTemperature",
+      "value": 20.98,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:00",
+      "variableName": "WaterTemperature",
+      "value": 21.03,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:15",
+      "variableName": "WaterTemperature",
+      "value": 21.1,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    },
+    {
+      "siteId": "410001",
+      "timeStamp": "20-Feb-2025 12:30",
+      "variableName": "WaterTemperature",
+      "value": 21.18,
+      "unitOfMeasure": "degrees Centigrade",
+      "qualityCode": "56"
+    }
+  ],
+  "latestRecords": [],
+  "qualities": {
+    "56": "Auto QC - Instrument not calibrated",
+    "125": "Auto QC - Passed",
+    "135": "Auto QC - Telemetry data where out of Calibration could not be determined"
+  },
+  "currentRecordCount": 576,
+  "firstPageUrl": "",
+  "previousPageUrl": "",
+  "nextPageUrl": "",
+  "lastPageUrl": "",
+  "requestId": "",
+  "responseMessage": "Request Successful",
+  "totalPages": 1,
+  "totalRecordCount": 576
+}

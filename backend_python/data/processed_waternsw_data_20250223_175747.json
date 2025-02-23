@@ -1,0 +1,486 @@
+{
+  "site_id": "410001",
+  "timeseries": [
+    {
+      "timestamp": "22-Feb-2025 00:00",
+      "waterLevel": 1.808,
+      "flowRate": 7276.082
+    },
+    {
+      "timestamp": "22-Feb-2025 00:15",
+      "waterLevel": 1.808,
+      "flowRate": 7276.082
+    },
+    {
+      "timestamp": "22-Feb-2025 00:30",
+      "waterLevel": null,
+      "flowRate": null
+    },
+    {
+      "timestamp": "22-Feb-2025 00:45",
+      "waterLevel": 1.809,
+      "flowRate": 7281.532
+    },
+    {
+      "timestamp": "22-Feb-2025 01:00",
+      "waterLevel": 1.807,
+      "flowRate": 7270.632
+    },
+    {
+      "timestamp": "22-Feb-2025 01:15",
+      "waterLevel": 1.808,
+      "flowRate": 7276.082
+    },
+    {
+      "timestamp": "22-Feb-2025 01:30",
+      "waterLevel": 1.806,
+      "flowRate": 7265.183
+    },
+    {
+      "timestamp": "22-Feb-2025 01:45",
+      "waterLevel": 1.808,
+      "flowRate": 7276.082
+    },
+    {
+      "timestamp": "22-Feb-2025 02:00",
+      "waterLevel": 1.806,
+      "flowRate": 7265.183
+    },
+    {
+      "timestamp": "22-Feb-2025 02:15",
+      "waterLevel": 1.806,
+      "flowRate": 7265.183
+    },
+    {
+      "timestamp": "22-Feb-2025 02:30",
+      "waterLevel": 1.808,
+      "flowRate": 7276.082
+    },
+    {
+      "timestamp": "22-Feb-2025 02:45",
+      "waterLevel": 1.807,
+      "flowRate": 7270.632
+    },
+    {
+      "timestamp": "22-Feb-2025 03:00",
+      "waterLevel": 1.806,
+      "flowRate": 7265.183
+    },
+    {
+      "timestamp": "22-Feb-2025 03:15",
+      "waterLevel": 1.807,
+      "flowRate": 7270.632
+    },
+    {
+      "timestamp": "22-Feb-2025 03:30",
+      "waterLevel": 1.806,
+      "flowRate": 7265.183
+    },
+    {
+      "timestamp": "22-Feb-2025 03:45",
+      "waterLevel": 1.807,
+      "flowRate": 7270.632
+    },
+    {
+      "timestamp": "22-Feb-2025 04:00",
+      "waterLevel": 1.805,
+      "flowRate": 7259.736
+    },
+    {
+      "timestamp": "22-Feb-2025 04:15",
+      "waterLevel": 1.806,
+      "flowRate": 7265.183
+    },
+    {
+      "timestamp": "22-Feb-2025 04:30",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 04:45",
+      "waterLevel": 1.805,
+      "flowRate": 7259.736
+    },
+    {
+      "timestamp": "22-Feb-2025 05:00",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 05:15",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 05:30",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 05:45",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 06:00",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 06:15",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 06:30",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 06:45",
+      "waterLevel": 1.802,
+      "flowRate": 7243.399
+    },
+    {
+      "timestamp": "22-Feb-2025 07:00",
+      "waterLevel": 1.803,
+      "flowRate": 7248.844
+    },
+    {
+      "timestamp": "22-Feb-2025 07:15",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 07:30",
+      "waterLevel": 1.804,
+      "flowRate": 7254.289
+    },
+    {
+      "timestamp": "22-Feb-2025 07:45",
+      "waterLevel": 1.802,
+      "flowRate": 7243.399
+    },
+    {
+      "timestamp": "22-Feb-2025 08:00",
+      "waterLevel": 1.801,
+      "flowRate": 7237.956
+    },
+    {
+      "timestamp": "22-Feb-2025 08:15",
+      "waterLevel": 1.803,
+      "flowRate": 7248.844
+    },
+    {
+      "timestamp": "22-Feb-2025 08:30",
+      "waterLevel": 1.802,
+      "flowRate": 7243.399
+    },
+    {
+      "timestamp": "22-Feb-2025 08:45",
+      "waterLevel": 1.801,
+      "flowRate": 7237.956
+    },
+    {
+      "timestamp": "22-Feb-2025 09:00",
+      "waterLevel": 1.801,
+      "flowRate": 7237.956
+    },
+    {
+      "timestamp": "22-Feb-2025 09:15",
+      "waterLevel": 1.801,
+      "flowRate": 7237.956
+    },
+    {
+      "timestamp": "22-Feb-2025 09:30",
+      "waterLevel": 1.8,
+      "flowRate": 7232.514
+    },
+    {
+      "timestamp": "22-Feb-2025 09:45",
+      "waterLevel": 1.8,
+      "flowRate": 7232.514
+    },
+    {
+      "timestamp": "22-Feb-2025 10:00",
+      "waterLevel": 1.799,
+      "flowRate": 7227.072
+    },
+    {
+      "timestamp": "22-Feb-2025 10:15",
+      "waterLevel": 1.801,
+      "flowRate": 7237.956
+    },
+    {
+      "timestamp": "22-Feb-2025 10:30",
+      "waterLevel": 1.802,
+      "flowRate": 7243.399
+    },
+    {
+      "timestamp": "22-Feb-2025 10:45",
+      "waterLevel": 1.8,
+      "flowRate": 7232.514
+    },
+    {
+      "timestamp": "22-Feb-2025 11:00",
+      "waterLevel": 1.799,
+      "flowRate": 7227.072
+    },
+    {
+      "timestamp": "22-Feb-2025 11:15",
+      "waterLevel": 1.799,
+      "flowRate": 7227.072
+    },
+    {
+      "timestamp": "22-Feb-2025 11:30",
+      "waterLevel": 1.798,
+      "flowRate": 7221.632
+    },
+    {
+      "timestamp": "22-Feb-2025 11:45",
+      "waterLevel": 1.799,
+      "flowRate": 7227.072
+    },
+    {
+      "timestamp": "22-Feb-2025 12:00",
+      "waterLevel": 1.798,
+      "flowRate": 7221.632
+    },
+    {
+      "timestamp": "22-Feb-2025 12:15",
+      "waterLevel": 1.798,
+      "flowRate": 7221.632
+    },
+    {
+      "timestamp": "22-Feb-2025 12:30",
+      "waterLevel": 1.797,
+      "flowRate": 7216.193
+    },
+    {
+      "timestamp": "22-Feb-2025 12:45",
+      "waterLevel": 1.797,
+      "flowRate": 7216.193
+    },
+    {
+      "timestamp": "22-Feb-2025 13:00",
+      "waterLevel": 1.797,
+      "flowRate": 7216.193
+    },
+    {
+      "timestamp": "22-Feb-2025 13:15",
+      "waterLevel": 1.797,
+      "flowRate": 7216.193
+    },
+    {
+      "timestamp": "22-Feb-2025 13:30",
+      "waterLevel": 1.796,
+      "flowRate": 7210.755
+    },
+    {
+      "timestamp": "22-Feb-2025 13:45",
+      "waterLevel": 1.797,
+      "flowRate": 7216.193
+    },
+    {
+      "timestamp": "22-Feb-2025 14:00",
+      "waterLevel": 1.797,
+      "flowRate": 7216.193
+    },
+    {
+      "timestamp": "22-Feb-2025 14:15",
+      "waterLevel": 1.795,
+      "flowRate": 7205.318
+    },
+    {
+      "timestamp": "22-Feb-2025 14:30",
+      "waterLevel": 1.796,
+      "flowRate": 7210.755
+    },
+    {
+      "timestamp": "22-Feb-2025 14:45",
+      "waterLevel": 1.795,
+      "flowRate": 7205.318
+    },
+    {
+      "timestamp": "22-Feb-2025 15:00",
+      "waterLevel": 1.795,
+      "flowRate": 7205.318
+    },
+    {
+      "timestamp": "22-Feb-2025 15:15",
+      "waterLevel": 1.794,
+      "flowRate": 7199.883
+    },
+    {
+      "timestamp": "22-Feb-2025 15:30",
+      "waterLevel": 1.793,
+      "flowRate": 7194.448
+    },
+    {
+      "timestamp": "22-Feb-2025 15:45",
+      "waterLevel": 1.794,
+      "flowRate": 7199.883
+    },
+    {
+      "timestamp": "22-Feb-2025 16:00",
+      "waterLevel": 1.794,
+      "flowRate": 7199.883
+    },
+    {
+      "timestamp": "22-Feb-2025 16:15",
+      "waterLevel": 1.794,
+      "flowRate": 7199.883
+    },
+    {
+      "timestamp": "22-Feb-2025 16:30",
+      "waterLevel": 1.794,
+      "flowRate": 7199.883
+    },
+    {
+      "timestamp": "22-Feb-2025 16:45",
+      "waterLevel": 1.793,
+      "flowRate": 7194.448
+    },
+    {
+      "timestamp": "22-Feb-2025 17:00",
+      "waterLevel": 1.793,
+      "flowRate": 7194.448
+    },
+    {
+      "timestamp": "22-Feb-2025 17:15",
+      "waterLevel": 1.792,
+      "flowRate": 7189.014
+    },
+    {
+      "timestamp": "22-Feb-2025 17:30",
+      "waterLevel": 1.793,
+      "flowRate": 7194.448
+    },
+    {
+      "timestamp": "22-Feb-2025 17:45",
+      "waterLevel": 1.791,
+      "flowRate": 7183.582
+    },
+    {
+      "timestamp": "22-Feb-2025 18:00",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 18:15",
+      "waterLevel": 1.792,
+      "flowRate": 7189.014
+    },
+    {
+      "timestamp": "22-Feb-2025 18:30",
+      "waterLevel": 1.792,
+      "flowRate": 7189.014
+    },
+    {
+      "timestamp": "22-Feb-2025 18:45",
+      "waterLevel": 1.792,
+      "flowRate": 7189.014
+    },
+    {
+      "timestamp": "22-Feb-2025 19:00",
+      "waterLevel": 1.791,
+      "flowRate": 7183.582
+    },
+    {
+      "timestamp": "22-Feb-2025 19:15",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 19:30",
+      "waterLevel": 1.792,
+      "flowRate": 7189.014
+    },
+    {
+      "timestamp": "22-Feb-2025 19:45",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 20:00",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 20:15",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 20:30",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 20:45",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 21:00",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 21:15",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 21:30",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 21:45",
+      "waterLevel": 1.789,
+      "flowRate": 7172.72
+    },
+    {
+      "timestamp": "22-Feb-2025 22:00",
+      "waterLevel": 1.789,
+      "flowRate": 7172.72
+    },
+    {
+      "timestamp": "22-Feb-2025 22:15",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 22:30",
+      "waterLevel": 1.788,
+      "flowRate": 7167.29
+    },
+    {
+      "timestamp": "22-Feb-2025 22:45",
+      "waterLevel": 1.789,
+      "flowRate": 7172.72
+    },
+    {
+      "timestamp": "22-Feb-2025 23:00",
+      "waterLevel": 1.789,
+      "flowRate": 7172.72
+    },
+    {
+      "timestamp": "22-Feb-2025 23:15",
+      "waterLevel": 1.789,
+      "flowRate": 7172.72
+    },
+    {
+      "timestamp": "22-Feb-2025 23:30",
+      "waterLevel": 1.79,
+      "flowRate": 7178.15
+    },
+    {
+      "timestamp": "22-Feb-2025 23:45",
+      "waterLevel": 1.789,
+      "flowRate": 7172.72
+    }
+  ],
+  "total_records": 96
+}
