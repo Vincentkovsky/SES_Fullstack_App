@@ -191,13 +191,14 @@ class SurfaceWaterRequestSchema(Schema):
     site_id = fields.String(required=False, default="410001")
     start_date = fields.String(required=True)
     end_date = fields.String(required=True)
-    variable = fields.String(required=False, default="streamwaterlevel,flowrate")
+    variable = fields.String(required=True, default="StreamWaterLevel")
 
 def fetch_surface_water_data(site_id: str = "410001", 
                            start_date: str = "2024-03-24 00:00",
                            end_date: str = "2024-03-24 01:00",
                            frequency: str = "Instantaneous",
-                           page_number: int = 1) -> Dict:
+                           page_number: int = 1,
+                           variable: str = "StreamWaterLevel") -> Dict:
     """
     Fetch surface water data from WaterNSW API
     
@@ -216,7 +217,8 @@ def fetch_surface_water_data(site_id: str = "410001",
         'dataType': 'AutoQC',
         'pageNumber': page_number,
         'startDate': start_date,
-        'endDate': end_date
+        'endDate': end_date,
+        'variable': variable
     }
     
     
