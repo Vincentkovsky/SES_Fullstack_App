@@ -1,6 +1,17 @@
-export const fetchTilesList = async (): Promise<{ message: string[] }> => {
-    const response = await fetch("http://localhost:3000/api/tilesList");
-    return response.json();
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:3000/api';
+
+export const fetchTilesList = async (isSteedMode: boolean = false) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/tilesList`, {
+      params: { isSteedMode }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tiles list:', error);
+    throw error;
+  }
 };
 
 export const runInference = async (): Promise<{ message: string }> => {
@@ -19,25 +30,18 @@ export const runInference = async (): Promise<{ message: string }> => {
     return response.json();
 };
 
-export const fetchTileByCoordinates = async (
-    timestamp: string,
-    z: number,
-    x: number,
-    y: number
-  ): Promise<Blob> => {
-    const url = `http://localhost:3000/api/tiles/${timestamp}/${z}/${x}/${y}`; // Replace with your API URL
-  
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch tile: ${response.statusText}`);
-      }
-      return await response.blob(); // Return the tile as a Blob
-    } catch (error) {
-      console.error("Error fetching tile:", error);
-      throw error; // Rethrow the error for handling by the caller
-    }
-  };
+export const fetchTileByCoordinates = async (timestamp: string, z: string, x: string, y: string, isSteedMode: boolean = false) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/tiles/${timestamp}/${z}/${x}/${y}`, {
+      params: { isSteedMode },
+      responseType: 'blob'
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tile:', error);
+    throw error;
+  }
+};
 
 export interface GaugingData {
   site_id: string;

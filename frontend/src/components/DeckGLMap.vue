@@ -8,6 +8,10 @@
       @start-inference="handleInferenceStart"
     />
     <div ref="mapContainer" style="width: 100%; height: 100vh;"></div>
+    <MapModeSwitch
+      v-model="isSteedMode"
+      class="mode-switch-container"
+    />
     <div class="map-controls">
       <MapZoomControls
         class="panel-button"
@@ -137,6 +141,7 @@ import MapLayerControls from './MapLayerControls.vue';
 import MapSettingsControl from './MapSettingsControl.vue';
 import MapBasemapControl from './MapBasemapControl.vue';
 import SettingsModal from './SettingsModal.vue';
+import MapModeSwitch from './MapModeSwitch.vue';
 
 // State
 const mapContainer = ref<HTMLElement | null>(null);
@@ -145,6 +150,7 @@ const isPlaying = ref(true);
 const playbackSpeed = ref(1);
 const currentTimestamp = ref('');
 const progress = ref(0);
+const isSteedMode = ref(false);
 let map: mapboxgl.Map | null = null;
 
 // Layers
@@ -270,7 +276,7 @@ const scaleInfo = computed(() => {
 const createTileLayer = (timestamp: string) => {
   return new TileLayer({
     id: `TileLayer-${timestamp}`,
-    data: `http://localhost:3000/api/tiles/${timestamp}/{z}/{x}/{y}`,
+    data: `http://localhost:3000/api/tiles/${timestamp}/{z}/{x}/{y}?isSteedMode=${isSteedMode.value}`,
     maxZoom: 14,
     minZoom: 8,
     tileSize: 256,
@@ -559,7 +565,7 @@ const handleInference = async () => {
 onMounted(async () => {
   try {
     const map = await initializeMap();
-    const response = await fetchTilesList();
+    const response = await fetchTilesList(isSteedMode.value);
     timestamps = response.message;
 
     if (timestamps.length === 0) {
@@ -593,6 +599,29 @@ watch(playbackSpeed, (newSpeed) => {
     startAnimation();
   }
 }, { flush: 'sync' });
+
+watch(isSteedMode, async (newMode) => {
+  try {
+    // Refresh tiles list when mode changes
+    const response = await fetchTilesList(newMode);
+    timestamps = response.message;
+    
+    if (timestamps.length === 0) {
+      throw new Error('No timestamps available');
+    }
+
+    // Reset animation
+    currentTimeIndex = 0;
+    currentTimestamp.value = timestamps[0];
+    updateLayers(0);
+    
+    if (isPlaying.value) {
+      startAnimation();
+    }
+  } catch (error) {
+    console.error('Error refreshing tiles after mode change:', error);
+  }
+});
 
 const toggleSettings = () => {
   isSettingsOpen.value = !isSettingsOpen.value;
@@ -829,10 +858,10 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
   position: absolute;
   bottom: 80px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.8);
   padding: 12px;
   border-radius: 8px;
-  color: white;
+  color: black;
   z-index: 1000;
   backdrop-filter: blur(4px);
 }
@@ -842,6 +871,7 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
   font-weight: 500;
   margin-bottom: 8px;
   text-align: center;
+  color: black;
 }
 
 .legend-gradient {
@@ -875,6 +905,7 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
   font-size: 0.8em;
   font-weight: 500;
   padding: 4px 0;
+  color: black;
 }
 
 .gradient-labels span {
@@ -891,6 +922,13 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
 .basemap-control-container {
   position: absolute;
   bottom: 80px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.mode-switch-container {
+  position: absolute;
+  top: 20px;
   left: 20px;
   z-index: 1000;
 }

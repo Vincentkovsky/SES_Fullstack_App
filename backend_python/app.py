@@ -29,8 +29,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Update the tiles path constant at the top of the file
+# Update the tiles path constants at the top of the file
 TILES_BASE_PATH = "/projects/TCCTVS/FSI/cnnModel/inference"
+LOCAL_TILES_PATH = os.path.join(os.path.dirname(__file__), "data/3di_res/timeseries_tiles")
 
 def execute_inference_script() -> Tuple[Dict[str, str], int]:
     """Execute inference script and return results with timestamp"""
@@ -97,41 +98,42 @@ def run_inference():
 def test():
     return jsonify({"message": "Hello, World!"}), 200
 
-# 获取 timeseries_tiles 文件夹下的所有子文件夹名
 @app.route('/api/tilesList', methods=['GET'])
 def get_tiles_list():
     try:
-        # First check the inference output directory
-        inference_dirs = sorted([
-            d for d in os.listdir(TILES_BASE_PATH)
-            if os.path.isdir(os.path.join(TILES_BASE_PATH, d))
-        ], reverse=True)  # Sort in reverse to get newest first
+        is_steed_mode = request.args.get('isSteedMode', 'false').lower() == 'true'
         
-
-        print(inference_dirs)
-        if not inference_dirs:
-            # Fallback to default tiles directory if no inference outputs
-            fallback_path = os.path.join(os.path.dirname(__file__), "data/3di_res/timeseries_tiles")
-            if os.path.exists(fallback_path):
-                directories = sorted(
-                    name for name in os.listdir(fallback_path)
-                    if os.path.isdir(os.path.join(fallback_path, name))
-                )
-                return jsonify({"message": directories}), 200
-            return jsonify({"error": "No tiles available"}), 404
-
-        # Get the latest inference directory
-        latest_inference = inference_dirs[1]
-        tiles_path = os.path.join(TILES_BASE_PATH, latest_inference, f"timeseries_tiles_{latest_inference}")
-        
-        if not os.path.exists(tiles_path):
-            return jsonify({"error": "Tiles not yet generated"}), 404
+        if is_steed_mode:
+            # STEED mode: Use inference output directory
+            inference_dirs = sorted([
+                d for d in os.listdir(TILES_BASE_PATH)
+                if os.path.isdir(os.path.join(TILES_BASE_PATH, d))
+            ], reverse=True)  # Sort in reverse to get newest first
             
-        # List all timestamps in the tiles directory
-        timestamps = sorted(
-            name for name in os.listdir(tiles_path)
-            if os.path.isdir(os.path.join(tiles_path, name))
-        )
+            if not inference_dirs:
+                return jsonify({"error": "No tiles available in STEED mode"}), 404
+
+            # Get the latest inference directory
+            latest_inference = inference_dirs[1]
+            tiles_path = os.path.join(TILES_BASE_PATH, latest_inference, f"timeseries_tiles_{latest_inference}")
+            
+            if not os.path.exists(tiles_path):
+                return jsonify({"error": "Tiles not yet generated in STEED mode"}), 404
+                
+            # List all timestamps in the tiles directory
+            timestamps = sorted(
+                name for name in os.listdir(tiles_path)
+                if os.path.isdir(os.path.join(tiles_path, name))
+            )
+        else:
+            # Local mode: Use local tiles directory
+            if not os.path.exists(LOCAL_TILES_PATH):
+                return jsonify({"error": "No tiles available in local mode"}), 404
+                
+            timestamps = sorted(
+                name for name in os.listdir(LOCAL_TILES_PATH)
+                if os.path.isdir(os.path.join(LOCAL_TILES_PATH, name))
+            )
         
         return jsonify({"message": timestamps}), 200
         
@@ -139,22 +141,38 @@ def get_tiles_list():
         logger.error(f"Error reading tiles directory: {error}")
         return jsonify({"error": "Unable to retrieve tiles list"}), 500
 
-# 根据时间戳和坐标获取 tile
 @app.route('/api/tiles/<timestamp>/<z>/<x>/<y>', methods=['GET'])
 def get_tile_by_coordinates(timestamp, z, x, y):
     try:
-        # First try to get tile from latest inference output
-        inference_dirs = sorted([
-            d for d in os.listdir(TILES_BASE_PATH)
-            if os.path.isdir(os.path.join(TILES_BASE_PATH, d))
-        ], reverse=True)
+        is_steed_mode = request.args.get('isSteedMode', 'false').lower() == 'true'
         
-        if inference_dirs:
-            latest_inference = inference_dirs[0]
+        if is_steed_mode:
+            # STEED mode: Use inference output directory
+            inference_dirs = sorted([
+                d for d in os.listdir(TILES_BASE_PATH)
+                if os.path.isdir(os.path.join(TILES_BASE_PATH, d))
+            ], reverse=True)
+            
+            if inference_dirs:
+                latest_inference = inference_dirs[0]
+                tile_path = os.path.join(
+                    TILES_BASE_PATH,
+                    latest_inference,
+                    f"timeseries_tiles_{latest_inference}",
+                    timestamp,
+                    z,
+                    x,
+                    f"{y}.png"
+                )
+                
+                if os.path.exists(tile_path):
+                    return send_file(tile_path), 200
+            
+            return jsonify({"error": "Tile not found in STEED mode"}), 404
+        else:
+            # Local mode: Use local tiles directory
             tile_path = os.path.join(
-                TILES_BASE_PATH,
-                latest_inference,
-                f"timeseries_tiles_{latest_inference}",
+                LOCAL_TILES_PATH,
                 timestamp,
                 z,
                 x,
@@ -163,18 +181,9 @@ def get_tile_by_coordinates(timestamp, z, x, y):
             
             if os.path.exists(tile_path):
                 return send_file(tile_path), 200
-        
-        # Fallback to default tiles directory
-        fallback_path = os.path.join(
-            os.path.dirname(__file__),
-            f"data/3di_res/timeseries_tiles/{timestamp}/{z}/{x}/{y}.png"
-        )
-        
-        if os.path.exists(fallback_path):
-            return send_file(fallback_path), 200
+                
+            return jsonify({"error": "Tile not found in local mode"}), 404
             
-        return jsonify({"error": "Tile not found"}), 404
-        
     except Exception as error:
         logger.error(f"Error serving tile: {error}")
         return jsonify({"error": "Unable to retrieve tile"}), 500
