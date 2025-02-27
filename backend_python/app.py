@@ -55,8 +55,9 @@ def execute_inference_script() -> Tuple[Dict[str, str], int]:
                 **os.environ,
                 'START_TMP': start_tmp  # Pass as environment variable
             },
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,  # Use this instead of text=True
             shell=True  # Enable shell to modify the script inline
         )
         
@@ -67,7 +68,7 @@ def execute_inference_script() -> Tuple[Dict[str, str], int]:
                 "output": result.stdout
             }, 200
         else:
-            logger.error(f"Inference script failed with return code {result.returncode}")
+            logger.error(f"Inference script failed with return code {result.returncode} {result.stderr}")
             return {
                 "error": "Inference script execution failed",
                 "details": result.stderr
