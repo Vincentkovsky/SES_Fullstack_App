@@ -97,7 +97,7 @@ def test():
 # 获取 timeseries_tiles 文件夹下的所有子文件夹名
 @app.route('/api/tilesList', methods=['GET'])
 def get_tiles_list():
-    tiles_path = os.path.join(os.path.dirname(__file__), "data/3di_res/timeseries_tiles")
+    tiles_path = os.path.join(os.path.dirname(__file__), "data/3di_res/timeseries_tiles_20250218_044556")
     try:
         # 列出所有子文件夹并按字母顺序排序
         directories = sorted(
@@ -114,7 +114,7 @@ def get_tiles_list():
 def get_tile_by_coordinates(timestamp, z, x, y):
     tile_path = os.path.join(
         os.path.dirname(__file__),
-        f"data/3di_res/timeseries_tiles/{timestamp}/{z}/{x}/{y}.png"
+        f"data/3di_res/timeseries_tiles_20250218_044556/{timestamp}/{z}/{x}/{y}.png"
     )
     try:
         if os.path.exists(tile_path):
