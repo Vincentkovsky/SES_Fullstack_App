@@ -49,8 +49,8 @@ Thumbs.db
 
 
 #large files and other tedious files
-timeseries_tiles/
-**/timeseries_tiles/
+timeseries_tiles*/
+**/timeseries_tiles*/
 *.nc
 *.zip
 *.tif
