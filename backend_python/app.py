@@ -53,7 +53,7 @@ def execute_inference_script() -> Tuple[Dict[str, str], int]:
             [script_path],
             env={
                 **os.environ,
-                'START_TMP': start_tmp  # Pass as environment variable
+                'start_tmp': start_tmp  # Pass as environment variable
             },
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -115,7 +115,7 @@ def get_tiles_list():
                 return jsonify({"error": "No tiles available in STEED mode"}), 404
 
             # Get the latest inference directory
-            latest_inference = inference_dirs[1]
+            latest_inference = inference_dirs[-1]
             tiles_path = os.path.join(TILES_BASE_PATH, latest_inference, f"timeseries_tiles_{latest_inference}")
             
             if not os.path.exists(tiles_path):
@@ -146,6 +146,7 @@ def get_tiles_list():
 def get_tile_by_coordinates(timestamp, z, x, y):
     try:
         is_steed_mode = request.args.get('isSteedMode', 'false').lower() == 'true'
+
         
         if is_steed_mode:
             # STEED mode: Use inference output directory
@@ -155,7 +156,7 @@ def get_tile_by_coordinates(timestamp, z, x, y):
             ], reverse=True)
             
             if inference_dirs:
-                latest_inference = inference_dirs[0]
+                latest_inference = inference_dirs[-1]
                 tile_path = os.path.join(
                     TILES_BASE_PATH,
                     latest_inference,
@@ -165,7 +166,9 @@ def get_tile_by_coordinates(timestamp, z, x, y):
                     x,
                     f"{y}.png"
                 )
-                
+
+                print("tile_path:", tile_path)
+
                 if os.path.exists(tile_path):
                     return send_file(tile_path), 200
             
@@ -179,6 +182,8 @@ def get_tile_by_coordinates(timestamp, z, x, y):
                 x,
                 f"{y}.png"
             )
+
+            print("tile_path:", tile_path)
             
             if os.path.exists(tile_path):
                 return send_file(tile_path), 200

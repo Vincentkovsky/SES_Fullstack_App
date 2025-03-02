@@ -539,27 +539,6 @@ const setPlayback = (playing: boolean, speed: number) => {
   }
 };
 
-// Update the runInference method
-const handleInference = async () => {
-  try {
-    isInferenceRunning.value = true;
-    await runInference();
-    console.log('Inference completed successfully');
-    
-    // Refresh the tiles list after successful inference
-    const newTilesResponse = await fetchTilesList();
-    timestamps = newTilesResponse.message;
-    
-    // Optionally restart animation with new timestamps
-    if (isPlaying.value) {
-      startAnimation();
-    }
-  } catch (error) {
-    console.error('Error running inference:', error);
-  } finally {
-    isInferenceRunning.value = false;
-  }
-};
 
 // Lifecycle
 onMounted(async () => {
@@ -604,6 +583,7 @@ watch(isSteedMode, async (newMode) => {
   try {
     // Refresh tiles list when mode changes
     const response = await fetchTilesList(newMode);
+    console.log("response", response);
     timestamps = response.message;
     
     if (timestamps.length === 0) {
@@ -638,7 +618,7 @@ const handleSettingsUpdate = (newSettings: {
   
   // Update map style
   toggleBasemap(newSettings.mapStyle === 'satellite');
-  
+                                                                
   // Update UI visibility
   document.querySelector('.legend')?.classList.toggle('hidden', !newSettings.showLegend);
   document.querySelector('.coordinates')?.classList.toggle('hidden', !newSettings.showCoordinates);
@@ -649,12 +629,15 @@ const handleInferenceStart = async (inferenceSettings: {
   window: string;
 }) => {
   try {
+    console.log('Inference Start');
     isInferenceRunning.value = true;
     await runInference();
     console.log('Inference completed successfully');
     
     // Refresh the tiles list after successful inference
     const newTilesResponse = await fetchTilesList();
+
+    console.log(newTilesResponse);
     timestamps = newTilesResponse.message;
     
     // Optionally restart animation with new timestamps
