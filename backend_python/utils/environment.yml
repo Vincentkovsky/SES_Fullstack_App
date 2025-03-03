@@ -1,0 +1,15 @@
+name: geotiff_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - rasterio
+  - numpy
+  - scipy
+  - pip
+  - pip:
+    - APScheduler>=3.10.0
+    - tqdm>=4.66.0
+    - requests>=2.31.0
+    - python-dateutil>=2.8.2 

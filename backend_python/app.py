@@ -35,7 +35,8 @@ LOCAL_TILES_PATH = os.path.join(os.path.dirname(__file__), "data/3di_res/timeser
 
 def execute_inference_script() -> Tuple[Dict[str, str], int]:
     """Execute inference script and return results with timestamp"""
-    script_path = "/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh"
+    # script_path = "/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh"
+    script_path = "/Users/vincentjin/Desktop/SES/cnnModel/run_inference_w.sh"
     
     if not os.path.exists(script_path):
         logger.error(f"Inference script not found at: {script_path}")

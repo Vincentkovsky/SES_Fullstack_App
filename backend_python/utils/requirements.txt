@@ -1,0 +1,8 @@
+APScheduler>=3.10.0
+tqdm>=4.66.0
+requests>=2.31.0
+python-dateutil>=2.8.2
+pyproj>=3.6.0
+netCDF4>=1.6.0
+numpy>=1.26.0
+cftime>=1.6.0 

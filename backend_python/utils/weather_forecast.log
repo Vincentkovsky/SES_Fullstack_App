@@ -1,0 +1,49 @@
+2025-03-02 20:53:19,441 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-03-02 20:53:19,441 - __main__ - INFO - Starting scheduler...
+2025-03-02 20:53:19,441 - apscheduler.scheduler - INFO - Added job "Collect weather forecast data" to job store "default"
+2025-03-02 20:53:19,441 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-02 20:55:04,046 - __main__ - INFO - Scheduler stopped by user
+2025-03-02 20:55:05,820 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-03-02 20:55:05,820 - __main__ - INFO - Starting scheduler...
+2025-03-02 20:55:05,820 - apscheduler.scheduler - INFO - Added job "Collect weather forecast data" to job store "default"
+2025-03-02 20:55:05,820 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-02 20:56:23,954 - __main__ - INFO - Scheduler stopped by user
+2025-03-02 20:56:34,342 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-03-02 20:56:34,342 - __main__ - INFO - Starting scheduler...
+2025-03-02 20:56:34,342 - apscheduler.scheduler - INFO - Added job "Collect weather forecast data" to job store "default"
+2025-03-02 20:56:34,342 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-02 20:57:00,006 - apscheduler.executors.default - INFO - Running job "Collect weather forecast data (trigger: cron[hour='9,14,18,20', minute='57'], next run at: 2025-03-02 20:57:00 CST)" (scheduled at 2025-03-02 20:57:00+08:00)
+2025-03-02 20:57:00,007 - __main__ - INFO - Created directory: rainfall_forecast_json
+2025-03-02 20:57:04,031 - __main__ - ERROR - Error in collect_weather_forecast: No module named 'cftime'
+2025-03-02 20:57:04,031 - apscheduler.executors.default - INFO - Job "Collect weather forecast data (trigger: cron[hour='9,14,18,20', minute='57'], next run at: 2025-03-03 09:57:00 CST)" executed successfully
+2025-03-02 21:01:14,111 - __main__ - INFO - Scheduler stopped by user
+2025-03-02 21:01:16,862 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-03-02 21:01:16,862 - __main__ - INFO - Starting scheduler...
+2025-03-02 21:01:16,862 - apscheduler.scheduler - INFO - Added job "Collect weather forecast data" to job store "default"
+2025-03-02 21:01:16,862 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-02 21:02:00,005 - apscheduler.executors.default - INFO - Running job "Collect weather forecast data (trigger: cron[hour='9,14,18,21', minute='2'], next run at: 2025-03-02 21:02:00 CST)" (scheduled at 2025-03-02 21:02:00+08:00)
+2025-03-02 21:02:00,043 - __main__ - ERROR - Error in collect_weather_forecast: [Errno 2] No such file or directory: '/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/results_3di.nc'
+2025-03-02 21:02:00,043 - apscheduler.executors.default - INFO - Job "Collect weather forecast data (trigger: cron[hour='9,14,18,21', minute='2'], next run at: 2025-03-03 09:02:00 CST)" executed successfully
+2025-03-02 21:08:26,830 - __main__ - INFO - Scheduler stopped by user
+2025-03-02 21:08:27,982 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-03-02 21:08:27,982 - __main__ - INFO - Starting scheduler...
+2025-03-02 21:08:27,982 - apscheduler.scheduler - INFO - Added job "Collect weather forecast data" to job store "default"
+2025-03-02 21:08:27,982 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-02 21:09:00,006 - apscheduler.executors.default - INFO - Running job "Collect weather forecast data (trigger: cron[hour='9,14,18,21', minute='9'], next run at: 2025-03-02 21:09:00 CST)" (scheduled at 2025-03-02 21:09:00+08:00)
+2025-03-02 21:14:00,555 - __main__ - INFO - Successfully saved weather forecast data to rainfall_forecast_json/20250302-210900.json
+2025-03-02 21:14:00,564 - apscheduler.executors.default - INFO - Job "Collect weather forecast data (trigger: cron[hour='9,14,18,21', minute='9'], next run at: 2025-03-03 09:09:00 CST)" executed successfully
+2025-03-02 22:02:05,173 - __main__ - INFO - Scheduler stopped by user
+2025-03-02 22:02:06,796 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-03-02 22:02:06,796 - __main__ - INFO - Starting scheduler...
+2025-03-02 22:02:06,808 - __main__ - ERROR - Error in collect_weather_forecast: [Errno 2] No such file or directory: '/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/results_3di.nc'
+2025-03-02 22:02:06,809 - apscheduler.scheduler - INFO - Added job "Collect weather forecast data" to job store "default"
+2025-03-02 22:02:06,809 - apscheduler.scheduler - INFO - Scheduler started
+2025-03-02 22:03:00,006 - apscheduler.executors.default - INFO - Running job "Collect weather forecast data (trigger: cron[hour='9,14,18,22', minute='3'], next run at: 2025-03-02 22:03:00 CST)" (scheduled at 2025-03-02 22:03:00+08:00)
+2025-03-02 22:03:00,007 - __main__ - ERROR - Error in collect_weather_forecast: [Errno 2] No such file or directory: '/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/results_3di.nc'
+2025-03-02 22:03:00,007 - apscheduler.executors.default - INFO - Job "Collect weather forecast data (trigger: cron[hour='9,14,18,22', minute='3'], next run at: 2025-03-03 09:03:00 CST)" executed successfully
+2025-03-02 22:03:47,581 - __main__ - INFO - Scheduler stopped by user
+2025-03-02 22:03:53,779 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-03-02 22:03:53,779 - __main__ - INFO - Starting scheduler...
+2025-03-02 22:11:59,355 - __main__ - INFO - Successfully saved weather forecast data to rainfall_forecast_json/20250302-220353.json
+2025-03-02 22:11:59,361 - apscheduler.scheduler - INFO - Added job "Collect weather forecast data" to job store "default"
+2025-03-02 22:11:59,361 - apscheduler.scheduler - INFO - Scheduler started
