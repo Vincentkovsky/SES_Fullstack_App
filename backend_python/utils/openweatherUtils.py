@@ -69,11 +69,14 @@ def interpolate_30min_rainfall(hourly_data):
     timestamps_30min.append(timestamps[0])
     rainfall_30min.append(rainfall[0]/2)
 
-    for i in range(len(timestamps)-1):
+    for i in range(len(timestamps)-2):
         timestamps_30min.append(timestamps[i+1] - timedelta(minutes=30))
         rainfall_30min.append(rainfall[i+1]/2)
         timestamps_30min.append(timestamps[i+1])
         rainfall_30min.append(rainfall[i+1]/2)
+
+    timestamps_30min.append(timestamps[-1] - timedelta(minutes=30))
+    rainfall_30min.append(rainfall[-1]/2)
     
     # Convert timestamps to string format
     timestamps_str = [ts.strftime("%Y%m%d-%H%M%S") for ts in timestamps_30min]

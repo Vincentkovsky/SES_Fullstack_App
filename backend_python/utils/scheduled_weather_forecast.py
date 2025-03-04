@@ -38,7 +38,7 @@ def process_point(point):
     """Process a single grid point for weather forecast."""
     lon, lat = point
     try:
-        openweather_json = get_hourly_forecast(lat, lon, cnt=24, units="metric")
+        openweather_json = get_hourly_forecast(lat, lon, cnt=25, units="metric")
         if openweather_json:
             forecast_data = decode_hourly_forecast(openweather_json)
             return {
