@@ -113,7 +113,7 @@ def main():
     # Schedule jobs to run at 9:00, 14:00, and 18:00 every day
     scheduler.add_job(
         collect_weather_forecast,
-        CronTrigger(hour='9,14,18', minute='00'),
+        CronTrigger(hour='8,13,17', minute='58'),
         id='weather_forecast_job',
         name='Collect weather forecast data'
     )
