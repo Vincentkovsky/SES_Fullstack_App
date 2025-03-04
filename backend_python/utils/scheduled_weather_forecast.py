@@ -52,7 +52,10 @@ def collect_weather_forecast():
     """Collect weather forecast data and save to JSON file."""
     try:
         # Create output directory if it doesn't exist
-        output_dir = "rainfall_forecast_json"
+
+        output_dir = "/projects/TCCTVS/FSI/cnnModel/rainfall_forecast_json"
+
+
         ensure_directory_exists(output_dir)
 
         # Generate filename with timestamp
@@ -66,6 +69,7 @@ def collect_weather_forecast():
         # Process points with progress bar
         points_data = []
         timestamps = None
+
 
         with ThreadPoolExecutor(max_workers=40) as executor:
             futures = [executor.submit(process_point, point) for point in points]
@@ -113,6 +117,7 @@ def main():
 
     try:
         logger.info("Starting scheduler...")
+        logger.info(f'scheduler: {scheduler.print_jobs()}')
         # Run the job immediately when starting
         collect_weather_forecast()
         scheduler.start()
