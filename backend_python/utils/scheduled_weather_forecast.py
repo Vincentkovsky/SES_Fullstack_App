@@ -1,6 +1,6 @@
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 import logging
@@ -28,8 +28,14 @@ def ensure_directory_exists(directory):
         logger.info(f"Created directory: {directory}")
 
 def generate_filename():
-    """Generate filename based on current timestamp."""
-    return datetime.now().strftime("%Y%m%d-%H%M%S")
+    """Generate filename based on next 30-minute mark."""
+    now = datetime.now()
+    # Calculate minutes to next 30-minute mark
+    if now.minute < 30:
+        next_time = now.replace(minute=30, second=0, microsecond=0)
+    else:
+        next_time = (now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1))
+    return next_time.strftime("%Y%m%d-%H%M%S")
 
 def process_point(point):
     """Process a single grid point for weather forecast."""
