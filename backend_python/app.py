@@ -52,10 +52,7 @@ def execute_inference_script() -> Tuple[Dict[str, str], int]:
         # Execute script with timestamp parameter
         result = subprocess.run(
             [script_path],
-            env={
-                **os.environ,
-                'start_tmp': start_tmp  # Pass as environment variable
-            },
+            env=os.environ,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,  # Use this instead of text=True
