@@ -93,9 +93,6 @@ def run_inference():
     response, status_code = execute_inference_script()
     return jsonify(response), status_code
 
-@app.route('/api/test', methods=['GET'])
-def test():
-    return jsonify({"message": "Hello, World!"}), 200
 
 @app.route('/api/tilesList', methods=['GET'])
 def get_tiles_list():
@@ -399,6 +396,7 @@ def test_waternsw():
             "error": "WaterNSW API connection failed",
             "message": str(e)
         }), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='localhost', port=3000)
