@@ -3,13 +3,15 @@ import pyproj
 import rasterio
 from rasterio.transform import from_origin
 import multiprocessing as mp
-from datetime import datetime
-from typing import Tuple, List
+from datetime import datetime, timedelta
+from typing import Tuple, List, Dict, Union
 from pathlib import Path
 import os
 import xarray as xr
 from tqdm import tqdm
 from openweatherUtils import get_historical_archive_openmeteo, decode_historical_archive_openmeteo
+from pyproj import CRS, Transformer
+import numpy.typing as npt
 
 def get_bounds_from_3di_results(nc_path: str) -> Tuple[float, float, float, float]:
     """
@@ -169,9 +171,9 @@ class RainfallGridGenerator:
                                 start_date: str,
                                 end_date: str,
                                 output_dir: str,
-                                max_workers: int = 4) -> List[str]:
+                                max_workers: int = 4) -> Dict[str, List[str]]:
         """
-        生成降雨栅格文件
+        生成降雨栅格文件，同时输出GeoTIFF和NetCDF格式
         
         Args:
             start_date: 开始日期 (YYYYMMDD_HHMMSS)
@@ -180,10 +182,16 @@ class RainfallGridGenerator:
             max_workers: 最大并行进程数
             
         Returns:
-            生成的GeoTIFF文件路径列表
+            Dict包含生成的文件路径列表:
+            {
+                'geotiff': [...],
+                'netcdf': [...]
+            }
         """
         # 确保输出目录存在
         os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(os.path.join(output_dir, 'geotiff'), exist_ok=True)
+        os.makedirs(os.path.join(output_dir, 'netcdf'), exist_ok=True)
         
         # 准备并行处理参数
         args_list = [
@@ -198,7 +206,6 @@ class RainfallGridGenerator:
         # 并行获取降雨数据
         rainfall_data = {}
         with mp.Pool(max_workers) as pool:
-            # 使用tqdm显示进度
             results = list(tqdm(
                 pool.imap(self._get_rainfall_for_point, args_list),
                 total=total_points,
@@ -208,7 +215,7 @@ class RainfallGridGenerator:
             for i, j, rain_values in results:
                 rainfall_data[(i, j)] = rain_values
         
-        # 获取时间戳列表（从任意一个有效的返回数据中）
+        # 获取时间戳列表
         print("\n获取时间戳信息...")
         sample_data = get_historical_archive_openmeteo(
             latitude=self.lats[0, 0],
@@ -221,33 +228,44 @@ class RainfallGridGenerator:
         
         # 创建半小时时间戳
         half_hour_timestamps = []
+        hourly_timestamps = []  # 新增：仅整点时间戳
         for i in range(len(timestamps)-1):
-            # 解析ISO格式的时间戳
             current_time = datetime.fromisoformat(timestamps[i])
             next_time = datetime.fromisoformat(timestamps[i+1])
             half_time = current_time + (next_time - current_time) / 2
             
             half_hour_timestamps.append(current_time.strftime("%Y-%m-%dT%H:%M"))
             half_hour_timestamps.append(half_time.strftime("%Y-%m-%dT%H:%M"))
-        half_hour_timestamps.append(timestamps[-1])  # 添加最后一个时间戳
+  
+            hourly_timestamps.append(current_time)  # 新增：仅添加整点时间
+        
+        half_hour_timestamps.append(timestamps[-1])
+        hourly_timestamps.append(datetime.fromisoformat(timestamps[-1]))  # 新增：添加最后一个整点
         
         # 创建GeoTIFF文件
-        output_files = []
-        # 确保transform使用精确的边界和分辨率
+        geotiff_files = []
         transform = rasterio.transform.from_bounds(
-            520700.0,      # left
-            6104100.0,     # bottom
-            560000.0,      # right
-            6121550.0,     # top
-            int((560000.0 - 520700.0) / 5) ,    # width
-            int((6121550.0 - 6104100.0) / 5)   # height
+            self.bounds[0],      # left
+            self.bounds[1],      # bottom
+            self.bounds[2],      # right
+            self.bounds[3],      # top
+            self.grid_width - 1,    # width
+            self.grid_height - 1    # height
         )
         
-        print(f"\n开始生成GeoTIFF文件 (共 {len(half_hour_timestamps)} 个时间步)...")
-        for t, timestamp in enumerate(tqdm(half_hour_timestamps, desc="生成GeoTIFF", unit="文件")):
-            # 创建当前时间步的降雨强度矩阵 (使用float32)
+        # 准备NetCDF数据 - 修改为仅使用整点时间
+        unix_epoch = np.datetime64('1970-01-01T00:00:00', 'us')
+        hourly_time_steps = np.array(hourly_timestamps, dtype='datetime64[s]')
+        hourly_time_steps_seconds = ((hourly_time_steps - unix_epoch) / np.timedelta64(1, 's'))
+        
+        # 创建降雨数据数组 - 修改为仅使用整点数据
+        hourly_rainfall_array = np.zeros((len(hourly_timestamps), self.grid_height, self.grid_width), dtype=np.float32)
+        
+        print(f"\n开始生成降雨文件 (共 {len(half_hour_timestamps)} 个时间步)...")
+        for t, timestamp in enumerate(tqdm(half_hour_timestamps, desc="生成文件", unit="文件")):
+            # 创建当前时间步的降雨强度矩阵
             rainfall_matrix = np.zeros((self.grid_height, self.grid_width), dtype=np.float32)
-
+            
             # 如果是整点，直接使用数据
             if t % 2 == 0:
                 hour_index = t // 2
@@ -256,6 +274,8 @@ class RainfallGridGenerator:
                         rain_values = rainfall_data.get((i, j), [])
                         if hour_index < len(rain_values):
                             rainfall_matrix[i, j] = np.float32(rain_values[hour_index] / 2)
+                # 保存整点数据到hourly_rainfall_array
+                hourly_rainfall_array[hour_index] = rainfall_matrix * 2  # 乘以2转换回小时降雨量
             # 如果是半点，插值计算
             else:
                 hour_index = t // 2
@@ -263,21 +283,19 @@ class RainfallGridGenerator:
                     for j in range(self.grid_width):
                         rain_values = rainfall_data.get((i, j), [])
                         if hour_index + 1 < len(rain_values):
-                            # 线性插值
                             rainfall_matrix[i, j] = np.float32(rain_values[hour_index + 1] / 2)
             
-            # 生成文件名 - 将时间戳转换为datetime然后格式化
+            # 生成GeoTIFF文件
             dt = datetime.fromisoformat(timestamp)
             filename = f"rainfall_{dt.strftime('%Y%m%d%H%M%S')}.tif"
-            filepath = str(Path(output_dir) / filename)
+            filepath = str(Path(output_dir) / 'geotiff' / filename)
             
-            # 写入GeoTIFF (使用float32)
             with rasterio.open(
                 filepath,
                 'w',
                 driver='GTiff',
-                height=int((6121550.0 - 6104100.0) / 5),  # 精确高度
-                width=int((560000.0 - 520700.0) / 5),     # 精确宽度
+                height=self.grid_height,
+                width=self.grid_width,
                 count=1,
                 dtype='float32',
                 crs=rasterio.crs.CRS.from_string(self.utm_proj),
@@ -285,9 +303,80 @@ class RainfallGridGenerator:
             ) as dst:
                 dst.write(rainfall_matrix, 1)
             
-            output_files.append(filepath)
+            geotiff_files.append(filepath)
         
-        return output_files
+        # 创建NetCDF文件
+        netcdf_files = []
+        ds = xr.Dataset()
+        
+        # 添加时间维度 - 使用整点时间
+        ds['time'] = xr.DataArray(
+            hourly_time_steps_seconds,
+            dims='time',
+            attrs={
+                'standard_name': 'time',
+                'long_name': 'Time',
+                'units': 'seconds since 1970-01-01 00:00:00.0 +0000',
+                'calendar': 'standard',
+                'axis': 'T'
+            }
+        )
+        
+        # 添加空间维度
+        target_crs = CRS.from_string(self.utm_proj)
+        x_attrs, y_attrs = target_crs.cs_to_cf()
+        
+        ds['x'] = xr.DataArray(
+            np.linspace(self.bounds[0], self.bounds[2], self.grid_width),
+            dims='x',
+            attrs=x_attrs
+        )
+        
+        ds['y'] = xr.DataArray(
+            np.linspace(self.bounds[1], self.bounds[3], self.grid_height),
+            dims='y',
+            attrs=y_attrs
+        )
+        
+        # 添加降雨数据 - 使用整点数据
+        ds['values'] = xr.DataArray(
+            hourly_rainfall_array,  # 使用整点降雨数据
+            dims=('time', 'y', 'x'),
+            attrs={
+                'long_name': 'rain',
+                'grid_mapping': 'crs',
+                '_FillValue': 0,
+                'missing_value': 0,
+                'units': 'mm/hr'  # 单位保持为mm/hr
+            }
+        )
+        
+        # 添加投影信息
+        ds['crs'] = 1
+        ds['crs'].attrs = target_crs.to_cf()
+        ds['crs'].attrs['spatial_ref'] = f"EPSG:{target_crs.to_epsg()}"
+        ds['crs'].attrs['GeoTransform'] = f"{self.bounds[0]} {self.resolution} 0 {self.bounds[3]} 0 -{self.resolution}"
+        
+        # 添加全局属性
+        ds.attrs = {
+            'OFFSET': 0,
+            'Conventions': 'CF-1.6',
+            'title': 'Hourly Rainfall data',  # 更新标题以反映整点数据
+            'institution': 'Generated by RainfallGridGenerator',
+            'source': 'Open-Meteo API',
+            'references': 'https://open-meteo.com/'
+        }
+        
+        # 保存NetCDF文件 - 使用整点时间戳
+        nc_filename = f"rainfall_{hourly_timestamps[0].strftime('%Y%m%d%H%M')}_{hourly_timestamps[-1].strftime('%Y%m%d%H%M')}.nc"
+        nc_filepath = str(Path(output_dir) / 'netcdf' / nc_filename)
+        ds.to_netcdf(nc_filepath, format='NETCDF4')
+        netcdf_files.append(nc_filepath)
+        
+        return {
+            'geotiff': geotiff_files,
+            'netcdf': netcdf_files
+        }
 
 def generate_rainfall_rasters_for_3di(grid_bounds,
                                     start_date: str,

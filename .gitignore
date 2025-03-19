@@ -51,6 +51,7 @@ Thumbs.db
 #large files and other tedious files
 timeseries_tiles*/
 **/timeseries_tiles*/
+backend_python/data
 *.nc
 *.zip
 *.tif
