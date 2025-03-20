@@ -7,7 +7,11 @@ import json
 import time
 from typing import Dict, List, Tuple, Union
 
-from rainfall_grid import RainfallGridGenerator, get_bounds_from_3di_results
+from ..utils.rainfallGridUtils import RainfallGridGenerator, get_bounds_from_3di_results
+
+# Get the current file's directory
+CURRENT_DIR = Path(__file__).parent.resolve()
+PROGRESS_FILE = CURRENT_DIR / 'rainfall_generation_progress.json'
 
 @dataclass
 class GridBounds:
@@ -67,16 +71,19 @@ def save_progress(progress_file: Path, progress: Dict[str, Dict[str, Union[str, 
         json.dump(progress, f, indent=2)
 
 def main():
+    """
+    主函数：生成降雨数据
+    """
     # 设置输入和输出路径
-    output_base_dir = "../data/rainfall_data"
-    progress_file = Path(output_base_dir) / "progress.json"
+    input_dir = CURRENT_DIR / "rainfall_forecast_json"
+    output_base_dir = CURRENT_DIR / "rainfall_tiles"
+    progress_file = PROGRESS_FILE
 
     # 确保输出目录存在
-    Path(output_base_dir).mkdir(parents=True, exist_ok=True)
+    output_base_dir.mkdir(parents=True, exist_ok=True)
 
-    # 加载之前的进度
-    progress = load_progress(progress_file)
-
+    # 加载进度
+    progress = load_progress(progress_file) if progress_file.exists() else {}
 
     # 定义要生成的时间段
     time_periods = [

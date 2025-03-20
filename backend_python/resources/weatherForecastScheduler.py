@@ -6,16 +6,23 @@ from apscheduler.triggers.cron import CronTrigger
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
+import pathlib
 
-from gridUtils import constructWeatherGrid
-from openweatherUtils import get_hourly_forecast, decode_hourly_forecast
+from ..utils.gridUtils import constructWeatherGrid
+from ..utils.openweatherUtils import get_hourly_forecast, decode_hourly_forecast
+
+# Get the current file's directory
+CURRENT_DIR = pathlib.Path(__file__).parent.resolve()
+LOG_FILE = CURRENT_DIR / 'weather_forecast.log'
+NC_FILE = CURRENT_DIR / 'results_3di.nc'
+OUTPUT_DIR = "/projects/TCCTVS/FSI/cnnModel/rainfall_forecast_json"
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('weather_forecast.log'),
+        logging.FileHandler(LOG_FILE),
         logging.StreamHandler()
     ]
 )
@@ -55,24 +62,18 @@ def collect_weather_forecast():
     """Collect weather forecast data and save to JSON file."""
     try:
         # Create output directory if it doesn't exist
-
-        output_dir = "/projects/TCCTVS/FSI/cnnModel/rainfall_forecast_json"
-
-
-        ensure_directory_exists(output_dir)
+        ensure_directory_exists(OUTPUT_DIR)
 
         # Generate filename with timestamp
         filename = f"{generate_filename()}.json"
-        output_path = os.path.join(output_dir, filename)
+        output_path = os.path.join(OUTPUT_DIR, filename)
 
         # Generate grid points
-        nc_path = "results_3di.nc"  # Adjust path as needed
-        points = constructWeatherGrid(500, nc_path)
+        points = constructWeatherGrid(500, NC_FILE)
 
         # Process points with progress bar
         points_data = []
         timestamps = None
-
 
         with ThreadPoolExecutor(max_workers=40) as executor:
             futures = [executor.submit(process_point, point) for point in points]
