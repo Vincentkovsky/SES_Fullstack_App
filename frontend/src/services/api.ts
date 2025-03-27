@@ -47,8 +47,8 @@ export interface GaugingData {
   site_id: string;
   timeseries: Array<{
     timestamp: string;
-    waterLevel: number;
-    flowRate: number;
+    waterLevel: number | null;
+    flowRate: number | null;
   }>;
   total_records: number;
 }
@@ -109,4 +109,19 @@ export const fetchRainfallData = async (timestamp: string): Promise<number> => {
 
   const data = await response.json();
   return data.rain?.['1h'] || 0; // Returns rainfall in mm for the last hour
+};
+
+/**
+ * Fetches the list of historical simulations
+ * @returns Promise<string[]> List of historical simulation folder names
+ */
+export const fetchHistoricalSimulations = async (): Promise<string[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/historical-simulations`);
+    console.log('Historical simulations response:', response.data);
+    return response.data.message || [];
+  } catch (error) {
+    console.error('Error fetching historical simulations:', error);
+    throw error;
+  }
 };

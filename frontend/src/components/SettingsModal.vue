@@ -28,6 +28,15 @@
                     <option value="72">72 Hours</option>
                   </select>
                 </div>
+                <div class="setting-item">
+                  <label for="historical-simulation">Historical Simulations</label>
+                  <select id="historical-simulation" v-model="selectedHistoricalSimulation">
+                    <option value="">Select a simulation</option>
+                    <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
+                      {{ simulation }}
+                    </option>
+                  </select>
+                </div>
                 <div class="inference-buttons">
                   <button class="primary-button" @click="startInference">Start Inference</button>
                   <button class="secondary-button" @click="close">Cancel</button>
@@ -71,8 +80,8 @@
 import { ref, defineProps, defineEmits, onMounted, watch } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData } from '../services/api.js';
-import type { GaugingData } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations } from '../services/api.js';
+import type { GaugingData } from '../types/api';
 
 type Settings = {
   animationSpeed: string;
@@ -95,6 +104,7 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'update-settings', settings: Settings): void
   (e: 'start-inference', inferenceSettings: InferenceSettings): void
+  (e: 'select-historical-simulation', simulation: string): void
 }>();
 
 const settings = ref<Settings>({
@@ -113,7 +123,8 @@ const gaugingData = ref<GaugingData | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 const currentTimestamp = ref<string>('');
-
+const historicalSimulations = ref<string[]>([]);
+const selectedHistoricalSimulation = ref<string>('');
 
 const fetchGaugeData = async () => {
   if (!props.timestamps.length) return;
@@ -123,26 +134,26 @@ const fetchGaugeData = async () => {
   try {
     // Default to last 24 hours if no timestamps
     const now = new Date();
-        const yesterday = new Date(now);
-        yesterday.setDate(yesterday.getDate() - 10);
-        
-        // Format dates as "dd-Mon-yyyy hh:mm"
-        const formatDate = (date: Date) => {
-          const day = date.getDate().toString().padStart(2, '0');
-          const month = date.toLocaleString('en-US', { month: 'short' });
-          const year = date.getFullYear();
-          const hours = date.getHours().toString().padStart(2, '0');
-          const minutes = date.getMinutes().toString().padStart(2, '0');
-          
-          return `${day}-${month}-${year} ${"00"}:${"00"}`;
-        };
-        
-        const startDate = formatDate(yesterday);
-        const endDate = formatDate(now);
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 10);
+    
+    // Format dates as "dd-Mon-yyyy hh:mm"
+    const formatDate = (date: Date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = monthNames[date.getMonth()];
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${day}-${month}-${year} ${hours}:${minutes}`;
+    };
+    
+    const startDate = formatDate(yesterday);
+    const endDate = formatDate(now);
 
     const gaugingResponse = await fetchGaugingData(startDate, endDate);
    
-
     gaugingData.value = gaugingResponse;
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to fetch gauge data';
@@ -152,42 +163,59 @@ const fetchGaugeData = async () => {
   }
 };
 
+const fetchHistoricalSimulationsData = async () => {
+  try {
+    historicalSimulations.value = await fetchHistoricalSimulations();
+  } catch (error) {
+    console.error('Error fetching historical simulations:', error);
+  }
+};
+
 onMounted(() => {
   if (props.isOpen) {
     fetchGaugeData();
+    fetchHistoricalSimulationsData();
   }
 });
 
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
     try {
+      // Default to last 24 hours if no timestamps
+      const now = new Date();
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 10);
       
+      // Format dates as "dd-Mon-yyyy hh:mm"
+      const formatDate = (date: Date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+      };
       
-        // Default to last 24 hours if no timestamps
-        const now = new Date();
-        const yesterday = new Date(now);
-        yesterday.setDate(yesterday.getDate() - 10);
-        
-        // Format dates as "dd-Mon-yyyy hh:mm"
-        const formatDate = (date: Date) => {
-          const day = date.getDate().toString().padStart(2, '0');
-          const month = date.toLocaleString('en-US', { month: 'short' });
-          const year = date.getFullYear();
-          const hours = date.getHours().toString().padStart(2, '0');
-          const minutes = date.getMinutes().toString().padStart(2, '0');
-          
-          return `${day}-${month}-${year} ${"00"}:${"00"}`;
-        };
-        
-        const startDate = formatDate(yesterday);
-        const endDate = formatDate(now);
-
+      const startDate = formatDate(yesterday);
+      const endDate = formatDate(now);
 
       const gaugingResponse = await fetchGaugingData(startDate, endDate);
       gaugingData.value = gaugingResponse;
+      
+      // Also fetch historical simulations
+      await fetchHistoricalSimulationsData();
+      
     } catch (error) {
       console.error('Error fetching data:', error);
     }
+  }
+});
+
+watch(() => selectedHistoricalSimulation.value, (simulation) => {
+  if (simulation) {
+    emit('select-historical-simulation', simulation);
   }
 });
 

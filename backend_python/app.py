@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 # Update the tiles path constants at the top of the file
 TILES_BASE_PATH = "/projects/TCCTVS/FSI/cnnModel/inference"
 LOCAL_TILES_PATH = os.path.join(os.path.dirname(__file__), "data/3di_res/timeseries_tiles")
+HISTORICAL_SIMULATIONS_PATH = os.path.join(os.path.dirname(__file__), "data/3di_res/tiles")
 
 def execute_inference_script() -> Tuple[Dict[str, str], int]:
     """Execute inference script and return results with timestamp"""
@@ -397,6 +398,26 @@ def test_waternsw():
             "message": str(e)
         }), 500
 
+@app.route('/api/historical-simulations', methods=['GET'])
+def get_historical_simulations():
+    """
+    API endpoint to get list of historical simulation folders
+    """
+    try:
+        if not os.path.exists(HISTORICAL_SIMULATIONS_PATH):
+            return jsonify({"error": "Historical simulations directory not found"}), 404
+            
+        # List all folders in the historical simulations directory
+        simulations = sorted(
+            name for name in os.listdir(HISTORICAL_SIMULATIONS_PATH)
+            if os.path.isdir(os.path.join(HISTORICAL_SIMULATIONS_PATH, name))
+        )
+        
+        return jsonify({"message": simulations}), 200
+        
+    except Exception as error:
+        logger.error(f"Error reading historical simulations directory: {error}")
+        return jsonify({"error": "Unable to retrieve historical simulations list"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='localhost', port=3000)

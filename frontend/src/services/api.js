@@ -2,6 +2,13 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 
+/**
+ * @typedef {Object} GaugingData
+ * @property {string} site_id
+ * @property {Array<{timestamp: string, waterLevel: number, flowRate: number}>} timeseries
+ * @property {number} total_records
+ */
+
 export const fetchTilesList = async (isSteedMode = false) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/tilesList`, {
@@ -43,20 +50,34 @@ export const runInference = async () => {
     return response.json();
 };
 
+/**
+ * Fetches the list of historical simulations
+ * @returns {Promise<string[]>} List of historical simulation folder names
+ */
+export const fetchHistoricalSimulations = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/historical-simulations`);
+        return response.data.message || [];
+    } catch (error) {
+        console.error('Error fetching historical simulations:', error);
+        throw error;
+    }
+};
+
 export const fetchGaugingData = async (startDate, endDate) => {
     const url = new URL('http://localhost:3000/api/gauging');
     
     // Format dates as dd-MMM-yyyy HH:mm
     const formatDate = (date) => {
         const d = new Date(date);
-        return d.toLocaleString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        }).replace(',', '');
+        const day = d.getDate().toString().padStart(2, '0');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = monthNames[d.getMonth()];
+        const year = d.getFullYear();
+        const hours = d.getHours().toString().padStart(2, '0');
+        const minutes = d.getMinutes().toString().padStart(2, '0');
+        
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
     };
 
     url.searchParams.append('start_date', formatDate(startDate));
