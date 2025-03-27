@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 
-const props = defineProps<{
+const { isFloodLayerActive, isWeatherLayerActive } = defineProps<{
   isFloodLayerActive: boolean
   isWeatherLayerActive: boolean
 }>();

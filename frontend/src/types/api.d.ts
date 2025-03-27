@@ -7,3 +7,10 @@ export interface GaugingData {
   }>;
   total_records: number;
 }
+
+export interface Api {
+  fetchTilesList(isSteedMode?: boolean, simulation?: string): Promise<string[]>;
+  fetchGaugingData(startDate: string, endDate: string): Promise<GaugingData>;
+  fetchHistoricalSimulations(): Promise<string[]>;
+  runInference(): Promise<void>;
+}

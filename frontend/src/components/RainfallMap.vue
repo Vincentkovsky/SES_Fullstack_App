@@ -3,9 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import mapboxgl from 'mapbox-gl';
 
+// 实际使用timestamp,只是注释掉了watch部分
 const props = defineProps<{
   timestamp: string;
 }>();

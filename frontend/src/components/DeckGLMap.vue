@@ -3,15 +3,13 @@
     <SettingsModal 
       :is-open="isSettingsOpen" 
       :timestamps="timestamps"
+      v-model="isSteedMode"
       @close="isSettingsOpen = false"
       @update-settings="handleSettingsUpdate"
       @start-inference="handleInferenceStart"
+      @select-historical-simulation="handleHistoricalSimulation"
     />
     <div ref="mapContainer" style="width: 100%; height: 100vh;"></div>
-    <MapModeSwitch
-      v-model="isSteedMode"
-      class="mode-switch-container"
-    />
     <div class="map-controls">
       <MapZoomControls
         class="panel-button"
@@ -141,7 +139,6 @@ import MapLayerControls from './MapLayerControls.vue';
 import MapSettingsControl from './MapSettingsControl.vue';
 import MapBasemapControl from './MapBasemapControl.vue';
 import SettingsModal from './SettingsModal.vue';
-import MapModeSwitch from './MapModeSwitch.vue';
 
 // State
 const mapContainer = ref<HTMLElement | null>(null);
@@ -163,7 +160,6 @@ let currentTimeIndex = 0;
 
 // Constants
 const TRANSITION_DURATION = 800;
-const FADE_DURATION = 300;
 
 // 添加平滑过渡控制
 const TRANSITION_SETTINGS = {
@@ -187,7 +183,6 @@ const cursorLng = ref<number | null>(null);
 
 // Add new state for scale
 const currentZoom = ref(12);
-const scaleWidth = ref(100);
 
 // Add new state for inference
 const isInferenceRunning = ref(false);
@@ -198,9 +193,8 @@ const isSatellite = ref(false);
 // Add new state for settings
 const isSettingsOpen = ref(false);
 
-// Add weather layer state and source
-let weatherSource: mapboxgl.RasterTileSource | null = null;
-let weatherLayer: mapboxgl.Layer | null = null;
+// Add new state for simulation
+const currentSimulation = ref<string | null>(null);
 
 // Computed
 const formattedTimestamp = computed(() => {
@@ -231,6 +225,11 @@ const formattedCoordinates = computed(() => {
 
 // Update the scale computation
 const scaleInfo = computed(() => {
+  // 添加空值检查
+  if (cursorLat.value === null) {
+    return { width: 100, label: '1 km' };
+  }
+  
   const metersPerPixel = 156543.03392 * Math.cos(cursorLat.value * Math.PI / 180) / Math.pow(2, currentZoom.value);
   
   // Find a nice round number for the scale
@@ -274,9 +273,21 @@ const scaleInfo = computed(() => {
 
 // Methods
 const createTileLayer = (timestamp: string) => {
+  // 构建URL时，添加currentSimulation参数（如果有）
+  let tileUrl = `http://localhost:3000/api/tiles/${timestamp}/{z}/{x}/{y}?isSteedMode=${isSteedMode.value}`;
+  
+  // 检查是否有选择的模拟
+  if (currentSimulation.value) {
+    console.log(`使用模拟: ${currentSimulation.value}`);
+    // 使用专用的simulation路由
+    tileUrl = `http://localhost:3000/api/tiles/simulation/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}`;
+  }
+  
+  console.log(`瓦片URL: ${tileUrl}`);
+  
   return new TileLayer({
     id: `TileLayer-${timestamp}`,
-    data: `http://localhost:3000/api/tiles/${timestamp}/{z}/{x}/{y}?isSteedMode=${isSteedMode.value}`,
+    data: tileUrl,
     maxZoom: 14,
     minZoom: 8,
     tileSize: 256,
@@ -291,14 +302,14 @@ const createTileLayer = (timestamp: string) => {
     updateTriggers: {
       data: timestamp
     },
-    onTileError: (err) => {
+    onTileError: (err: Error) => {
       console.warn(`Tile loading error for timestamp ${timestamp}:`, err);
       return null;
     },
-    onTileLoad: (tile) => {
+    onTileLoad: (tile: { index: number[] }) => {
       console.debug(`Tile loaded successfully for timestamp ${timestamp} at z=${tile.index[0]}, x=${tile.index[1]}, y=${tile.index[2]}`);
     },
-    renderSubLayers: (props) => {
+    renderSubLayers: (props: any) => {
       const { boundingBox, data } = props.tile;
 
       if (!data) {
@@ -383,8 +394,8 @@ const startAnimation = () => {
     from: currentTimeIndex,
     to: timestamps.length,
     duration,
-    onUpdate: (value) => {
-      const nextIndex =  Math.floor(value % timestamps.length);
+    onUpdate: (value: number) => {
+      const nextIndex = Math.floor(value % timestamps.length);
       progress.value = (nextIndex / timestamps.length) * 100;
       
       if (nextIndex !== currentTimeIndex) {
@@ -446,7 +457,9 @@ const initializeMap = async () => {
 
   // Add zoom handler
   map.on('zoom', () => {
-    currentZoom.value = map.getZoom();
+    if (map) {
+      currentZoom.value = map.getZoom();
+    }
   });
 
   return map;
@@ -545,7 +558,7 @@ onMounted(async () => {
   try {
     const map = await initializeMap();
     const response = await fetchTilesList(isSteedMode.value);
-    timestamps = response.message;
+    timestamps = response.message || [];
 
     if (timestamps.length === 0) {
       throw new Error('No timestamps available');
@@ -584,7 +597,7 @@ watch(isSteedMode, async (newMode) => {
     // Refresh tiles list when mode changes
     const response = await fetchTilesList(newMode);
     console.log("response", response);
-    timestamps = response.message;
+    timestamps = response.message || [];
     
     if (timestamps.length === 0) {
       throw new Error('No timestamps available');
@@ -638,7 +651,7 @@ const handleInferenceStart = async (inferenceSettings: {
     const newTilesResponse = await fetchTilesList();
 
     console.log(newTilesResponse);
-    timestamps = newTilesResponse.message;
+    timestamps = newTilesResponse.message || [];
     
     // Optionally restart animation with new timestamps
     if (isPlaying.value) {
@@ -656,6 +669,45 @@ const toggleBasemap = (value: boolean) => {
   isSatellite.value = value;
   if (map) {
     map.setStyle(value ? 'mapbox://styles/mapbox/satellite-v9' : 'mapbox://styles/mapbox/streets-v12');
+  }
+};
+
+const handleHistoricalSimulation = async (simulation: string) => {
+  console.log(`Loading historical simulation: ${simulation}`);
+  
+  try {
+    // Stop any current animation
+    if (animationInstance) {
+      animationInstance.stop();
+    }
+    
+    // 更新当前选中的模拟场景
+    currentSimulation.value = simulation;
+    console.log(`设置当前模拟场景: ${simulation}`);
+    
+    // Fetch timestamps for the selected simulation
+    const response = await fetchTilesList(false, simulation);
+    timestamps = response.message || [];
+    
+    if (timestamps.length === 0) {
+      throw new Error('No timestamps available for selected simulation');
+    }
+
+    // Reset animation state
+    currentTimeIndex = 0;
+    currentTimestamp.value = timestamps[0];
+    progress.value = 0;
+    
+    // Update the first layer
+    updateLayers(0);
+    
+    // Start animation if it was playing
+    if (isPlaying.value) {
+      startAnimation();
+    }
+
+  } catch (error) {
+    console.error('Error loading historical simulation:', error);
   }
 };
 
@@ -905,13 +957,6 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
 .basemap-control-container {
   position: absolute;
   bottom: 80px;
-  left: 20px;
-  z-index: 1000;
-}
-
-.mode-switch-container {
-  position: absolute;
-  top: 20px;
   left: 20px;
   z-index: 1000;
 }

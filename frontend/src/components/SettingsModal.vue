@@ -11,24 +11,21 @@
           </button>
           <div class="modal-content">
             <div class="settings-layout">
-              <!-- Left Panel - Inference Settings -->
+              <!-- Left Panel - Settings based on mode -->
               <div class="inference-panel">
-                <h3>Inference Settings</h3>
-                <div class="setting-item">
-                  <label for="area">Area</label>
-                  <select id="area" v-model="inferenceSettings.area">
-                    <option value="wagga">Wagga Wagga</option>
-                  </select>
+                <div class="panel-header">
+                  <h3>{{ isLiveMode ? 'Inference Settings' : 'Show local results' }}</h3>
+                  <button 
+                    class="mode-button"
+                    :class="{ active: isLiveMode }"
+                    @click="toggleMode"
+                  >
+                    {{ isLiveMode ? 'Live Mode' : 'Local Mode' }}
+                  </button>
                 </div>
-                <div class="setting-item">
-                  <label for="window">Inference Window</label>
-                  <select id="window" v-model="inferenceSettings.window">
-                    <option value="24">24 Hours</option>
-                    <option value="48">48 Hours</option>
-                    <option value="72">72 Hours</option>
-                  </select>
-                </div>
-                <div class="setting-item">
+                
+                <!-- Local Mode: Only show Historical Simulations -->
+                <div v-if="!isLiveMode" class="setting-item">
                   <label for="historical-simulation">Historical Simulations</label>
                   <select id="historical-simulation" v-model="selectedHistoricalSimulation">
                     <option value="">Select a simulation</option>
@@ -37,8 +34,28 @@
                     </option>
                   </select>
                 </div>
+                
+                <!-- Live Mode: Show Inference Settings -->
+                <template v-if="isLiveMode">
+                  <div class="setting-item">
+                    <label for="area">Area</label>
+                    <select id="area" v-model="inferenceSettings.area">
+                      <option value="wagga">Wagga Wagga</option>
+                    </select>
+                  </div>
+                  <div class="setting-item">
+                    <label for="window">Inference Window</label>
+                    <select id="window" v-model="inferenceSettings.window">
+                      <option value="24">24 Hours</option>
+                      <option value="48">48 Hours</option>
+                      <option value="72">72 Hours</option>
+                    </select>
+                  </div>
+                </template>
+                
                 <div class="inference-buttons">
-                  <button class="primary-button" @click="startInference">Start Inference</button>
+                  <button v-if="isLiveMode" class="primary-button" @click="startInference">Start Inference</button>
+                  <button v-else class="primary-button" @click="loadHistoricalSimulation">Load Simulation</button>
                   <button class="secondary-button" @click="close">Cancel</button>
                 </div>
               </div>
@@ -80,9 +97,10 @@
 import { ref, defineProps, defineEmits, onMounted, watch } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations } from '../services/api.js';
-import type { GaugingData } from '../types/api';
+import { fetchGaugingData, fetchHistoricalSimulations } from '../services/api';
+import type { GaugingData } from '../services/api';
 
+// Types
 type Settings = {
   animationSpeed: string;
   mapStyle: string;
@@ -95,9 +113,11 @@ type InferenceSettings = {
   window: string;
 };
 
+// Props and Emits
 const props = defineProps<{
   isOpen: boolean;
   timestamps: string[];
+  modelValue?: boolean; // For mode (true = Live Mode, false = Local Mode)
 }>();
 
 const emit = defineEmits<{
@@ -105,7 +125,17 @@ const emit = defineEmits<{
   (e: 'update-settings', settings: Settings): void
   (e: 'start-inference', inferenceSettings: InferenceSettings): void
   (e: 'select-historical-simulation', simulation: string): void
+  (e: 'update:modelValue', value: boolean): void
 }>();
+
+// State
+const isLiveMode = ref(props.modelValue || false);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+const currentTimestamp = ref<string>('');
+const historicalSimulations = ref<string[]>([]);
+const selectedHistoricalSimulation = ref<string>('');
+const gaugingData = ref<GaugingData | null>(null);
 
 const settings = ref<Settings>({
   animationSpeed: '1',
@@ -119,119 +149,151 @@ const inferenceSettings = ref<InferenceSettings>({
   window: '24'
 });
 
-const gaugingData = ref<GaugingData | null>(null);
-const isLoading = ref(false);
-const error = ref<string | null>(null);
-const currentTimestamp = ref<string>('');
-const historicalSimulations = ref<string[]>([]);
-const selectedHistoricalSimulation = ref<string>('');
-
-const fetchGaugeData = async () => {
-  if (!props.timestamps.length) return;
+// Utility functions
+const formatDate = (date: Date): string => {
+  const day = date.getDate().toString().padStart(2, '0');
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
   
-  isLoading.value = true;
-  error.value = null;
-  try {
-    // Default to last 24 hours if no timestamps
-    const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 10);
-    
-    // Format dates as "dd-Mon-yyyy hh:mm"
-    const formatDate = (date: Date) => {
-      const day = date.getDate().toString().padStart(2, '0');
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const month = monthNames[date.getMonth()];
-      const year = date.getFullYear();
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      
-      return `${day}-${month}-${year} ${hours}:${minutes}`;
-    };
-    
-    const startDate = formatDate(yesterday);
-    const endDate = formatDate(now);
-
-    const gaugingResponse = await fetchGaugingData(startDate, endDate);
-   
-    gaugingData.value = gaugingResponse;
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to fetch gauge data';
-    console.error('Error fetching gauge data:', e);
-  } finally {
-    isLoading.value = false;
-  }
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
+const getDateFromTimestamp = (timestamp: string): Date | null => {
+  const match = timestamp.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
+  if (match) {
+    const [_, year, month, day, hour, minute] = match;
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
+  }
+  return null;
+};
+
+// Data fetching functions
 const fetchHistoricalSimulationsData = async () => {
   try {
-    historicalSimulations.value = await fetchHistoricalSimulations();
+    console.log('Fetching historical simulations...');
+    const data = await fetchHistoricalSimulations();
+    historicalSimulations.value = data;
+    console.log('Historical simulations fetched:', data);
   } catch (error) {
     console.error('Error fetching historical simulations:', error);
+    throw error; // Re-throw to be handled by caller
   }
 };
 
-onMounted(() => {
-  if (props.isOpen) {
-    fetchGaugeData();
-    fetchHistoricalSimulationsData();
+const fetchGaugeData = async (startDate: string, endDate: string) => {
+  try {
+    console.log('Fetching gauge data...', { startDate, endDate });
+    const response = await fetchGaugingData(startDate, endDate);
+    gaugingData.value = response;
+    console.log('Gauge data fetched:', response);
+  } catch (error) {
+    console.error('Error fetching gauge data:', error);
+    throw error; // Re-throw to be handled by caller
   }
-});
+};
 
-watch(() => props.isOpen, async (isOpen) => {
-  if (isOpen) {
-    try {
-      // Default to last 24 hours if no timestamps
-      const now = new Date();
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 10);
-      
-      // Format dates as "dd-Mon-yyyy hh:mm"
-      const formatDate = (date: Date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const month = monthNames[date.getMonth()];
-        const year = date.getFullYear();
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        
-        return `${day}-${month}-${year} ${hours}:${minutes}`;
-      };
-      
-      const startDate = formatDate(yesterday);
-      const endDate = formatDate(now);
-
-      const gaugingResponse = await fetchGaugingData(startDate, endDate);
-      gaugingData.value = gaugingResponse;
-      
-      // Also fetch historical simulations
-      await fetchHistoricalSimulationsData();
-      
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+// Action handlers
+const loadHistoricalSimulation = () => {
+  if (selectedHistoricalSimulation.value) {
+    emit('select-historical-simulation', selectedHistoricalSimulation.value);
+    close();
   }
-});
+};
 
-watch(() => selectedHistoricalSimulation.value, (simulation) => {
-  if (simulation) {
-    emit('select-historical-simulation', simulation);
-  }
-});
+const toggleMode = () => {
+  isLiveMode.value = !isLiveMode.value;
+  emit('update:modelValue', isLiveMode.value);
+};
 
 const close = () => {
   emit('close');
-};
-
-const saveSettings = () => {
-  emit('update-settings', settings.value);
-  close();
 };
 
 const startInference = () => {
   emit('start-inference', inferenceSettings.value);
   close();
 };
+
+// Data loading function
+const loadData = async () => {
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    // Load historical simulations first
+    await fetchHistoricalSimulationsData();
+
+    // Only fetch gauge data if we have timestamps
+    if (props.timestamps.length > 0) {
+      const now = new Date();
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 10);
+      
+      await fetchGaugeData(formatDate(yesterday), formatDate(now));
+    }
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Failed to load data';
+    console.error('Error loading data:', e);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Watchers
+watch(() => props.modelValue, (newValue) => {
+  if (newValue !== undefined) {
+    isLiveMode.value = newValue;
+  }
+});
+
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen) {
+    await loadData();
+  }
+});
+
+watch(() => selectedHistoricalSimulation.value, async (simulation) => {
+  if (!simulation) return;
+
+  try {
+    isLoading.value = true;
+    error.value = null;
+    
+    // Emit the selection first
+    emit('select-historical-simulation', simulation);
+    
+    // Wait for timestamps to be updated
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Fetch gauge data based on the new timestamps
+    if (props.timestamps.length > 0) {
+      const firstTimestamp = props.timestamps[0];
+      const lastTimestamp = props.timestamps[props.timestamps.length - 1];
+      
+      const startDate = getDateFromTimestamp(firstTimestamp);
+      const endDate = getDateFromTimestamp(lastTimestamp);
+      
+      if (startDate && endDate) {
+        await fetchGaugeData(formatDate(startDate), formatDate(endDate));
+      }
+    }
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Failed to load simulation data';
+    console.error('Error loading simulation data:', e);
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+// Initial setup
+onMounted(() => {
+  if (props.isOpen) {
+    loadData();
+  }
+});
 </script>
 
 <style scoped>
@@ -272,6 +334,37 @@ const startInference = () => {
 
 .modal-content {
   padding: 0;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.mode-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #1E3D78;
+  color: white;
+  font-size: 0.85em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-button:hover {
+  background: #2a4d8f;
+}
+
+.mode-button.active {
+  background: #F48703;
+}
+
+.mode-button.active:hover {
+  background: #ff9614;
 }
 
 .settings-layout {

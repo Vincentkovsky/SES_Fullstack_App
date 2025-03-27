@@ -57,3 +57,4 @@ backend_python/data
 *.tif
 
 *.json
+*.xml

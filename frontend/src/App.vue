@@ -4,6 +4,7 @@
     <SettingsModal 
       :is-open="isSettingsModalOpen" 
       :timestamps="timestamps"
+      v-model="isLiveMode"
       @close="closeSettingsModal" 
       @update-settings="updateSettings"
       @start-inference="startInference"
@@ -26,6 +27,7 @@ export default defineComponent({
   setup() {
     const isSettingsModalOpen = ref(false);
     const timestamps = ref([]);
+    const isLiveMode = ref(false); // false = Local Mode, true = Live Mode
 
     const closeSettingsModal = () => {
       isSettingsModalOpen.value = false;
@@ -48,6 +50,7 @@ export default defineComponent({
     return {
       isSettingsModalOpen,
       timestamps,
+      isLiveMode,
       closeSettingsModal,
       updateSettings,
       startInference,

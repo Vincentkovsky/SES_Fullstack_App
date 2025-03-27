@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 
-const props = defineProps<{
+const { isSatellite } = defineProps<{
   isSatellite: boolean
 }>();
 
