@@ -113,6 +113,9 @@
         </div>
       </div>
       <div class="right-controls">
+        <div class="water-depth" v-if="isFloodLayerActive">
+          {{ formattedWaterDepth }}
+        </div>
         <div class="coordinates">
           {{ formattedCoordinates || 'Lat 0.00000°S Lon 0.00000°E' }}
         </div>
@@ -133,12 +136,13 @@ import { MapboxOverlay } from '@deck.gl/mapbox';
 import mapboxgl from 'mapbox-gl';
 import { animate } from 'popmotion';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
-import { fetchTilesList, runInference } from '../services/api';
+import { fetchTilesList, runInference, fetchWaterDepth } from '../services/api';
 import MapZoomControls from './MapZoomControls.vue';
 import MapLayerControls from './MapLayerControls.vue';
 import MapSettingsControl from './MapSettingsControl.vue';
 import MapBasemapControl from './MapBasemapControl.vue';
 import SettingsModal from './SettingsModal.vue';
+import { debounce } from 'lodash-es';
 
 // State
 const mapContainer = ref<HTMLElement | null>(null);
@@ -195,6 +199,10 @@ const isSettingsOpen = ref(false);
 
 // Add new state for simulation
 const currentSimulation = ref<string | null>(null);
+
+// 添加水深相关状态
+const waterDepth = ref<number | null>(null);
+const isLoadingWaterDepth = ref(false);
 
 // Computed
 const formattedTimestamp = computed(() => {
@@ -269,6 +277,41 @@ const scaleInfo = computed(() => {
       label: `${roundedMeters} m`
     };
   }
+});
+
+// 获取水深信息的函数
+const fetchWaterDepthInfo = debounce(async (lat: number, lng: number) => {
+  if (!lat || !lng) return;
+  
+  isLoadingWaterDepth.value = true;
+  
+  try {
+    // 使用API服务获取水深数据，传递当前时间戳和模拟ID
+    const result = await fetchWaterDepth(
+      lat, 
+      lng, 
+      currentTimestamp.value, // 传递当前时间戳
+      currentSimulation.value || undefined // 传递当前模拟ID（如果有）
+    );
+    
+    // 保存结果
+    waterDepth.value = result.water_depth;
+    
+    // 可以选择保存更多详情
+    // waterLevel.value = result.water_level;
+    // demElevation.value = result.dem_elevation;
+  } catch (error) {
+    console.error('获取水深度失败:', error);
+    waterDepth.value = null;
+  } finally {
+    isLoadingWaterDepth.value = false;
+  }
+}, 300); // 300ms的防抖时间
+
+// 格式化水深显示的计算属性
+const formattedWaterDepth = computed(() => {
+  if (waterDepth.value === null) return 'Water depth : --';
+  return `Water depth : ${waterDepth.value} m`;
 });
 
 // Methods
@@ -453,6 +496,16 @@ const initializeMap = async () => {
   map.on('mousemove', (e) => {
     cursorLat.value = e.lngLat.lat;
     cursorLng.value = e.lngLat.lng;
+    
+    // 获取水深信息
+    if (isFloodLayerActive.value) {
+      fetchWaterDepthInfo(e.lngLat.lat, e.lngLat.lng);
+    }
+  });
+
+  // 添加鼠标移出事件处理
+  map.on('mouseout', () => {
+    waterDepth.value = null;
   });
 
   // Add zoom handler
@@ -848,6 +901,15 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
   align-items: center;
   gap: 20px;
   flex-shrink: 0;
+}
+
+.water-depth {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #FFFFFF;
+  white-space: nowrap;
+  margin-right: 16px;
+  min-width: 100px;
 }
 
 .coordinates {

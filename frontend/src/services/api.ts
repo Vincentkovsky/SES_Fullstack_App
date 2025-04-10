@@ -47,6 +47,19 @@ export interface InferenceSettings {
 }
 
 /**
+ * 水深信息接口
+ */
+export interface WaterDepthInfo {
+  latitude: number;
+  longitude: number;
+  dem_elevation: number;
+  water_level: number;
+  water_depth: number;
+  simulation: string;
+  timestamp: string;
+}
+
+/**
  * 格式化日期为 'dd-MMM-yyyy HH:mm' 格式
  * @param date 日期字符串或Date对象
  * @returns 格式化后的日期字符串
@@ -271,5 +284,43 @@ export const fetchHistoricalSimulations = async (): Promise<string[]> => {
     return response.data.message || [];
   } catch (error) {
     return handleApiError(error, 'Error fetching historical simulations');
+  }
+};
+
+/**
+ * 获取指定位置的水深信息
+ * @param lat 纬度
+ * @param lng 经度
+ * @param timestamp 可选的时间戳 (格式: waterdepth_yyyyMMdd_HHmmss)
+ * @param simulation 可选的模拟ID
+ * @returns 水深信息数据
+ */
+export const fetchWaterDepth = async (
+  lat: number,
+  lng: number,
+  timestamp?: string,
+  simulation?: string
+): Promise<WaterDepthInfo> => {
+  try {
+    const params = new URLSearchParams({
+      lat: lat.toString(),
+      lng: lng.toString()
+    });
+    
+    if (timestamp) {
+      params.append('timestamp', timestamp);
+    }
+    
+    if (simulation) {
+      params.append('simulation', simulation);
+    }
+    
+    const response = await axios.get<WaterDepthInfo>(
+      `${API_CONFIG.BASE_URL}/water-depth/point?${params.toString()}`
+    );
+    
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, 'Failed to fetch water depth data');
   }
 };
