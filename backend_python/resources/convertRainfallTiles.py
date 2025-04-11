@@ -122,7 +122,7 @@ def main():
         # 配置瓦片生成器
         config = TileGeneratorConfig(
             zoom_levels="0-14",
-            processes=8,
+            processes=128,
             xyz_format=True
         )
         tile_generator = TileGeneratorUtils(config)

@@ -11,32 +11,30 @@
           </button>
           <div class="modal-content">
             <div class="settings-layout">
-              <!-- Left Panel - Settings based on mode -->
+              <!-- Left Panel - Settings with tabs -->
               <div class="inference-panel">
-                <div class="panel-header">
-                  <h3>{{ isLiveMode ? 'Inference Settings' : 'Show local results' }}</h3>
+                <!-- Removed the panel-header with Inference Settings title -->
+                
+                <!-- Tabs for inference mode -->
+                <div class="tabs">
                   <button 
-                    class="mode-button"
-                    :class="{ active: isLiveMode }"
-                    @click="toggleMode"
+                    class="tab-button" 
+                    :class="{ active: activeTab === 'live' }"
+                    @click="activeTab = 'live'"
                   >
-                    {{ isLiveMode ? 'Live Mode' : 'Local Mode' }}
+                    Live Inference
+                  </button>
+                  <button 
+                    class="tab-button" 
+                    :class="{ active: activeTab === 'historical' }"
+                    @click="activeTab = 'historical'"
+                  >
+                    Historical Floods
                   </button>
                 </div>
                 
-                <!-- Local Mode: Only show Historical Simulations -->
-                <div v-if="!isLiveMode" class="setting-item">
-                  <label for="historical-simulation">Historical Simulations</label>
-                  <select id="historical-simulation" v-model="selectedHistoricalSimulation">
-                    <option value="">Select a simulation</option>
-                    <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
-                      {{ simulation }}
-                    </option>
-                  </select>
-                </div>
-                
-                <!-- Live Mode: Show Inference Settings -->
-                <template v-if="isLiveMode">
+                <!-- Live Tab Content -->
+                <div v-if="activeTab === 'live'" class="tab-content">
                   <div class="setting-item">
                     <label for="area">Area</label>
                     <select id="area" v-model="inferenceSettings.area">
@@ -51,19 +49,32 @@
                       <option value="72">72 Hours</option>
                     </select>
                   </div>
-                </template>
+                </div>
+                
+                <!-- Historical Tab Content -->
+                <div v-if="activeTab === 'historical'" class="tab-content">
+                  <div class="setting-item">
+                    <label for="historical-simulation">Historical Floods</label>
+                    <select id="historical-simulation" v-model="selectedHistoricalSimulation">
+                      <option value="">Select a flood event</option>
+                      <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
+                        {{ simulation }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
                 
                 <div class="inference-buttons">
-                  <button v-if="isLiveMode" class="primary-button" @click="startInference">Start Inference</button>
-                  <button v-else class="primary-button" @click="loadHistoricalSimulation">Load Simulation</button>
+                  <button class="primary-button" @click="activeTab === 'live' ? startInference() : loadHistoricalSimulation()">
+                    Start Inference
+                  </button>
                   <button class="secondary-button" @click="close">Cancel</button>
                 </div>
               </div>
 
-              <!-- Right Panel - Real-time Data -->
+              <!-- Right Panel - Maps and Data -->
               <div class="map-settings-panel">
                 <div class="settings-section">
-                  <h3>Real-time Data</h3>
                   <div class="graph-container">
                     <div class="graph-item">
                       <div class="graph-header">
@@ -75,10 +86,11 @@
                       </div>
                     </div>
                     <div class="graph-item">
-                      <h4>Rainfall Forecast</h4>
+                      <h4>Rainfall Data</h4>
                       <div class="graph-content">
                         <RainfallMap 
                           :timestamp="currentTimestamp"
+                          :simulation="selectedHistoricalSimulation"
                         />
                       </div>
                     </div>
@@ -94,10 +106,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, onMounted, watch } from 'vue';
+import { ref, defineProps, defineEmits, onMounted, watch, computed } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList } from '../services/api';
 import type { GaugingData } from '../services/api';
 
 // Types
@@ -106,6 +118,7 @@ type Settings = {
   mapStyle: string;
   showLegend: boolean;
   showCoordinates: boolean;
+  showRainfallLayer: boolean;
 };
 
 type InferenceSettings = {
@@ -129,19 +142,22 @@ const emit = defineEmits<{
 }>();
 
 // State
-const isLiveMode = ref(props.modelValue || false);
+const activeTab = ref('live'); // New state for active tab
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 const currentTimestamp = ref<string>('');
 const historicalSimulations = ref<string[]>([]);
 const selectedHistoricalSimulation = ref<string>('');
 const gaugingData = ref<GaugingData | null>(null);
+const rainfallData = ref<string[]>([]);
+const hasRainfallData = ref(false);
 
 const settings = ref<Settings>({
   animationSpeed: '1',
   mapStyle: 'satellite',
   showLegend: true,
-  showCoordinates: true
+  showCoordinates: true,
+  showRainfallLayer: true
 });
 
 const inferenceSettings = ref<InferenceSettings>({
@@ -195,18 +211,49 @@ const fetchGaugeData = async (startDate: string, endDate: string) => {
   }
 };
 
+// Computed properties
+const hasRainfallDataForSelection = computed(() => {
+  return rainfallData.value.length > 0;
+});
+
 // Action handlers
-const loadHistoricalSimulation = () => {
+const loadHistoricalSimulation = async () => {
   if (selectedHistoricalSimulation.value) {
+    try {
+      // Check for rainfall data availability
+      console.log(`Checking rainfall data for simulation ${selectedHistoricalSimulation.value}`);
+      const rainfallTimestamps = await fetchRainfallTilesList(selectedHistoricalSimulation.value);
+      hasRainfallData.value = rainfallTimestamps.length > 0;
+      rainfallData.value = rainfallTimestamps;
+      
+      if (hasRainfallData.value) {
+        console.log(`Loaded ${rainfallTimestamps.length} rainfall timestamps for simulation ${selectedHistoricalSimulation.value}`);
+      } else {
+        console.warn(`No rainfall timestamps found for simulation ${selectedHistoricalSimulation.value}`);
+      }
+    } catch (error) {
+      console.warn(`Error checking rainfall data for simulation ${selectedHistoricalSimulation.value}:`, error);
+      hasRainfallData.value = false;
+      rainfallData.value = [];
+    }
+    
+    // Emit the simulation selection
     emit('select-historical-simulation', selectedHistoricalSimulation.value);
     close();
   }
 };
 
-const toggleMode = () => {
-  isLiveMode.value = !isLiveMode.value;
-  emit('update:modelValue', isLiveMode.value);
-};
+// When modelValue changes, update activeTab
+watch(() => props.modelValue, (newValue) => {
+  if (newValue !== undefined) {
+    activeTab.value = newValue ? 'live' : 'historical';
+  }
+});
+
+// Watch activeTab changes to emit update:modelValue
+watch(() => activeTab.value, (newTab) => {
+  emit('update:modelValue', newTab === 'live');
+});
 
 const close = () => {
   emit('close');
@@ -215,6 +262,17 @@ const close = () => {
 const startInference = () => {
   emit('start-inference', inferenceSettings.value);
   close();
+};
+
+// Add rainfall toggle function
+const toggleRainfallLayer = () => {
+  if (hasRainfallDataForSelection.value) {
+    // Toggle the rainfall layer visibility
+    emit('update-settings', {
+      ...settings.value,
+      showRainfallLayer: !settings.value.showRainfallLayer
+    });
+  }
 };
 
 // Data loading function
@@ -228,11 +286,16 @@ const loadData = async () => {
 
     // Only fetch gauge data if we have timestamps
     if (props.timestamps.length > 0) {
-      const now = new Date();
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 10);
+      const firstTimestamp = props.timestamps[0];
+      const lastTimestamp = props.timestamps[props.timestamps.length - 1];
       
-      await fetchGaugeData(formatDate(yesterday), formatDate(now));
+
+      const startDate = getDateFromTimestamp(firstTimestamp);
+      const endDate = getDateFromTimestamp(lastTimestamp);
+      
+      if (startDate && endDate) {
+        await fetchGaugeData(formatDate(startDate), formatDate(endDate));
+      }
     }
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to load data';
@@ -243,12 +306,6 @@ const loadData = async () => {
 };
 
 // Watchers
-watch(() => props.modelValue, (newValue) => {
-  if (newValue !== undefined) {
-    isLiveMode.value = newValue;
-  }
-});
-
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
     await loadData();
@@ -262,6 +319,25 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
     isLoading.value = true;
     error.value = null;
     
+    // Check for rainfall data availability
+    try {
+      console.log(`Checking rainfall data for simulation ${simulation}`);
+      const rainfallTimestamps = await fetchRainfallTilesList(simulation);
+      hasRainfallData.value = rainfallTimestamps.length > 0;
+      rainfallData.value = rainfallTimestamps;
+      
+      if (hasRainfallData.value) {
+        console.log(`Loaded ${rainfallTimestamps.length} rainfall timestamps for simulation ${simulation}`);
+        currentTimestamp.value = rainfallTimestamps[0] || '';
+      } else {
+        console.warn(`No rainfall timestamps found for simulation ${simulation}`);
+      }
+    } catch (error) {
+      console.warn(`Error checking rainfall data for simulation ${simulation}:`, error);
+      hasRainfallData.value = false;
+      rainfallData.value = [];
+    }
+    
     // Emit the selection first
     emit('select-historical-simulation', simulation);
     
@@ -273,6 +349,7 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
       const firstTimestamp = props.timestamps[0];
       const lastTimestamp = props.timestamps[props.timestamps.length - 1];
       
+
       const startDate = getDateFromTimestamp(firstTimestamp);
       const endDate = getDateFromTimestamp(lastTimestamp);
       
@@ -290,6 +367,9 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
 
 // Initial setup
 onMounted(() => {
+  // Set initial tab based on modelValue prop
+  activeTab.value = props.modelValue ? 'live' : 'historical';
+  
   if (props.isOpen) {
     loadData();
   }
@@ -343,28 +423,37 @@ onMounted(() => {
   margin-bottom: 1.25rem;
 }
 
-.mode-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #1E3D78;
-  color: white;
-  font-size: 0.85em;
+/* New tab styles */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(209, 213, 219, 0.4);
+  margin-bottom: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
+  color: #4b5563;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
-.mode-button:hover {
-  background: #2a4d8f;
+.tab-button:hover {
+  color: #1E3D78;
 }
 
-.mode-button.active {
-  background: #F48703;
+.tab-button.active {
+  color: #1E3D78;
+  border-bottom: 2px solid #1E3D78;
 }
 
-.mode-button.active:hover {
-  background: #ff9614;
+.tab-content {
+  margin-bottom: 1.25rem;
 }
 
 .settings-layout {
@@ -624,5 +713,43 @@ onMounted(() => {
   font-size: 0.875rem;
   font-weight: 500;
   color: #4b5563;
+}
+
+.rainfall-toggle-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.rainfall-toggle-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.rainfall-toggle-button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: #e5e7eb;
+  color: #4b5563;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rainfall-toggle-button.active {
+  background: #1E3D78;
+  color: white;
+}
+
+.rainfall-toggle-button:hover {
+  opacity: 0.9;
 }
 </style> 

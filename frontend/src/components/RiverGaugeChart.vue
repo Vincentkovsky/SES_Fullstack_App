@@ -41,8 +41,9 @@ const props = defineProps<{
 const chartData = computed(() => {
   if (!props.gaugingData) return null;
 
-  const timestamps = props.gaugingData.timeseries.map(item => {
-    const date = new Date(item.timestamp);
+  // Parse timestamps to display in a more readable format
+  const timestamps = props.gaugingData.timestamps.map(timestamp => {
+    const date = new Date(timestamp);
     return date.toLocaleTimeString('en-US', { 
       year: '2-digit', 
       month: '2-digit',
@@ -53,7 +54,7 @@ const chartData = computed(() => {
     });
   });
 
-  const values = props.gaugingData.timeseries.map(item => item.waterLevel);
+  const values = props.gaugingData.values;
   const color = '59, 130, 246'; // Blue for water level
 
   return {

@@ -28,17 +28,26 @@
         @toggle-weather="toggleWeatherLayer"
       />
     </div>
-    <div class="legend">
-      <div class="legend-title">Flood</div>
+    <div class="legend" :class="{ 'hidden': !isLegendVisible }">
+      <div class="legend-title">{{ isWeatherLayerActive ? 'Rainfall' : 'Flood' }}</div>
       <div class="legend-gradient">
         <div class="legend-content">
-          <div class="gradient-bar"></div>
-          <div class="gradient-labels">
+          <div v-if="!isWeatherLayerActive" class="gradient-bar flood-gradient"></div>
+          <div v-if="!isWeatherLayerActive" class="gradient-labels flood-labels">
             <span>10m</span>
             <span>5m</span>
             <span>2m</span>
             <span>1m</span>
             <span>0m</span>
+          </div>
+          
+          <div v-if="isWeatherLayerActive" class="gradient-bar rainfall-gradient"></div>
+          <div v-if="isWeatherLayerActive" class="gradient-labels rainfall-labels">
+            <span>45mm</span>
+            <span>30mm</span>
+            <span>15mm</span>
+            <span>5mm</span>
+            <span>1mm</span>
           </div>
         </div>
       </div>
@@ -136,7 +145,7 @@ import { MapboxOverlay } from '@deck.gl/mapbox';
 import mapboxgl from 'mapbox-gl';
 import { animate } from 'popmotion';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
-import { fetchTilesList, runInference, fetchWaterDepth } from '../services/api';
+import { fetchTilesList, runInference, fetchWaterDepth, fetchRainfallTilesList } from '../services/api';
 import MapZoomControls from './MapZoomControls.vue';
 import MapLayerControls from './MapLayerControls.vue';
 import MapSettingsControl from './MapSettingsControl.vue';
@@ -204,21 +213,56 @@ const currentSimulation = ref<string | null>(null);
 const waterDepth = ref<number | null>(null);
 const isLoadingWaterDepth = ref(false);
 
+// Add new state for rainfall data
+const rainfallTimestamps = ref<string[]>([]);
+const currentRainfallIndex = ref(0);
+const currentRainfallTimestamp = ref('');
+
+// Add new state for legend visibility
+const isLegendVisible = computed(() => {
+  return isFloodLayerActive.value || (isWeatherLayerActive.value && rainfallTimestamps.value.length > 0);
+});
+
 // Computed
 const formattedTimestamp = computed(() => {
-  if (!currentTimestamp.value) return '';
-  const match = currentTimestamp.value.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
-  if (!match) return currentTimestamp.value;
+  // For flood layer timestamps
+  if (isFloodLayerActive.value) {
+    if (!currentTimestamp.value) return '';
+    const match = currentTimestamp.value.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
+    if (!match) return currentTimestamp.value;
+    
+    const [_, year, month, day, hour, minute] = match;
+    const currentDate = new Date(Number(year), Number(month) - 1, Number(day));
+    
+    if (!startDate.value) return `${hour}:${minute} Day 1`;
+    
+    const diffTime = Math.abs(currentDate.getTime() - startDate.value.getTime()) +1;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return `${hour}:${minute} Day ${diffDays}`;
+  } 
+  // For rainfall timestamps - update to handle rainfall_YYYYMMDDHHMMSS format
+  else if (isWeatherLayerActive.value) {
+    if (!currentRainfallTimestamp.value) return '';
+    
+    // Extract timestamp from rainfall_YYYYMMDDHHMMSS format
+    const match = currentRainfallTimestamp.value.match(/rainfall_(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+    if (match) {
+      const [_, year, month, day, hour, minute, second] = match;
+      const currentDate = new Date(Number(year), Number(month) - 1, Number(day));
+      
+      if (!startDate.value) return `${hour}:${minute} Day 1`;
+      
+      const diffTime = Math.abs(currentDate.getTime() - startDate.value.getTime()) + 1;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      return `${hour}:${minute} Day ${diffDays}`;
+    }
+    
+    return currentRainfallTimestamp.value;
+  }
   
-  const [_, year, month, day, hour, minute] = match;
-  const currentDate = new Date(Number(year), Number(month) - 1, Number(day));
-  
-  if (!startDate.value) return `${hour}:${minute} Day 1`;
-  
-  const diffTime = Math.abs(currentDate.getTime() - startDate.value.getTime()) +1;
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return `${hour}:${minute} Day ${diffDays}`;
+  return '';
 });
 
 // Add computed for formatted coordinates
@@ -379,9 +423,80 @@ const createTileLayer = (timestamp: string) => {
   });
 };
 
+const createRainfallLayer = (timestamp: string) => {
+  if (!currentSimulation.value) return null;
+  
+  console.log(`Creating rainfall layer for simulation ${currentSimulation.value} with timestamp ${timestamp}`);
+  
+  // Update the rainfall tile URL to include the timestamp in the format rainfall_YYYYMMDDHHMMSS
+  const tileUrl = `http://localhost:3000/api/rainfall-tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}`;
+  
+
+  return new TileLayer({
+    id: `RainfallLayer-${currentSimulation.value}-${timestamp}`,
+    data: tileUrl,
+    maxZoom: 14,
+    minZoom: 6,
+    tileSize: 256,
+    maxCacheSize: 100,
+    coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
+    loadOptions: {
+      fetch: {
+        maxConcurrency: 8,
+      }
+    },
+    refinementStrategy: 'no-overlap',
+    updateTriggers: {
+      data: timestamp
+    },
+    onTileError: (err: Error) => {
+      console.warn(`Rainfall tile loading error for ${currentSimulation.value} ${timestamp}:`, err);
+      return null;
+    },
+    onTileLoad: (tile: { index: number[] }) => {
+      console.debug(`Rainfall tile loaded successfully for ${currentSimulation.value} ${timestamp} at z=${tile.index[0]}, x=${tile.index[1]}, y=${tile.index[2]}`);
+    },
+    renderSubLayers: (props: any) => {
+      const { boundingBox, data } = props.tile;
+
+      if (!data) {
+        return null;
+      }
+
+      try {
+        return new BitmapLayer({
+          id: props.id,
+          image: data,
+          bounds: [
+            boundingBox[0][0],
+            boundingBox[0][1],
+            boundingBox[1][0],
+            boundingBox[1][1],
+          ],
+          opacity: 0.7,
+        });
+      } catch (error) {
+        console.warn(`Error rendering rainfall tile layer for ${currentSimulation.value} ${timestamp}:`, error);
+        return null;
+      }
+    },
+  });
+};
+
 const updateLayers = (index: number) => {
   try {
-    const newLayer = isFloodLayerActive.value ? createTileLayer(timestamps[index]) : null;
+    let newLayer = null;
+    
+    // Determine which layer to create based on active layer type
+    if (isFloodLayerActive.value) {
+      newLayer = createTileLayer(timestamps[index]);
+      currentTimestamp.value = timestamps[index];
+    } else if (isWeatherLayerActive.value && currentSimulation.value && rainfallTimestamps.value.length > 0) {
+      // For rainfall, use the rainfall timestamps
+      const rainfallTimestamp = rainfallTimestamps.value[currentRainfallIndex.value];
+      newLayer = createRainfallLayer(rainfallTimestamp);
+      currentRainfallTimestamp.value = rainfallTimestamp;
+    }
 
     if (previousLayer) {
       let startTime: number | null = null;
@@ -395,10 +510,12 @@ const updateLayers = (index: number) => {
         const opacity = TRANSITION_SETTINGS.interpolation.opacity(1, 0, eased);
         
         const layerProps = previousLayer?.props;
-        previousLayer = new TileLayer({
-          ...layerProps,
-          opacity,
-        });
+        previousLayer = previousLayer?.constructor === TileLayer 
+          ? new TileLayer({
+              ...layerProps,
+              opacity,
+            })
+          : null;
         
         deckOverlay?.setProps({ 
           layers: [previousLayer, currentLayer].filter(Boolean) 
@@ -418,7 +535,7 @@ const updateLayers = (index: number) => {
     currentLayer = newLayer;
     deckOverlay?.setProps({ layers: [previousLayer, currentLayer].filter(Boolean) });
   } catch (error) {
-    console.error(`Error updating layers for timestamp index ${index}:`, error);
+    console.error(`Error updating layers:`, error);
     if (animationInstance) {
       animationInstance.stop();
       isPlaying.value = false;
@@ -430,21 +547,36 @@ const startAnimation = () => {
   if (animationInstance) {
     animationInstance.stop();
   }
-
-  const duration = TRANSITION_DURATION * timestamps.length / playbackSpeed.value;
+  
+  // Set the appropriate timestamp array based on active layer
+  const activeTimestamps = isFloodLayerActive.value ? timestamps : rainfallTimestamps.value;
+  
+  // Skip animation if there are no timestamps
+  if (activeTimestamps.length === 0) {
+    return;
+  }
+  
+  // Calculate animation duration based on the selected layer type
+  const duration = TRANSITION_DURATION * activeTimestamps.length / playbackSpeed.value;
   
   animationInstance = animate({
-    from: currentTimeIndex,
-    to: timestamps.length,
+    from: isFloodLayerActive.value ? currentTimeIndex : currentRainfallIndex.value,
+    to: activeTimestamps.length,
     duration,
     onUpdate: (value: number) => {
-      const nextIndex = Math.floor(value % timestamps.length);
-      progress.value = (nextIndex / timestamps.length) * 100;
+      const nextIndex = Math.floor(value % activeTimestamps.length);
+      progress.value = (nextIndex / activeTimestamps.length) * 100;
       
-      if (nextIndex !== currentTimeIndex) {
-        currentTimeIndex = nextIndex;
-        currentTimestamp.value = timestamps[currentTimeIndex];
-        updateLayers(currentTimeIndex);
+      if (isFloodLayerActive.value) {
+        if (nextIndex !== currentTimeIndex) {
+          currentTimeIndex = nextIndex;
+          updateLayers(currentTimeIndex);
+        }
+      } else {
+        if (nextIndex !== currentRainfallIndex.value) {
+          currentRainfallIndex.value = nextIndex;
+          updateLayers(currentRainfallIndex.value);
+        }
       }
     },
   });
@@ -548,48 +680,65 @@ const toggleFloodLayer = () => {
   updateLayers(currentTimeIndex);
 };
 
-const toggleWeatherLayer = () => {
-  map?.setZoom(6);
+const toggleWeatherLayer = async () => {
+  map?.setZoom(10);
   map?.setCenter([147.356, -35.117]);
   
   isWeatherLayerActive.value = !isWeatherLayerActive.value;
   
+  // If turning on the weather layer
   if (isWeatherLayerActive.value) {
-    // Turn off flood layer when weather layer is active
-    isFloodLayerActive.value = false;
-    if (currentLayer) {
-      deckOverlay?.setProps({ layers: [] });
-    }
+    try {
+      // Turn off flood layer
+      isFloodLayerActive.value = false;
+      if (currentLayer) {
+        deckOverlay?.setProps({ layers: [] });
+      }
 
-    // Add weather layer if it doesn't exist
-    if (!map?.getSource('weather')) {
-      map?.addSource('weather', {
-        type: 'raster',
-        tiles: [
-          `http://maps.openweathermap.org/maps/2.0/weather/PR0/{z}/{x}/{y}?appid=${OPENWEATHERMAP_API_KEY}`
-        ],
-        tileSize: 256,
-        attribution: '© OpenWeatherMap'
-      });
-    }
+      // Make sure we have a selected simulation
+      if (!currentSimulation.value) {
+        console.error('No simulation selected. Please select a simulation first.');
+        isWeatherLayerActive.value = false;
+        return;
+      }
 
-    if (!map?.getLayer('weather-layer')) {
-      map?.addLayer({
-        id: 'weather-layer',
-        type: 'raster',
-        source: 'weather',
-        paint: {
-          'raster-opacity': 0.8
-        }
-      });
+      // First fetch the rainfall timestamps for the selected simulation
+      console.log(`Fetching rainfall timestamps for simulation: ${currentSimulation.value}`);
+      rainfallTimestamps.value = await fetchRainfallTilesList(currentSimulation.value);
+      
+      if (rainfallTimestamps.value.length === 0) {
+        console.error('No rainfall data available for the selected simulation');
+        isWeatherLayerActive.value = false;
+        return;
+      }
+      
+      // Set the initial rainfall timestamp
+      currentRainfallIndex.value = 0;
+      currentRainfallTimestamp.value = rainfallTimestamps.value[0];
+      
+      // Create and display the rainfall layer with the first timestamp
+      const rainfallLayer = createRainfallLayer(currentRainfallTimestamp.value);
+      currentLayer = rainfallLayer;
+      deckOverlay?.setProps({ layers: [rainfallLayer].filter(Boolean) });
+      
+      // Start animation if playing
+      if (isPlaying.value) {
+        startAnimation();
+      }
+    } catch (error) {
+      console.error('Failed to load rainfall data:', error);
+      isWeatherLayerActive.value = false;
     }
   } else {
     // Remove weather layer
-    if (map?.getLayer('weather-layer')) {
-      map.removeLayer('weather-layer');
+    if (currentLayer) {
+      deckOverlay?.setProps({ layers: [] });
+      currentLayer = null;
     }
-    if (map?.getSource('weather')) {
-      map.removeSource('weather');
+    
+    // Stop animation for rainfall layer
+    if (animationInstance) {
+      animationInstance.stop();
     }
   }
 };
@@ -734,9 +883,9 @@ const handleHistoricalSimulation = async (simulation: string) => {
       animationInstance.stop();
     }
     
-    // 更新当前选中的模拟场景
+    // Update current selection simulation
     currentSimulation.value = simulation;
-    console.log(`设置当前模拟场景: ${simulation}`);
+    console.log(`Setting current simulation: ${simulation}`);
     
     // Fetch timestamps for the selected simulation
     const response = await fetchTilesList(false, simulation);
@@ -745,13 +894,27 @@ const handleHistoricalSimulation = async (simulation: string) => {
     if (timestamps.length === 0) {
       throw new Error('No timestamps available for selected simulation');
     }
+    
+    // Also fetch rainfall timestamps for the simulation
+    try {
+      console.log(`Fetching rainfall timestamps for simulation: ${simulation}`);
+      rainfallTimestamps.value = await fetchRainfallTilesList(simulation);
+      console.log(`Found ${rainfallTimestamps.value.length} rainfall timestamps`);
+    } catch (error) {
+      console.warn('Failed to load rainfall timestamps:', error);
+      rainfallTimestamps.value = [];
+    }
 
     // Reset animation state
     currentTimeIndex = 0;
     currentTimestamp.value = timestamps[0];
+    currentRainfallIndex.value = 0;
+    if (rainfallTimestamps.value.length > 0) {
+      currentRainfallTimestamp.value = rainfallTimestamps.value[0];
+    }
     progress.value = 0;
     
-    // Update the first layer
+    // Update the first layer based on which layer is active
     updateLayers(0);
     
     // Start animation if it was playing
@@ -961,6 +1124,12 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
   color: black;
   z-index: 1000;
   backdrop-filter: blur(4px);
+  transition: opacity 0.3s ease;
+}
+
+.legend.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .legend-title {
@@ -986,12 +1155,27 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
   width: 20px;
   height: 150px;
   border-radius: 4px;
+}
+
+/* Flood depth gradient */
+.flood-gradient {
   background: linear-gradient(to bottom, 
     rgb(0, 0, 255) 0%,
     rgb(0, 128, 255) 25%,
     rgb(86, 180, 255) 50%,
     rgb(173, 216, 230) 75%,
     rgb(220, 238, 245) 100%
+  );
+}
+
+/* Rainfall gradient based on rainfallColor.txt */
+.rainfall-gradient {
+  background: linear-gradient(to bottom, 
+    rgb(0, 0, 255) 0%,      /* 45mm - Blue */
+    rgb(86, 121, 212) 25%,  /* 30mm - Lighter blue */
+    rgb(130, 168, 216) 50%, /* 15mm - Light blue */
+    rgb(173, 216, 230) 75%, /* 5mm - Light blue/cyan */
+    rgb(200, 230, 240) 100% /* 1mm - Very light blue */
   );
 }
 

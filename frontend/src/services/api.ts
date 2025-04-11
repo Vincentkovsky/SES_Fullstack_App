@@ -33,9 +33,19 @@ export interface TimeSeriesPoint {
  * 测量数据接口
  */
 export interface GaugingData {
-  site_id: string;
-  timeseries: TimeSeriesPoint[];
-  total_records: number;
+  data_count: number;
+  data_source: {
+    file_path: string;
+    timestamp: string;
+    type: string;
+  };
+  site_info: {
+    site_id: string;
+    site_name: string;
+    variable: string;
+  };
+  timestamps: string[];
+  values: number[];
 }
 
 /**
@@ -322,5 +332,53 @@ export const fetchWaterDepth = async (
     return response.data;
   } catch (error) {
     return handleApiError(error, 'Failed to fetch water depth data');
+  }
+};
+
+/**
+ * 获取特定模拟的降雨瓦片时间戳列表
+ * @param simulation 模拟名称
+ * @returns 降雨瓦片时间戳列表
+ */
+export const fetchRainfallTilesList = async (simulation: string): Promise<string[]> => {
+  try {
+    if (!simulation) {
+      throw new Error('模拟名称不能为空');
+    }
+    
+    const response: AxiosResponse<ApiResponse<string[]>> = await axios.get(
+      `${API_CONFIG.BASE_URL}/rainfall-tiles/${simulation}`
+    );
+    return response.data.message || [];
+  } catch (error) {
+    return handleApiError(error, `无法获取模拟 ${simulation} 的降雨瓦片列表`);
+  }
+};
+
+/**
+ * 根据坐标获取降雨瓦片
+ * @param simulation 模拟名称
+ * @param z 缩放级别
+ * @param x X坐标
+ * @param y Y坐标
+ * @returns 降雨瓦片图像数据（Blob）
+ */
+export const fetchRainfallTile = async (
+  simulation: string,
+  z: string | number,
+  x: string | number,
+  y: string | number
+): Promise<Blob> => {
+  try {
+    const response = await axios.get(
+      `${API_CONFIG.BASE_URL}/rainfall-tiles/${simulation}/${z}/${x}/${y}`,
+      {
+        responseType: 'blob'
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, `无法获取降雨瓦片: ${simulation}/${z}/${x}/${y}`);
   }
 };
