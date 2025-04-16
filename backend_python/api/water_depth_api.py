@@ -16,6 +16,9 @@ import numpy as np
 from datetime import datetime
 import os
 import glob
+import rasterio
+from rasterio.transform import from_origin
+from rasterio.warp import transform_geom
 
 # 导入自定义模块
 from utils.water_depth_calculator import (
@@ -34,6 +37,8 @@ water_depth_bp = Blueprint('water_depth', __name__)
 BASE_DIR = Path(__file__).parent.parent
 NETCDF_DIR = BASE_DIR / "data/3di_res/netcdf"
 DEM_FILE = BASE_DIR / "data/3di_res/5m_dem.tif"
+# 添加GeoTIFF文件路径
+GEOTIFF_DIR = BASE_DIR / "data/3di_res/geotiff"
 
 
 def get_available_simulations() -> List[str]:
@@ -43,19 +48,58 @@ def get_available_simulations() -> List[str]:
     Returns:
         List[str]: 可用的模拟数据文件名列表
     """
-    nc_files = glob.glob(str(NETCDF_DIR / "*.nc"))
-    return [os.path.basename(f) for f in sorted(nc_files)]
+    # 从GeoTIFF目录获取模拟文件夹列表
+    simulations = [d.name for d in GEOTIFF_DIR.iterdir() if d.is_dir()]
+    return sorted(simulations)
+
+
+def get_water_depth_from_geotiff(geotiff_path: str, lat: float, lng: float) -> float:
+    """
+    从GeoTIFF文件读取指定坐标的水深度
+    
+    Args:
+        geotiff_path (str): GeoTIFF文件路径
+        lat (float): 纬度
+        lng (float): 经度
+    
+    Returns:
+        float: 水深度值
+    """
+    try:
+        with rasterio.open(geotiff_path) as src:
+            # 将地理坐标转换为栅格坐标（行列）
+            # 使用rasterio.transform.index替代rowcol
+            row, col = src.index(lng, lat)
+            
+            # 确保坐标在栅格范围内
+            if row < 0 or row >= src.height or col < 0 or col >= src.width:
+                logger.warning(f"坐标 ({lat}, {lng}) 超出栅格范围")
+                return 0.0
+            
+            # 读取坐标处的值
+            depth_value = src.read(1, window=((row, row+1), (col, col+1)))
+            
+            # 如果没有有效值，返回0
+            if depth_value.size == 0 or np.all(depth_value == src.nodata):
+                return 0.0
+            
+            # 四舍五入到2位小数
+            return round(float(depth_value[0][0]), 2)
+    except Exception as e:
+        logger.error(f"从GeoTIFF读取水深度失败: {str(e)}")
+        raise
 
 
 @water_depth_bp.route('/api/water-depth', methods=['GET'])
 def get_water_depth():
     """
-    获取指定地理坐标的水深度
+    获取指定地理坐标的水深度（从GeoTIFF文件读取）
     
     查询参数:
         lat (float): 纬度
         lng (float): 经度
-        simulation (str, optional): 模拟数据文件名，如不指定则使用最新的模拟
+        simulation (str, optional): 模拟数据文件夹名称
+        timestamp (str, optional): 时间戳，如waterdepth_20230101_120000
         
     Returns:
         JSON: 水深度数据
@@ -65,6 +109,7 @@ def get_water_depth():
         lat = request.args.get('lat')
         lng = request.args.get('lng')
         simulation = request.args.get('simulation')
+        timestamp = request.args.get('timestamp')
         
         # 参数验证
         if not lat or not lng:
@@ -79,51 +124,70 @@ def get_water_depth():
             return jsonify({
                 "error": "lat和lng参数必须是有效的数值"
             }), HTTPStatus.BAD_REQUEST
-            
-        # 获取可用的模拟数据
-        available_simulations = get_available_simulations()
-        if not available_simulations:
-            return jsonify({
-                "error": "没有可用的模拟数据"
-            }), HTTPStatus.NOT_FOUND
-            
-        # 选择模拟数据
-        if not simulation:
-            simulation = available_simulations[-1]  # 默认使用最新的模拟
-        elif simulation not in available_simulations:
-            return jsonify({
-                "error": f"指定的模拟数据 '{simulation}' 不存在",
-                "available_simulations": available_simulations
-            }), HTTPStatus.NOT_FOUND
-            
-        # 构建NetCDF文件路径
-        nc_file = str(NETCDF_DIR / simulation)
         
-        # 获取DEM值
+        # 验证simulation参数
+        if not simulation:
+            # 获取可用的模拟文件夹
+            simulations = get_available_simulations()
+            if not simulations:
+                return jsonify({
+                    "error": "没有可用的模拟数据"
+                }), HTTPStatus.NOT_FOUND
+            
+            simulation = simulations[-1]  # 默认使用最新的模拟
+        
+        # 构建模拟文件夹路径
+        simulation_dir = GEOTIFF_DIR / simulation
+        if not simulation_dir.exists() or not simulation_dir.is_dir():
+            return jsonify({
+                "error": f"指定的模拟 '{simulation}' 不存在"
+            }), HTTPStatus.NOT_FOUND
+        
+        # 获取可用的时间戳
+        tiff_files = list(simulation_dir.glob("*.tif"))
+        if not tiff_files:
+            return jsonify({
+                "error": f"模拟 '{simulation}' 没有可用的GeoTIFF文件"
+            }), HTTPStatus.NOT_FOUND
+        
+        # 排序并从文件名提取时间戳
+        tiff_files.sort()
+        available_timestamps = [f.stem for f in tiff_files]
+        
+        # 验证timestamp参数
+        if not timestamp:
+            # 默认使用最新的时间戳
+            timestamp = available_timestamps[-1]
+        elif timestamp not in available_timestamps:
+            # 尝试匹配部分时间戳
+            matched_timestamps = [ts for ts in available_timestamps if timestamp in ts]
+            if matched_timestamps:
+                timestamp = matched_timestamps[0]
+            else:
+                return jsonify({
+                    "error": f"指定的时间戳 '{timestamp}' 不存在",
+                    "available_timestamps": available_timestamps
+                }), HTTPStatus.NOT_FOUND
+        
+        # 构建GeoTIFF文件路径
+        geotiff_path = str(simulation_dir / f"{timestamp}.tif")
+        
+        # 从GeoTIFF获取水深度
+        try:
+            water_depth_value = get_water_depth_from_geotiff(geotiff_path, lat, lng)
+        except Exception as e:
+            logger.error(f"获取水深度失败: {str(e)}")
+            return jsonify({
+                "error": "从GeoTIFF获取水深度失败",
+                "details": str(e)
+            }), HTTPStatus.INTERNAL_SERVER_ERROR
+        
+        # 获取DEM值（可选，如果需要的话）
         try:
             dem_value = get_dem_value(str(DEM_FILE), lat, lng)
         except Exception as e:
             logger.error(f"获取DEM值失败: {str(e)}")
-            return jsonify({
-                "error": "获取地面高程数据失败",
-                "details": str(e)
-            }), HTTPStatus.INTERNAL_SERVER_ERROR
-            
-        # 获取水位数据
-        try:
-            times, water_levels = get_closest_node_level(nc_file, lat, lng)
-        except Exception as e:
-            logger.error(f"获取水位数据失败: {str(e)}")
-            return jsonify({
-                "error": "获取水位数据失败",
-                "details": str(e)
-            }), HTTPStatus.INTERNAL_SERVER_ERROR
-            
-        # 计算水深度
-        water_depth = water_levels - dem_value
-        
-        # 四舍五入到2位小数
-        water_depth_rounded = np.round(water_depth, decimals=2)
+            dem_value = None
         
         # 构建结果
         result = {
@@ -131,14 +195,14 @@ def get_water_depth():
                 "latitude": lat,
                 "longitude": lng
             },
-            "dem_elevation": float(dem_value),
-            "water_levels": water_levels.tolist(),
-            "water_depths": water_depth_rounded.tolist(),
-            "times": [str(t) for t in times],
+            "water_depth": water_depth_value,
             "simulation": simulation,
-            "current_water_depth": float(water_depth_rounded[-1]),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": timestamp,
         }
+        
+        # 如果有DEM值，添加到结果
+        if dem_value is not None:
+            result["dem_elevation"] = float(dem_value)
         
         return jsonify(result), HTTPStatus.OK
         
@@ -147,130 +211,6 @@ def get_water_depth():
         return jsonify({
             "error": "获取水深度数据失败",
             "details": str(e)
-        }), HTTPStatus.INTERNAL_SERVER_ERROR
-
-
-@water_depth_bp.route('/api/water-depth/point', methods=['GET'])
-def get_water_depth_at_point():
-    """
-    获取指定地理坐标的当前水深度（简化版，只返回当前值）
-    
-    查询参数:
-        lat (float): 纬度
-        lng (float): 经度
-        simulation (str, optional): 模拟数据文件名，如不指定则使用最新的模拟
-        timestamp (str, optional): 时间戳，如不指定则使用最新的时间点
-        
-    Returns:
-        JSON: 简化的水深度数据
-    """
-    try:
-        # 获取并验证参数
-        lat = request.args.get('lat')
-        lng = request.args.get('lng')
-        simulation = request.args.get('simulation')
-        timestamp = request.args.get('timestamp')  # 新增时间戳参数
-        
-        # 参数验证
-        if not lat or not lng:
-            return jsonify({
-                "error": "必须提供lat和lng参数"
-            }), HTTPStatus.BAD_REQUEST
-            
-        try:
-            lat = float(lat)
-            lng = float(lng)
-        except ValueError:
-            return jsonify({
-                "error": "lat和lng参数必须是有效的数值"
-            }), HTTPStatus.BAD_REQUEST
-            
-        # 获取可用的模拟数据
-        available_simulations = get_available_simulations()
-        if not available_simulations:
-            return jsonify({
-                "error": "没有可用的模拟数据"
-            }), HTTPStatus.NOT_FOUND
-            
-        # 选择模拟数据
-        if not simulation:
-            simulation = available_simulations[-1]  # 默认使用最新的模拟
-        elif simulation not in available_simulations:
-            return jsonify({
-                "error": f"指定的模拟数据 '{simulation}' 不存在",
-                "available_simulations": available_simulations
-            }), HTTPStatus.NOT_FOUND
-            
-        # 构建NetCDF文件路径
-        nc_file = str(NETCDF_DIR / simulation)
-        
-        # 获取DEM值
-        try:
-            dem_value = get_dem_value(str(DEM_FILE), lat, lng)
-        except Exception as e:
-            logger.error(f"获取DEM值失败: {str(e)}")
-            return jsonify({
-                "error": "获取地面高程数据失败"
-            }), HTTPStatus.INTERNAL_SERVER_ERROR
-            
-        # 获取水位数据
-        try:
-            times, water_levels = get_closest_node_level(nc_file, lat, lng)
-        except Exception as e:
-            logger.error(f"获取水位数据失败: {str(e)}")
-            return jsonify({
-                "error": "获取水位数据失败"
-            }), HTTPStatus.INTERNAL_SERVER_ERROR
-            
-        # 如果提供了时间戳，查找最接近的时间点
-        index = -1  # 默认使用最新的时间点
-        if timestamp:
-            try:
-                # 解析时间戳格式 (waterdepth_YYYYMMDD_HHMMSS)
-                # 将其转换为numpy datetime64格式，以便与times数组比较
-                timestamp_match = timestamp.strip().split('_')
-                if len(timestamp_match) >= 3:
-                    date_part = timestamp_match[1]
-                    time_part = timestamp_match[2]
-                    
-                    # 构建与times数组相同格式的时间字符串
-                    timestamp_str = f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:]} {time_part[:2]}:{time_part[2:4]}:00"
-                    target_time = np.datetime64(timestamp_str)
-                    
-                    # 查找最接近的时间点
-                    time_diffs = np.abs(np.array(times) - target_time)
-                    index = np.argmin(time_diffs)
-                    
-                    logger.info(f"找到最接近时间戳 {timestamp} 的时间点: {times[index]}, 索引: {index}")
-                else:
-                    logger.warning(f"无效的时间戳格式: {timestamp}")
-            except Exception as e:
-                logger.error(f"处理时间戳时出错: {timestamp}, 错误: {str(e)}")
-                # 继续使用最新的时间点
-        
-        # 计算水深度
-        water_depth = water_levels[index] - dem_value  # 使用指定或最新的时间点
-        
-        # 四舍五入到2位小数
-        water_depth_rounded = round(float(water_depth), 2)
-        
-        # 构建简化结果
-        result = {
-            "latitude": lat,
-            "longitude": lng,
-            "dem_elevation": float(dem_value),
-            "water_level": float(water_levels[index]),
-            "water_depth": water_depth_rounded,
-            "simulation": simulation,
-            "timestamp": str(times[index])
-        }
-        
-        return jsonify(result), HTTPStatus.OK
-        
-    except Exception as e:
-        logger.error(f"获取水深度数据失败: {str(e)}")
-        return jsonify({
-            "error": "获取水深度数据失败"
         }), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
@@ -283,6 +223,7 @@ def get_simulations():
         JSON: 可用的模拟数据列表
     """
     try:
+        # 从GeoTIFF目录获取模拟文件夹列表
         simulations = get_available_simulations()
         
         return jsonify({
@@ -293,5 +234,64 @@ def get_simulations():
     except Exception as e:
         logger.error(f"获取模拟数据列表失败: {str(e)}")
         return jsonify({
-            "error": "获取模拟数据列表失败"
+            "error": "获取模拟数据列表失败",
+            "details": str(e)
+        }), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@water_depth_bp.route('/api/timestamps', methods=['GET'])
+def get_timestamps():
+    """
+    获取指定模拟的可用时间戳列表
+    
+    查询参数:
+        simulation (str, optional): 模拟数据文件夹名称，不提供时使用最新的模拟
+        
+    Returns:
+        JSON: 可用的时间戳列表
+    """
+    try:
+        # 获取并验证参数
+        simulation = request.args.get('simulation')
+        
+        # 如果未提供simulation参数
+        if not simulation:
+            # 获取可用的模拟文件夹
+            simulations = get_available_simulations()
+            if not simulations:
+                return jsonify({
+                    "error": "没有可用的模拟数据"
+                }), HTTPStatus.NOT_FOUND
+            
+            simulation = simulations[-1]  # 默认使用最新的模拟
+        
+        # 构建模拟文件夹路径
+        simulation_dir = GEOTIFF_DIR / simulation
+        if not simulation_dir.exists() or not simulation_dir.is_dir():
+            return jsonify({
+                "error": f"指定的模拟 '{simulation}' 不存在"
+            }), HTTPStatus.NOT_FOUND
+        
+        # 获取可用的时间戳
+        tiff_files = list(simulation_dir.glob("*.tif"))
+        if not tiff_files:
+            return jsonify({
+                "error": f"模拟 '{simulation}' 没有可用的GeoTIFF文件"
+            }), HTTPStatus.NOT_FOUND
+        
+        # 排序并从文件名提取时间戳
+        tiff_files.sort()
+        timestamps = [f.stem for f in tiff_files]
+        
+        return jsonify({
+            "simulation": simulation,
+            "timestamps": timestamps,
+            "count": len(timestamps)
+        }), HTTPStatus.OK
+        
+    except Exception as e:
+        logger.error(f"获取时间戳列表失败: {str(e)}")
+        return jsonify({
+            "error": "获取时间戳列表失败",
+            "details": str(e)
         }), HTTPStatus.INTERNAL_SERVER_ERROR 
