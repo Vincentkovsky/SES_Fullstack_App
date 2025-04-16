@@ -273,8 +273,8 @@ def plot_water_depth(data: Dict[str, Any], output_file: str, river_level_data: O
         # 创建图表
         plt.figure(figsize=(14, 8))
         
-        # 绘制模拟水深度
-        plt.plot(times, water_depths, 'b-', linewidth=2, label='Simulated Water Depth')
+        # 绘制模拟水深度 - 更改为红色(原为蓝色)
+        plt.plot(times, water_depths, 'r-', linewidth=2, label='Simulated Water Depth')
         
         # 如果提供了河流水位数据，在同一坐标系上绘制
         if river_level_data is not None:
@@ -286,7 +286,8 @@ def plot_water_depth(data: Dict[str, Any], output_file: str, river_level_data: O
             filtered_data = river_level_data[mask]
             
             if not filtered_data.empty:
-                plt.plot(filtered_data['date'], filtered_data['level'], 'r-', linewidth=2, label='Observed River Level')
+                # 绘制实测河流水位 - 更改为蓝色(原为红色)
+                plt.plot(filtered_data['date'], filtered_data['level'], 'b-', linewidth=2, label='Observed River Level')
                 
                 # 计算统计信息
                 mean_sim = np.mean(water_depths)
@@ -441,8 +442,7 @@ def process_netcdf_files(netcdf_dir: str, dem_file: str, output_dir: str,
             file_name = os.path.basename(nc_file)
             base_name = os.path.splitext(file_name)[0]
             output_json = os.path.join(output_dir, f"{base_name}_water_depth.json")
-            output_plot = os.path.join(plots_dir, f"{base_name}_water_depth.png")
-            output_comparison_plot = os.path.join(plots_dir, f"{base_name}_water_depth_comparison.png")
+            output_plot = os.path.join(plots_dir, f"{base_name}_water_depth_comparison.png")
             
             logger.info(f"Processing {file_name}...")
             
@@ -452,13 +452,13 @@ def process_netcdf_files(netcdf_dir: str, dem_file: str, output_dir: str,
             # 保存结果到JSON
             save_water_depth_data(water_depth_data, output_json)
             
-            # 绘制水深度折线图（仅模拟数据）
-            plot_water_depth(water_depth_data, output_plot)
-            
-            # 绘制水深度与实测河流水位比较图（如果有河流水位数据）
+            # 绘制水深度与实测河流水位对比图
+            # 不再生成单独的水深度图，只生成一张对比图
+            plot_water_depth(water_depth_data, output_plot, river_level_data)
             if river_level_data is not None:
-                plot_water_depth(water_depth_data, output_comparison_plot, river_level_data)
                 logger.info(f"Created comparison plot with river level data")
+            else:
+                logger.info(f"Created water depth plot without river level data")
             
         logger.info("All files processed successfully")
     except Exception as e:
