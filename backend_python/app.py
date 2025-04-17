@@ -24,7 +24,8 @@ from api import (
     inference_bp,
     gauging_bp,
     cache_bp,
-    health_bp
+    health_bp,
+    raster_bp
 )
 
 # 加载环境变量
@@ -58,6 +59,7 @@ def create_app():
     app.register_blueprint(gauging_bp)
     app.register_blueprint(cache_bp)
     app.register_blueprint(health_bp)
+    app.register_blueprint(raster_bp)
     
     @app.route('/')
     def index():

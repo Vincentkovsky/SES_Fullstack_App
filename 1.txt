@@ -1,7 +1,0 @@
-帮我生成一个.gitignore文件并把fullstack文件夹上传到“echo "# UTS_SES" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/Vincentkovsky/UTS_SES.git
-git push -u origin main”

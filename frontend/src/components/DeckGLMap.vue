@@ -330,20 +330,34 @@ const fetchWaterDepthInfo = debounce(async (lat: number, lng: number) => {
   isLoadingWaterDepth.value = true;
   
   try {
-    // 使用API服务获取水深数据，传递当前时间戳和模拟ID
-    const result = await fetchWaterDepth(
-      lat, 
-      lng, 
-      currentTimestamp.value, // 传递当前时间戳
-      currentSimulation.value || undefined // 传递当前模拟ID（如果有）
-    );
+    // 确保有当前时间戳和模拟ID
+    if (!currentTimestamp.value) {
+      console.warn('无法获取水深：当前时间戳为空');
+      return;
+    }
     
-    // 保存结果
-    waterDepth.value = result.water_depth;
+    const simulation = currentSimulation.value || '20221024_20221022';
     
-    // 可以选择保存更多详情
-    // waterLevel.value = result.water_level;
-    // demElevation.value = result.dem_elevation;
+    // 构建API URL
+    const url = `http://127.0.0.1:3000/api/water-depth?lat=${lat}&lng=${lng}&simulation=${simulation}&timestamp=${currentTimestamp.value}`;
+    
+    // 发送请求
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP错误: ${response.status}`);
+    }
+    
+    // 解析响应
+    const data = await response.json();
+    if (data.success) {
+      // 保存结果
+      waterDepth.value = data.depth !== undefined ? data.depth : null;
+      
+      // 记录日志
+      console.debug(`坐标(${lat}, ${lng})处的水深: ${waterDepth.value}米`);
+    } else {
+      throw new Error(data.message || '获取水深失败');
+    }
   } catch (error) {
     console.error('获取水深度失败:', error);
     waterDepth.value = null;
@@ -361,13 +375,18 @@ const formattedWaterDepth = computed(() => {
 // Methods
 const createTileLayer = (timestamp: string) => {
   // 构建URL时，添加currentSimulation参数（如果有）
-  let tileUrl = `http://localhost:3000/api/tiles/${timestamp}/{z}/{x}/{y}?isSteedMode=${isSteedMode.value}`;
+  let tileUrl = '';
   
   // 检查是否有选择的模拟
   if (currentSimulation.value) {
     console.log(`使用模拟: ${currentSimulation.value}`);
-    // 使用专用的simulation路由
-    tileUrl = `http://localhost:3000/api/tiles/simulation/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}`;
+    // 使用后端API路径
+    tileUrl = `http://127.0.0.1:3000/api/tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}.png`;
+  } else {
+    // 默认使用第一个可用的模拟(通常是20221024_20221022)
+    const defaultSimulation = '20221024_20221022';
+    console.log(`使用默认模拟: ${defaultSimulation}`);
+    tileUrl = `http://127.0.0.1:3000/api/tiles/${defaultSimulation}/${timestamp}/{z}/{x}/{y}.png`;
   }
   
   console.log(`瓦片URL: ${tileUrl}`);
@@ -375,7 +394,7 @@ const createTileLayer = (timestamp: string) => {
   return new TileLayer({
     id: `TileLayer-${timestamp}`,
     data: tileUrl,
-    maxZoom: 14,
+    maxZoom: 16,  // 增加最大缩放级别以支持更高精度
     minZoom: 8,
     tileSize: 256,
     maxCacheSize: 100,
@@ -651,13 +670,22 @@ const initializeMap = async () => {
 };
 
 const preloadFirstFrame = async (firstTimestamp: string) => {
-  const baseUrl = `http://localhost:3000/api/tiles/${firstTimestamp}`;
-  await Promise.all([
-    fetch(`${baseUrl}/12/3964/2494`),
-    fetch(`${baseUrl}/12/3964/2495`),
-    fetch(`${baseUrl}/12/3965/2494`),
-    fetch(`${baseUrl}/12/3965/2495`)
-  ]);
+  // 确定使用哪个模拟
+  const simulation = currentSimulation.value || '20221024_20221022';
+  const baseUrl = `http://127.0.0.1:3000/api/tiles/${simulation}/${firstTimestamp}`;
+  
+  try {
+    // 预加载一些瓦片来加速初始显示
+    await Promise.all([
+      fetch(`${baseUrl}/12/3964/2494.png`),
+      fetch(`${baseUrl}/12/3964/2495.png`),
+      fetch(`${baseUrl}/12/3965/2494.png`),
+      fetch(`${baseUrl}/12/3965/2495.png`)
+    ]);
+    console.log('预加载瓦片完成');
+  } catch (error) {
+    console.warn('预加载瓦片失败:', error);
+  }
 };
 
 // Add layer toggle methods
@@ -759,8 +787,31 @@ const setPlayback = (playing: boolean, speed: number) => {
 onMounted(async () => {
   try {
     const map = await initializeMap();
-    const response = await fetchTilesList(isSteedMode.value);
-    timestamps = response.message || [];
+    
+    // 获取时间步列表
+    try {
+      // 默认使用第一个可用的模拟(通常是20221024_20221022)
+      const defaultSimulation = '20221024_20221022';
+      currentSimulation.value = defaultSimulation;
+      
+      // 直接调用后端API
+      const response = await fetch(`http://127.0.0.1:3000/api/simulations/${defaultSimulation}/timesteps`);
+      if (!response.ok) {
+        throw new Error(`HTTP错误: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        // 提取时间步ID列表
+        timestamps = data.data.map((item: any) => item.timestep_id);
+        console.log(`获取到${timestamps.length}个时间步`);
+      } else {
+        throw new Error('API返回的数据格式不正确');
+      }
+    } catch (error) {
+      console.error('获取时间步列表失败:', error);
+      throw error; // 让错误继续向上传播
+    }
 
     if (timestamps.length === 0) {
       throw new Error('No timestamps available');
@@ -796,16 +847,29 @@ watch(playbackSpeed, (newSpeed) => {
 
 watch(isSteedMode, async (newMode) => {
   try {
-    // Refresh tiles list when mode changes
-    const response = await fetchTilesList(newMode);
-    console.log("response", response);
-    timestamps = response.message || [];
+    // 获取当前选择的模拟
+    const simulation = currentSimulation.value || '20221024_20221022';
+    
+    // 刷新时间步列表
+    const response = await fetch(`http://127.0.0.1:3000/api/simulations/${simulation}/timesteps`);
+    if (!response.ok) {
+      throw new Error(`HTTP错误: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data.success && data.data) {
+      // 提取时间步ID列表
+      timestamps = data.data.map((item: any) => item.timestep_id);
+      console.log(`模式切换后获取到${timestamps.length}个时间步`);
+    } else {
+      throw new Error('API返回的数据格式不正确');
+    }
     
     if (timestamps.length === 0) {
       throw new Error('No timestamps available');
     }
 
-    // Reset animation
+    // 重置动画
     currentTimeIndex = 0;
     currentTimestamp.value = timestamps[0];
     updateLayers(0);
@@ -816,7 +880,7 @@ watch(isSteedMode, async (newMode) => {
   } catch (error) {
     console.error('Error refreshing tiles after mode change:', error);
   }
-});
+}, { flush: 'sync' });
 
 const toggleSettings = () => {
   isSettingsOpen.value = !isSettingsOpen.value;
@@ -878,24 +942,41 @@ const handleHistoricalSimulation = async (simulation: string) => {
   console.log(`Loading historical simulation: ${simulation}`);
   
   try {
-    // Stop any current animation
+    // 停止任何当前动画
     if (animationInstance) {
       animationInstance.stop();
     }
     
-    // Update current selection simulation
+    // 更新当前选择的模拟
     currentSimulation.value = simulation;
     console.log(`Setting current simulation: ${simulation}`);
     
-    // Fetch timestamps for the selected simulation
-    const response = await fetchTilesList(false, simulation);
-    timestamps = response.message || [];
+    // 调用后端API获取时间步列表
+    try {
+      // 直接调用后端API
+      const response = await fetch(`http://127.0.0.1:3000/api/simulations/${simulation}/timesteps`);
+      if (!response.ok) {
+        throw new Error(`HTTP错误: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        // 提取时间步ID列表
+        timestamps = data.data.map((item: any) => item.timestep_id);
+        console.log(`获取到${timestamps.length}个时间步`);
+      } else {
+        throw new Error('API返回的数据格式不正确');
+      }
+    } catch (error) {
+      console.error('获取时间步列表失败:', error);
+      timestamps = [];
+    }
     
     if (timestamps.length === 0) {
       throw new Error('No timestamps available for selected simulation');
     }
     
-    // Also fetch rainfall timestamps for the simulation
+    // Also fetch rainfall timestamps for the simulation (保持不变)
     try {
       console.log(`Fetching rainfall timestamps for simulation: ${simulation}`);
       rainfallTimestamps.value = await fetchRainfallTilesList(simulation);
