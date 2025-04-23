@@ -121,12 +121,33 @@ def create_app() -> FastAPI:
         """应用关闭时执行"""
         logger.info("应用关闭中...")
         
-        # 清理资源
-        # 等待所有异步任务完成
-        pending = asyncio.all_tasks()
-        if pending:
-            logger.info(f"等待 {len(pending)} 个异步任务完成...")
-            await asyncio.gather(*pending, return_exceptions=True)
+        try:
+            # 清理资源
+            # 获取当前任务
+            current_task = asyncio.current_task()
+            
+            # 获取所有异步任务，但排除当前关闭任务
+            pending = [task for task in asyncio.all_tasks() 
+                      if task is not current_task and not task.done()]
+            
+            if pending:
+                logger.info(f"等待 {len(pending)} 个异步任务完成（最多5秒）...")
+                # 设置超时，最多等待5秒
+                try:
+                    # 取消所有任务并等待它们完成
+                    for task in pending:
+                        task.cancel()
+                    # 使用超时等待任务完成
+                    await asyncio.wait_for(
+                        asyncio.gather(*pending, return_exceptions=True),
+                        timeout=5.0
+                    )
+                except asyncio.TimeoutError:
+                    logger.warning("等待任务超时，强制关闭")
+                except Exception as e:
+                    logger.error(f"等待任务完成时出错: {str(e)}")
+        except Exception as e:
+            logger.error(f"关闭过程中出错: {str(e)}")
         
         logger.info("应用已关闭")
     
