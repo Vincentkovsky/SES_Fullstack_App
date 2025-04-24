@@ -1,0 +1,46 @@
+MAP
+  NAME "[SIMULATION_ID]"
+  SIZE 800 600
+  # 使用动态范围，将由代码设置
+  EXTENT [BBOX]
+  UNITS meters
+  DEBUG 5
+  CONFIG "MS_ERRORFILE" "/tmp/mapserver_error.log"
+  
+  PROJECTION
+    "init=epsg:32755"
+  END
+  
+  WEB
+    METADATA
+      "wms_title" "Water Depth Simulation [SIMULATION_ID]"
+      "wms_srs" "EPSG:32755 EPSG:4326 EPSG:3857"
+      "wms_enable_request" "*"
+      "wms_onlineresource" "http://localhost:5000/api/mapserver/[SIMULATION_ID]"
+    END
+  END
+  
+  OUTPUTFORMAT
+    NAME png
+    DRIVER "AGG/PNG"
+    MIMETYPE "image/png"
+    IMAGEMODE RGBA
+    EXTENSION "png"
+    TRANSPARENT ON
+  END
+  
+  # 水深度的图例
+  LEGEND
+    STATUS ON
+    KEYSIZE 20 10
+    LABEL
+      TYPE TRUETYPE
+      FONT "sans"
+      SIZE 8
+      COLOR 0 0 0
+    END
+  END
+  
+  # 这里将动态添加每个时间步长的图层
+  [LAYERS]
+END

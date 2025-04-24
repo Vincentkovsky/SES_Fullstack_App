@@ -1,57 +1,77 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+配置模块
+
+从环境变量加载配置项并提供全局访问。
+"""
+
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import logging
 
 logger = logging.getLogger(__name__)
 
 class Config:
-    """应用配置类"""
-    # API密钥从环境变量获取
-    API_KEY = os.getenv('WATERNSW_API_KEY')
-    WATERNSW_BASE_URL = "https://api.waternsw.com.au/water/"
-    WATERNSW_SURFACE_WATER_ENDPOINT = "surface-water-data-api_download"
+    """配置类"""
     
-    # 文件路径使用Path对象，这样更加跨平台兼容
-    TILES_BASE_PATH = Path(os.getenv('TILES_BASE_PATH', "/projects/TCCTVS/FSI/cnnModel/inference"))
-    HISTORICAL_SIMULATIONS_PATH = Path(__file__).parent.parent / "data/3di_res/tiles"
-    DATA_DIR = Path(__file__).parent.parent / "data"
+    # API密钥
+    WATERNSW_API_KEY = os.getenv('WATERNSW_API_KEY', '')
+    THREEDI_API_PERSONAL_API_TOKEN = os.getenv('THREEDI_API_PERSONAL_API_TOKEN', '')
     
-    # 创建必要的目录
-    DATA_DIR.mkdir(exist_ok=True)
-    (DATA_DIR / "3di_res").mkdir(exist_ok=True)
+    # 文件路径配置
+    TILES_BASE_PATH = os.getenv('TILES_BASE_PATH', '/projects/TCCTVS/FSI/cnnModel/inference')
+    INFERENCE_SCRIPT = os.getenv('INFERENCE_SCRIPT', '/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh')
     
-    # 根据环境选择推理脚本路径
-    INFERENCE_SCRIPT = os.getenv('INFERENCE_SCRIPT', "/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh")
+    # 数据目录配置
+    DATA_DIR = os.getenv('DATA_DIR', 'backend_python/data')
+    GEOTIFF_DIR = os.getenv('GEOTIFF_DIR', 'backend_python/data/3di_res/geotiff')
+    DEM_FILE = os.getenv('DEM_FILE', 'backend_python/data/3di/dem_wagga_wagga.tif')
     
-    # CORS配置
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173')
+    # MapServer配置
+    MAPFILE_TEMPLATE = os.getenv('MAPFILE_TEMPLATE', 'backend_python/mapserver/templates/simulation_template.map')
+    MAPFILE_OUTPUT_DIR = os.getenv('MAPFILE_OUTPUT_DIR', 'backend_python/mapserver/mapfiles')
+    MAPSERVER_CGI_URL = os.getenv('MAPSERVER_CGI_URL', 'http://localhost/cgi-bin/mapserv')
     
     # 应用配置
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')
     HOST = os.getenv('FLASK_HOST', 'localhost')
-    PORT = int(os.getenv('FLASK_PORT', 3000))
+    PORT = int(os.getenv('FLASK_PORT', '5000'))
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173')
     
     # 缓存配置
-    CACHE_EXPIRY_SECONDS = 60 * 15  # 15分钟
+    CACHE_DURATION = int(os.getenv('CACHE_DURATION', '3600'))  # 默认缓存1小时
+    
+    @classmethod
+    def to_dict(cls) -> Dict[str, Any]:
+        """
+        将配置转换为字典
+        
+        Returns:
+            Dict[str, Any]: 配置字典
+        """
+        return {key: value for key, value in cls.__dict__.items() 
+                if not key.startswith('__') and not callable(value)}
     
     @classmethod
     def validate(cls) -> bool:
-        """验证配置是否有效"""
-        missing_vars = []
+        """
+        验证配置是否有效
         
-        # 检查关键API密钥
-        if not cls.API_KEY:
-            missing_vars.append("WATERNSW_API_KEY")
+        Returns:
+            bool: 配置是否有效
+        """
+        required_keys = [
+            'WATERNSW_API_KEY',
+            'THREEDI_API_PERSONAL_API_TOKEN'
+        ]
         
-        # 检查关键路径
-        if not os.path.exists(cls.INFERENCE_SCRIPT):
-            logger.warning(f"推理脚本路径不存在: {cls.INFERENCE_SCRIPT}")
+        for key in required_keys:
+            if not getattr(cls, key):
+                return False
         
-        if missing_vars:
-            logger.warning(f"缺少关键环境变量: {', '.join(missing_vars)}")
-            return False
-            
         return True
 
 def get_env(key: str, default: Any = None) -> Any:

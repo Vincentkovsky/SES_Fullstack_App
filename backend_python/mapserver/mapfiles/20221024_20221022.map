@@ -1,0 +1,6175 @@
+MAP
+  NAME "20221024_20221022"
+  SIZE 800 600
+  # 使用动态范围，将由代码设置
+  EXTENT 520700 6104100 560000 6121550
+  UNITS meters
+  DEBUG 5
+  CONFIG "MS_ERRORFILE" "/tmp/mapserver_error.log"
+  
+  PROJECTION
+    "init=epsg:32755"
+  END
+  
+  WEB
+    METADATA
+      "wms_title" "Water Depth Simulation 20221024_20221022"
+      "wms_srs" "EPSG:32755 EPSG:4326 EPSG:3857"
+      "wms_enable_request" "*"
+      "wms_onlineresource" "http://localhost:5000/api/mapserver/20221024_20221022"
+    END
+  END
+  
+  OUTPUTFORMAT
+    NAME png
+    DRIVER "AGG/PNG"
+    MIMETYPE "image/png"
+    IMAGEMODE RGBA
+    EXTENSION "png"
+    TRANSPARENT ON
+  END
+  
+  # 水深度的图例
+  LEGEND
+    STATUS ON
+    KEYSIZE 20 10
+    LABEL
+      TYPE TRUETYPE
+      FONT "sans"
+      SIZE 8
+      COLOR 0 0 0
+    END
+  END
+  
+  # 这里将动态添加每个时间步长的图层
+  
+  LAYER
+    NAME "waterdepth_20221024_000000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_000000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_000000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_000000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_003000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_003000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_003000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_003000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_010000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_010000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_010000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_010000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_013001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_013001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_013001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_013001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_020000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_020000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_020000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_020000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_023001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_023001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_023001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_023001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_030000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_030000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_030000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_030000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_033000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_033000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_033000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_033000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_040000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_040000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_040000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_040000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_043001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_043001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_043001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_043001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_050000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_050000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_050000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_050000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_053000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_053000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_053000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_053000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_060000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_060000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_060000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_060000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_063000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_063000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_063000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_063000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_070000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_070000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_070000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_070000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_073000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_073000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_073000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_073000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_080000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_080000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_080000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_080000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_083000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_083000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_083000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_083000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_090000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_090000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_090000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_090000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_093000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_093000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_093000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_093000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_100001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_100001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_100001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_100001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_103000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_103000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_103000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_103000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_110000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_110000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_110000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_110000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_113000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_113000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_113000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_113000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_120000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_120000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_120000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_120000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_123001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_123001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_123001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_123001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_130000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_130000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_130000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_130000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_133000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_133000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_133000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_133000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_140000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_140000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_140000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_140000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_143000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_143000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_143000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_143000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_150000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_150000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_150000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_150000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_153000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_153000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_153000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_153000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_160000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_160000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_160000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_160000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_163000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_163000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_163000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_163000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_170000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_170000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_170000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_170000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_173000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_173000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_173000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_173000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_180000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_180000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_180000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_180000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_183000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_183000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_183000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_183000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_190000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_190000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_190000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_190000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_193000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_193000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_193000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_193000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_200000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_200000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_200000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_200000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_203000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_203000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_203000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_203000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_210000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_210000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_210000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_210000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_213000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_213000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_213000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_213000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_220000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_220000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_220000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_220000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_223000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_223000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_223000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_223000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_230000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_230000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_230000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_230000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221024_233001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_233001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221024_233001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_233001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_000000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_000000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_000000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_000000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_003000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_003000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_003000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_003000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_010001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_010001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_010001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_010001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_013000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_013000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_013000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_013000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_020001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_020001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_020001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_020001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_023000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_023000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_023000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_023000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_030000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_030000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_030000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_030000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_033000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_033000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_033000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_033000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_040001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_040001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_040001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_040001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_043001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_043001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_043001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_043001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_050000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_050000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_050000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_050000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_053000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_053000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_053000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_053000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_060000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_060000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_060000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_060000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_063000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_063000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_063000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_063000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_070000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_070000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_070000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_070000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_073000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_073000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_073000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_073000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_080000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_080000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_080000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_080000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_083001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_083001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_083001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_083001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_090000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_090000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_090000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_090000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_093001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_093001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_093001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_093001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_100000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_100000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_100000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_100000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_103000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_103000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_103000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_103000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_110000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_110000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_110000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_110000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_113000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_113000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_113000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_113000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_120000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_120000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_120000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_120000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_123000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_123000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_123000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_123000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_130000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_130000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_130000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_130000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_133000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_133000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_133000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_133000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_140000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_140000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_140000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_140000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_143000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_143000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_143000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_143000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_150000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_150000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_150000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_150000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_153000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_153000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_153000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_153000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_160001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_160001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_160001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_160001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_163001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_163001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_163001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_163001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_170001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_170001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_170001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_170001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_173000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_173000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_173000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_173000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_180001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_180001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_180001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_180001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_183001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_183001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_183001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_183001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_190001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_190001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_190001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_190001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_193001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_193001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_193001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_193001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_200000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_200000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_200000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_200000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_203000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_203000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_203000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_203000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_210000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_210000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_210000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_210000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_213000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_213000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_213000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_213000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_220000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_220000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_220000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_220000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_223000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_223000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_223000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_223000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_230001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_230001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_230001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_230001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221025_233000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221025_233000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221025_233000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221025_233000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_000000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_000000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_000000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_000000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_003000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_003000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_003000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_003000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_010001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_010001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_010001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_010001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_013000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_013000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_013000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_013000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_020000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_020000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_020000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_020000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_023000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_023000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_023000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_023000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_030000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_030000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_030000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_030000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_033000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_033000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_033000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_033000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_040000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_040000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_040000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_040000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_043000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_043000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_043000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_043000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_050000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_050000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_050000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_050000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_053001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_053001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_053001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_053001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_060000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_060000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_060000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_060000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_063000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_063000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_063000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_063000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_070000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_070000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_070000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_070000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_073000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_073000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_073000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_073000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_080000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_080000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_080000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_080000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_083001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_083001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_083001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_083001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_090000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_090000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_090000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_090000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_093000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_093000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_093000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_093000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_100000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_100000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_100000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_100000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_103000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_103000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_103000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_103000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_110000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_110000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_110000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_110000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_113000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_113000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_113000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_113000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_120000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_120000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_120000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_120000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_123001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_123001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_123001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_123001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_130000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_130000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_130000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_130000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_133000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_133000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_133000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_133000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_140000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_140000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_140000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_140000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_143001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_143001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_143001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_143001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_150000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_150000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_150000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_150000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_153000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_153000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_153000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_153000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_160000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_160000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_160000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_160000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_163000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_163000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_163000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_163000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_170000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_170000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_170000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_170000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_173000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_173000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_173000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_173000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_180000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_180000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_180000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_180000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_183001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_183001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_183001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_183001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_190000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_190000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_190000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_190000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_193000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_193000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_193000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_193000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_200000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_200000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_200000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_200000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_203000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_203000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_203000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_203000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_210000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_210000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_210000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_210000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_213001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_213001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_213001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_213001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_220000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_220000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_220000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_220000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_223000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_223000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_223000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_223000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_230000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_230000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_230000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_230000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221026_233000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221026_233000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221026_233000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221026_233000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_000000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_000000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_000000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_000000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_003000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_003000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_003000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_003000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_010000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_010000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_010000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_010000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_013000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_013000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_013000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_013000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_020000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_020000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_020000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_020000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_023000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_023000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_023000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_023000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_030000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_030000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_030000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_030000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_033000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_033000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_033000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_033000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_040000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_040000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_040000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_040000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_043000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_043000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_043000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_043000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_050000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_050000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_050000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_050000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_053000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_053000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_053000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_053000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_060000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_060000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_060000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_060000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_063000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_063000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_063000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_063000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_070000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_070000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_070000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_070000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_073000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_073000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_073000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_073000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_080000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_080000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_080000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_080000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_083000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_083000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_083000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_083000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_090000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_090000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_090000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_090000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_093000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_093000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_093000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_093000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_100000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_100000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_100000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_100000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_103000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_103000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_103000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_103000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_110000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_110000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_110000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_110000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_113000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_113000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_113000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_113000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_120001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_120001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_120001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_120001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_123001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_123001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_123001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_123001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_130001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_130001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_130001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_130001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_133001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_133001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_133001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_133001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_140001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_140001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_140001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_140001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_143000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_143000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_143000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_143000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_150000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_150000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_150000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_150000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_153000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_153000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_153000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_153000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_160000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_160000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_160000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_160000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_163001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_163001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_163001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_163001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_170000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_170000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_170000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_170000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_173000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_173000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_173000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_173000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_180000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_180000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_180000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_180000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_183000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_183000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_183000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_183000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_190001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_190001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_190001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_190001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_193000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_193000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_193000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_193000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_200000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_200000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_200000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_200000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_203000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_203000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_203000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_203000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_210000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_210000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_210000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_210000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_213000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_213000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_213000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_213000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_220000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_220000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_220000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_220000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_223000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_223000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_223000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_223000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_230000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_230000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_230000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_230000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221027_233000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221027_233000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221027_233000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221027_233000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_000000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_000000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_000000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_000000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_003000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_003000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_003000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_003000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_010000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_010000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_010000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_010000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_013000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_013000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_013000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_013000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_020001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_020001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_020001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_020001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_023000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_023000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_023000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_023000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_030001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_030001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_030001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_030001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_033000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_033000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_033000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_033000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_040000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_040000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_040000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_040000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_043001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_043001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_043001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_043001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_050000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_050000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_050000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_050000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_053001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_053001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_053001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_053001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_060000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_060000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_060000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_060000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_063001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_063001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_063001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_063001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_070001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_070001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_070001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_070001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_073000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_073000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_073000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_073000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_080000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_080000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_080000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_080000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_083000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_083000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_083000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_083000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_090000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_090000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_090000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_090000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_093001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_093001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_093001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_093001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_100001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_100001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_100001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_100001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_103001"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_103001.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_103001"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_103001"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_110000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_110000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_110000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_110000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_113000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_113000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_113000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_113000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_120000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_120000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_120000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_120000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "waterdepth_20221028_123000"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221028_123000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "Water Depth at 20221028_123000"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221028_123000"
+      "gml_include_items" "all"
+      "wms_include_items" "all"
+      "wms_feature_info_mime_type" "application/json"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+  LAYER
+    NAME "all_waterdepth"
+    TYPE RASTER
+    STATUS ON
+    DATA "/Users/vincentjin/Desktop/SES/SES_Fullstack_App/backend_python/data/3di_res/geotiff/20221024_20221022/waterdepth_20221024_000000.tif"
+    PROJECTION
+      "init=epsg:32755"
+    END
+    METADATA
+      "wms_title" "All Water Depth Layers"
+      "wms_timeitem" "TIME"
+      "wms_timeextent" "20221024_000000,20221024_003000,20221024_010000,20221024_013001,20221024_020000,20221024_023001,20221024_030000,20221024_033000,20221024_040000,20221024_043001,20221024_050000,20221024_053000,20221024_060000,20221024_063000,20221024_070000,20221024_073000,20221024_080000,20221024_083000,20221024_090000,20221024_093000,20221024_100001,20221024_103000,20221024_110000,20221024_113000,20221024_120000,20221024_123001,20221024_130000,20221024_133000,20221024_140000,20221024_143000,20221024_150000,20221024_153000,20221024_160000,20221024_163000,20221024_170000,20221024_173000,20221024_180000,20221024_183000,20221024_190000,20221024_193000,20221024_200000,20221024_203000,20221024_210000,20221024_213000,20221024_220000,20221024_223000,20221024_230000,20221024_233001,20221025_000000,20221025_003000,20221025_010001,20221025_013000,20221025_020001,20221025_023000,20221025_030000,20221025_033000,20221025_040001,20221025_043001,20221025_050000,20221025_053000,20221025_060000,20221025_063000,20221025_070000,20221025_073000,20221025_080000,20221025_083001,20221025_090000,20221025_093001,20221025_100000,20221025_103000,20221025_110000,20221025_113000,20221025_120000,20221025_123000,20221025_130000,20221025_133000,20221025_140000,20221025_143000,20221025_150000,20221025_153000,20221025_160001,20221025_163001,20221025_170001,20221025_173000,20221025_180001,20221025_183001,20221025_190001,20221025_193001,20221025_200000,20221025_203000,20221025_210000,20221025_213000,20221025_220000,20221025_223000,20221025_230001,20221025_233000,20221026_000000,20221026_003000,20221026_010001,20221026_013000,20221026_020000,20221026_023000,20221026_030000,20221026_033000,20221026_040000,20221026_043000,20221026_050000,20221026_053001,20221026_060000,20221026_063000,20221026_070000,20221026_073000,20221026_080000,20221026_083001,20221026_090000,20221026_093000,20221026_100000,20221026_103000,20221026_110000,20221026_113000,20221026_120000,20221026_123001,20221026_130000,20221026_133000,20221026_140000,20221026_143001,20221026_150000,20221026_153000,20221026_160000,20221026_163000,20221026_170000,20221026_173000,20221026_180000,20221026_183001,20221026_190000,20221026_193000,20221026_200000,20221026_203000,20221026_210000,20221026_213001,20221026_220000,20221026_223000,20221026_230000,20221026_233000,20221027_000000,20221027_003000,20221027_010000,20221027_013000,20221027_020000,20221027_023000,20221027_030000,20221027_033000,20221027_040000,20221027_043000,20221027_050000,20221027_053000,20221027_060000,20221027_063000,20221027_070000,20221027_073000,20221027_080000,20221027_083000,20221027_090000,20221027_093000,20221027_100000,20221027_103000,20221027_110000,20221027_113000,20221027_120001,20221027_123001,20221027_130001,20221027_133001,20221027_140001,20221027_143000,20221027_150000,20221027_153000,20221027_160000,20221027_163001,20221027_170000,20221027_173000,20221027_180000,20221027_183000,20221027_190001,20221027_193000,20221027_200000,20221027_203000,20221027_210000,20221027_213000,20221027_220000,20221027_223000,20221027_230000,20221027_233000,20221028_000000,20221028_003000,20221028_010000,20221028_013000,20221028_020001,20221028_023000,20221028_030001,20221028_033000,20221028_040000,20221028_043001,20221028_050000,20221028_053001,20221028_060000,20221028_063001,20221028_070001,20221028_073000,20221028_080000,20221028_083000,20221028_090000,20221028_093001,20221028_100001,20221028_103001,20221028_110000,20221028_113000,20221028_120000,20221028_123000"
+    END
+    TEMPLATE "dummy.html"
+    
+      CLASS
+        NAME "Water Depth"
+        STYLE
+          COLORRANGE 255 0 0  0 0 255
+          DATARANGE 0 5
+        END
+      END
+
+  END
+
+END

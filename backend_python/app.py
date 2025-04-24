@@ -24,7 +24,8 @@ from api import (
     inference_bp,
     gauging_bp,
     cache_bp,
-    health_bp
+    health_bp,
+    mapserver_bp  # 新增：MapServer API
 )
 
 # 加载环境变量
@@ -58,6 +59,13 @@ def create_app():
     app.register_blueprint(gauging_bp)
     app.register_blueprint(cache_bp)
     app.register_blueprint(health_bp)
+    app.register_blueprint(mapserver_bp)  # 新增：注册MapServer API蓝图
+    
+    # 配置MapServer相关设置
+    app.config['GEOTIFF_DIR'] = Config.GEOTIFF_DIR
+    app.config['MAPFILE_TEMPLATE'] = Config.MAPFILE_TEMPLATE
+    app.config['MAPFILE_OUTPUT_DIR'] = Config.MAPFILE_OUTPUT_DIR
+    app.config['MAPSERVER_CGI_URL'] = Config.MAPSERVER_CGI_URL
     
     @app.route('/')
     def index():

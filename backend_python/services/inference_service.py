@@ -1,11 +1,14 @@
 import os
-import subprocess
+import glob
+import time
 import logging
-from typing import Dict, Any, Tuple
-from http import HTTPStatus
+import subprocess
 from pathlib import Path
-from core.config import Config
-from utils.helpers import get_timestamp
+from typing import List, Dict, Any, Optional, Tuple, Union
+from http import HTTPStatus
+
+from backend_python.core.config import Config
+from backend_python.utils.helpers import get_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -59,23 +62,30 @@ def execute_inference_script() -> Tuple[Dict[str, Any], int]:
             "details": str(e)
         }, HTTPStatus.INTERNAL_SERVER_ERROR
 
-def get_latest_inference_dir() -> Path:
+def get_latest_inference_dir() -> Optional[Path]:
     """
     获取最新的推理目录
     
     Returns:
-        Path: 最新推理目录的路径，如果不存在则返回None
+        Optional[Path]: 最新推理目录的路径，如果不存在则返回None
     """
+    base_path = Path(Config.TILES_BASE_PATH)
+    
     try:
+        if not base_path.exists():
+            logger.warning(f"推理目录不存在: {base_path}")
+            return None
+            
         inference_dirs = sorted([
-            d for d in os.listdir(Config.TILES_BASE_PATH)
-            if (Config.TILES_BASE_PATH / d).is_dir()
+            d for d in os.listdir(base_path)
+            if (base_path / d).is_dir()
         ], reverse=True)
         
         if not inference_dirs:
+            logger.info(f"推理目录为空: {base_path}")
             return None
             
-        return Config.TILES_BASE_PATH / inference_dirs[0]
-    except (FileNotFoundError, PermissionError):
-        logger.error(f"无法访问推理目录: {Config.TILES_BASE_PATH}")
+        return base_path / inference_dirs[0]
+    except (FileNotFoundError, PermissionError) as e:
+        logger.error(f"无法访问推理目录: {base_path}, 错误: {str(e)}")
         return None 
