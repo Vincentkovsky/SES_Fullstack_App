@@ -138,12 +138,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import mapboxgl from 'mapbox-gl';
-import { animate } from 'popmotion';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { fetchTilesList, runInference, fetchWaterDepth, fetchRainfallTilesList } from '../services/api';
 import MapZoomControls from './MapZoomControls.vue';
@@ -166,20 +165,27 @@ let map: mapboxgl.Map | null = null;
 // Layers
 let currentLayer: TileLayer | null = null;
 let previousLayer: TileLayer | null = null;
-let animationInstance: any = null;
+let animationIntervalId: number | null = null;
 let deckOverlay: MapboxOverlay | null = null;
 let timestamps: string[] = [];
 let currentTimeIndex = 0;
 
-// Constants
-const TRANSITION_DURATION = 800;
+// Constants for fixed time intervals
+const BASE_FRAME_INTERVAL = 1000; // 1 second per frame at 1x speed
+// Frame intervals for different playback speeds (in milliseconds)
+const FRAME_INTERVALS = {
+  1: BASE_FRAME_INTERVAL, // 1x speed: 1 frame per second
+  2: BASE_FRAME_INTERVAL / 2, // 2x speed: 1 frame per 500ms
+  3: BASE_FRAME_INTERVAL / 3, // 3x speed: 1 frame per 333ms
+};
 
-// 添加平滑过渡控制
+// Constants
+const TRANSITION_DURATION = 300; // Reduced from 800ms to 300ms for smoother transitions
+// Add transition settings for animation
 const TRANSITION_SETTINGS = {
-  duration: 300,
-  easing: (t: number) => t * (2 - t), // easeOut
+  easing: (t: number) => t * (2 - t), // Simple easeOut function
   interpolation: {
-    opacity: (from: number, to: number, t: number) => from + (to - from) * t
+    opacity: (start: number, end: number, t: number) => start + (end - start) * t
   }
 };
 
@@ -395,7 +401,7 @@ const createTileLayer = (timestamp: string) => {
     id: `TileLayer-${timestamp}`,
     data: tileUrl,
     maxZoom: 16,  // 增加最大缩放级别以支持更高精度
-    minZoom: 8,
+    minZoom: 13,
     tileSize: 256,
     maxCacheSize: 100,
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -454,8 +460,8 @@ const createRainfallLayer = (timestamp: string) => {
   return new TileLayer({
     id: `RainfallLayer-${currentSimulation.value}-${timestamp}`,
     data: tileUrl,
-    maxZoom: 14,
-    minZoom: 6,
+    maxZoom: 16,
+    minZoom: 13,
     tileSize: 256,
     maxCacheSize: 100,
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -523,7 +529,7 @@ const updateLayers = (index: number) => {
       const animate = (currentTime: number) => {
         if (!startTime) startTime = currentTime;
         const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / TRANSITION_SETTINGS.duration, 1);
+        const progress = Math.min(elapsed / TRANSITION_DURATION, 1);
         const eased = TRANSITION_SETTINGS.easing(progress);
         
         const opacity = TRANSITION_SETTINGS.interpolation.opacity(1, 0, eased);
@@ -555,16 +561,20 @@ const updateLayers = (index: number) => {
     deckOverlay?.setProps({ layers: [previousLayer, currentLayer].filter(Boolean) });
   } catch (error) {
     console.error(`Error updating layers:`, error);
-    if (animationInstance) {
-      animationInstance.stop();
+    // Updated error handling for the new interval-based system
+    if (animationIntervalId !== null) {
+      clearInterval(animationIntervalId);
+      animationIntervalId = null;
       isPlaying.value = false;
     }
   }
 };
 
 const startAnimation = () => {
-  if (animationInstance) {
-    animationInstance.stop();
+  // Clear any existing animation interval
+  if (animationIntervalId !== null) {
+    clearInterval(animationIntervalId);
+    animationIntervalId = null;
   }
   
   // Set the appropriate timestamp array based on active layer
@@ -575,30 +585,28 @@ const startAnimation = () => {
     return;
   }
   
-  // Calculate animation duration based on the selected layer type
-  const duration = TRANSITION_DURATION * activeTimestamps.length / playbackSpeed.value;
+  // Get the interval based on current playback speed
+  const frameInterval = FRAME_INTERVALS[playbackSpeed.value as keyof typeof FRAME_INTERVALS] || BASE_FRAME_INTERVAL;
   
-  animationInstance = animate({
-    from: isFloodLayerActive.value ? currentTimeIndex : currentRainfallIndex.value,
-    to: activeTimestamps.length,
-    duration,
-    onUpdate: (value: number) => {
-      const nextIndex = Math.floor(value % activeTimestamps.length);
-      progress.value = (nextIndex / activeTimestamps.length) * 100;
-      
-      if (isFloodLayerActive.value) {
-        if (nextIndex !== currentTimeIndex) {
-          currentTimeIndex = nextIndex;
-          updateLayers(currentTimeIndex);
-        }
-      } else {
-        if (nextIndex !== currentRainfallIndex.value) {
-          currentRainfallIndex.value = nextIndex;
-          updateLayers(currentRainfallIndex.value);
-        }
-      }
-    },
-  });
+  console.log(`Starting animation with fixed interval: ${frameInterval}ms per frame`);
+  
+  // Start a new interval timer
+  animationIntervalId = window.setInterval(() => {
+    // Calculate next index with wrapping
+    let nextIndex;
+    
+    if (isFloodLayerActive.value) {
+      nextIndex = (currentTimeIndex + 1) % timestamps.length;
+      currentTimeIndex = nextIndex;
+      progress.value = (nextIndex / timestamps.length) * 100;
+      updateLayers(currentTimeIndex);
+    } else {
+      nextIndex = (currentRainfallIndex.value + 1) % rainfallTimestamps.value.length;
+      currentRainfallIndex.value = nextIndex;
+      progress.value = (nextIndex / rainfallTimestamps.value.length) * 100;
+      updateLayers(currentRainfallIndex.value);
+    }
+  }, frameInterval);
 };
 
 const togglePlayPause = () => {
@@ -606,7 +614,10 @@ const togglePlayPause = () => {
   if (isPlaying.value) {
     startAnimation();
   } else {
-    animationInstance?.stop();
+    if (animationIntervalId !== null) {
+      clearInterval(animationIntervalId);
+      animationIntervalId = null;
+    }
   }
 };
 
@@ -632,6 +643,8 @@ const initializeMap = async () => {
     style: 'mapbox://styles/mapbox/streets-v12',
     center: [147.356, -35.117],
     zoom: 12,
+    minZoom: 12,
+    maxZoom: 16,
     accessToken: 'pk.eyJ1IjoidmluY2VudDEyOCIsImEiOiJjbHo4ZHhtcWswMXh0MnBvbW5vM2o0d2djIn0.Qj9VErbIh7yNL-DjTnAUFA'
   });
 
@@ -691,7 +704,6 @@ const preloadFirstFrame = async (firstTimestamp: string) => {
 // Add layer toggle methods
 const toggleFloodLayer = () => {
   isFloodLayerActive.value = !isFloodLayerActive.value;
-  map?.setZoom(12);
   map?.setCenter([147.356, -35.117]);
   
   // Turn off weather layer when flood layer is active
@@ -709,7 +721,6 @@ const toggleFloodLayer = () => {
 };
 
 const toggleWeatherLayer = async () => {
-  map?.setZoom(10);
   map?.setCenter([147.356, -35.117]);
   
   isWeatherLayerActive.value = !isWeatherLayerActive.value;
@@ -717,6 +728,12 @@ const toggleWeatherLayer = async () => {
   // If turning on the weather layer
   if (isWeatherLayerActive.value) {
     try {
+      // Stop any existing animation
+      if (animationIntervalId !== null) {
+        clearInterval(animationIntervalId);
+        animationIntervalId = null;
+      }
+      
       // Turn off flood layer
       isFloodLayerActive.value = false;
       if (currentLayer) {
@@ -765,8 +782,9 @@ const toggleWeatherLayer = async () => {
     }
     
     // Stop animation for rainfall layer
-    if (animationInstance) {
-      animationInstance.stop();
+    if (animationIntervalId !== null) {
+      clearInterval(animationIntervalId);
+      animationIntervalId = null;
     }
   }
 };
@@ -775,10 +793,15 @@ const setPlayback = (playing: boolean, speed: number) => {
   isPlaying.value = playing;
   playbackSpeed.value = speed;
   
+  // Always clear existing interval when changing playback settings
+  if (animationIntervalId !== null) {
+    clearInterval(animationIntervalId);
+    animationIntervalId = null;
+  }
+  
+  // Start new animation if playing is true
   if (playing) {
     startAnimation();
-  } else {
-    animationInstance?.stop();
   }
 };
 
@@ -827,7 +850,12 @@ onMounted(async () => {
     await preloadFirstFrame(timestamps[0]);
     currentTimestamp.value = timestamps[0];
     updateLayers(0);
-    startAnimation();
+    
+    // Start the animation with fixed time intervals
+    if (isPlaying.value) {
+      startAnimation();
+    }
+    
     isLoading.value = false;
 
   } catch (error) {
@@ -836,17 +864,39 @@ onMounted(async () => {
   }
 });
 
+// Add cleanup for animation interval
+onBeforeUnmount(() => {
+  // Clean up animation interval when component is unmounted
+  if (animationIntervalId !== null) {
+    clearInterval(animationIntervalId);
+    animationIntervalId = null;
+  }
+});
+
 // Watchers
 watch(playbackSpeed, (newSpeed) => {
   if (isPlaying.value) {
-    const durationMs = Math.round(TRANSITION_DURATION / newSpeed);
-    console.log(`Playback speed: ${newSpeed}x (${durationMs}ms per frame)`);
+    // Stop and restart animation with new speed
+    if (animationIntervalId !== null) {
+      clearInterval(animationIntervalId);
+      animationIntervalId = null;
+    }
+    
+    const frameInterval = FRAME_INTERVALS[newSpeed as keyof typeof FRAME_INTERVALS] || BASE_FRAME_INTERVAL;
+    console.log(`Playback speed changed: ${newSpeed}x (${frameInterval}ms per frame)`);
+    
     startAnimation();
   }
 }, { flush: 'sync' });
 
 watch(isSteedMode, async (newMode) => {
   try {
+    // Stop existing animation
+    if (animationIntervalId !== null) {
+      clearInterval(animationIntervalId);
+      animationIntervalId = null;
+    }
+    
     // 获取当前选择的模拟
     const simulation = currentSimulation.value || '20221024_20221022';
     
@@ -910,6 +960,13 @@ const handleInferenceStart = async (inferenceSettings: {
   try {
     console.log('Inference Start');
     isInferenceRunning.value = true;
+    
+    // Stop any current animation
+    if (animationIntervalId !== null) {
+      clearInterval(animationIntervalId);
+      animationIntervalId = null;
+    }
+    
     await runInference();
     console.log('Inference completed successfully');
     
@@ -919,7 +976,14 @@ const handleInferenceStart = async (inferenceSettings: {
     console.log(newTilesResponse);
     timestamps = newTilesResponse.message || [];
     
-    // Optionally restart animation with new timestamps
+    // Reset animation state
+    currentTimeIndex = 0;
+    if (timestamps.length > 0) {
+      currentTimestamp.value = timestamps[0];
+      updateLayers(0);
+    }
+    
+    // Restart animation with new timestamps if it was playing
     if (isPlaying.value) {
       startAnimation();
     }
@@ -942,9 +1006,10 @@ const handleHistoricalSimulation = async (simulation: string) => {
   console.log(`Loading historical simulation: ${simulation}`);
   
   try {
-    // 停止任何当前动画
-    if (animationInstance) {
-      animationInstance.stop();
+    // Stop any current animation
+    if (animationIntervalId !== null) {
+      clearInterval(animationIntervalId);
+      animationIntervalId = null;
     }
     
     // 更新当前选择的模拟
