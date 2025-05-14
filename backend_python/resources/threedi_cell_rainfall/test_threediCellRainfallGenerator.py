@@ -77,12 +77,12 @@ class TestThreediCellRainfallGenerator(unittest.TestCase):
         except Exception as e:
             self.fail(f"Rainfall generation failed with error: {str(e)}")
 
-    # @classmethod
-    # def tearDownClass(cls):
-    #     # Clean up test output directory
-    #     if os.path.exists(cls.test_output_dir):
-    #         import shutil
-    #         shutil.rmtree(cls.test_output_dir)
+    @classmethod
+    def tearDownClass(cls):
+        # Clean up test output directory
+        if os.path.exists(cls.test_output_dir):
+            import shutil
+            shutil.rmtree(cls.test_output_dir)
 
 if __name__ == '__main__':
     unittest.main() 

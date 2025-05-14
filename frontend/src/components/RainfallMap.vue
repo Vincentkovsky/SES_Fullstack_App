@@ -28,7 +28,7 @@ let lastFrameTime = 0;
 const FRAME_DELAY = 500; // 500ms between frames
 
 // Methods
-const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_ACCESS_TOKEN = import.meta.env.SHARED_MAPBOX_ACCESS_TOKEN;
 
 // Start animation
 const startAnimation = () => {

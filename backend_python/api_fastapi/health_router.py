@@ -46,7 +46,7 @@ async def sync_env_endpoint(background_tasks: BackgroundTasks) -> Dict[str, Any]
 async def sync_frontend_env_vars():
     """
     将前端需要的环境变量从后端.env文件同步到前端.env文件
-    只同步以VITE_开头的变量
+    同步以SHARED_开头的变量
     
     使用异步IO操作以避免阻塞
     """
@@ -59,7 +59,7 @@ async def sync_frontend_env_vars():
     
     try:
         # 读取后端.env文件
-        vite_vars = {}
+        shared_vars = {}
         with open(backend_env_path, 'r') as f:
             for line in f:
                 line = line.strip()
@@ -67,10 +67,10 @@ async def sync_frontend_env_vars():
                     continue
                 if '=' in line:
                     key, value = line.split('=', 1)
-                    if key.startswith('VITE_'):
-                        vite_vars[key] = value
+                    if key.startswith('SHARED_'):
+                        shared_vars[key] = value
         
-        # 如果前端.env文件存在，读取并保留非VITE_变量
+        # 如果前端.env文件存在，读取并保留其他变量
         existing_vars = {}
         if frontend_env_path.exists():
             with open(frontend_env_path, 'r') as f:
@@ -80,7 +80,7 @@ async def sync_frontend_env_vars():
                         continue
                     if '=' in line:
                         key, value = line.split('=', 1)
-                        if not key.startswith('VITE_'):
+                        if not key.startswith('SHARED_'):
                             existing_vars[key] = value
         
         # 合并变量并写入前端.env文件
@@ -89,11 +89,13 @@ async def sync_frontend_env_vars():
             f.write("# 此文件由后端自动生成，包含前端所需的环境变量\n")
             f.write("# 请勿直接修改，应该修改后端的.env文件\n\n")
             
-            # 写入VITE_变量
-            for key, value in vite_vars.items():
-                f.write(f"{key}={value}\n")
+            # 写入VITE_和SHARED_变量
+            if shared_vars:
+                f.write("# 共享环境变量\n")
+                for key, value in shared_vars.items():
+                    f.write(f"{key}={value}\n")
             
-            # 写入其他非VITE_变量
+            # 写入其他非共享变量
             if existing_vars:
                 f.write("\n# 其他前端特定变量\n")
                 for key, value in existing_vars.items():

@@ -23,6 +23,11 @@ from pyproj import Transformer, CRS
 from functools import lru_cache
 from starlette.concurrency import run_in_threadpool
 import os
+import json
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 # 配置日志
 logger = logging.getLogger(__name__)
@@ -40,12 +45,39 @@ EARTH_RADIUS = 6378137.0
 ORIGIN_SHIFT = np.pi * EARTH_RADIUS
 HALF_EARTH_CIRCUMFERENCE = 20037508.34
 
-# 默认颜色映射
-DEFAULT_COLORMAP = {
-    "0.0": [0, 0, 0, 0],
-    "1.0": [173, 216, 230, 0],
-    "10.0": [0, 0, 255, 255]
-}
+def load_colormap_from_env() -> Dict[str, list]:
+    """从环境变量加载颜色映射表"""
+    try:
+        color_str = os.getenv('SHARED_WATER_DEPTH_COLORS', '')
+        if not color_str:
+            raise ValueError("No color mapping found in environment variables")
+        
+        # 解析颜色映射字符串
+        color_dict = {}
+        for pair in color_str.split(';'):
+            if not pair:
+                continue
+            depth, colors = pair.split('=')
+            color_dict[depth] = [int(x) for x in colors.split(',')]
+        
+        return color_dict
+    except Exception as e:
+        logger.error(f"加载颜色映射失败: {e}")
+        # 返回默认颜色映射
+        return {
+            "0.0": [0, 0, 0, 0],
+            "0.1": [220, 240, 250, 50],
+            "0.3": [200, 230, 255, 100],
+            "0.5": [160, 210, 255, 150],
+            "1.0": [100, 180, 255, 180],
+            "2.0": [50, 150, 255, 200],
+            "3.0": [0, 120, 255, 220],
+            "5.0": [0, 80, 255, 235],
+            "10.0": [0, 40, 255, 255]
+        }
+
+# 加载颜色映射
+DEFAULT_COLORMAP = load_colormap_from_env()
 
 # 全局坐标转换器
 MERC_TO_UTM = Transformer.from_crs(
@@ -236,15 +268,9 @@ async def get_simulations():
         simulations = []
         for sim_dir in GEOTIFF_DIR.iterdir():
             if sim_dir.is_dir():
-                timesteps = await get_simulation_timesteps(sim_dir.name)
-                simulations.append({
-                    "simulation_id": sim_dir.name,
-                    "name": sim_dir.name,
-                    "description": f"Water depth simulation {sim_dir.name}",
-                    "num_timesteps": len(timesteps)
-                })
+                simulations.append(sim_dir.name)
         
-        return {'success': True, 'data': simulations}
+        return {'success': True, 'message': simulations}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

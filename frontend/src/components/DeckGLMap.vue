@@ -1073,7 +1073,7 @@ const handleHistoricalSimulation = async (simulation: string) => {
   }
 };
 
-const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
+const OPENWEATHERMAP_API_KEY = import.meta.env.SHARED_OPENWEATHERMAP_API_KEY;
 </script>
 
 <style scoped>

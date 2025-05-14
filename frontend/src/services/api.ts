@@ -257,7 +257,7 @@ export const fetchRainfallData = async (timestamp: string): Promise<number> => {
   try {
     // 获取环境变量中的API密钥
     // @ts-ignore - 环境变量在vite-env.d.ts中定义
-    const apiKey = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
+    const apiKey = import.meta.env.SHARED_OPENWEATHERMAP_API_KEY;
     if (!apiKey) {
       throw new Error('OpenWeatherMap API key is missing');
     }
@@ -289,7 +289,7 @@ export const fetchRainfallData = async (timestamp: string): Promise<number> => {
 export const fetchHistoricalSimulations = async (): Promise<string[]> => {
   try {
     const response: AxiosResponse<ApiResponse<string[]>> = await axios.get(
-      `${API_CONFIG.BASE_URL}/historical-simulations`
+      `${API_CONFIG.BASE_URL}/simulations`
     );
     return response.data.message || [];
   } catch (error) {
