@@ -4,7 +4,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
  * API配置常量
  */
 const API_CONFIG = {
-  BASE_URL: 'http://localhost:3000/api',
+  BASE_URL: 'http://localhost:8000',
   WEATHER_BASE_URL: 'https://api.openweathermap.org/data/2.5',
   WAGGA_COORDINATES: {
     lat: -35.117,

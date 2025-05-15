@@ -25,7 +25,7 @@ class Config:
     INFERENCE_SCRIPT = os.getenv('INFERENCE_SCRIPT', "/projects/TCCTVS/FSI/cnnModel/run_inference_w.sh")
     
     # CORS配置
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173')
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000')
     
     # 应用配置
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')

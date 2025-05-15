@@ -59,8 +59,8 @@
     />
     <div class="bottom-control-bar">
       <div class="logos">
-        <img src="../assets/icon/SES.svg" alt="SES Logo" class="logo" />
-        <img src="../assets/icon/UTS.svg" alt="UTS Logo" class="logo" />
+        <img :src="sesLogo" alt="SES Logo" class="logo" />
+        <img :src="utsLogo" alt="UTS Logo" class="logo" />
       </div>
       <div class="playback-controls">
         <button 
@@ -70,8 +70,8 @@
         >
           <img 
             :src="isPlaying && playbackSpeed === 1 
-              ? 'src/assets/icon/play activated.svg' 
-              : 'src/assets/icon/play.svg'" 
+              ? playActivatedIcon 
+              : playIcon" 
             alt="Play" 
           />
         </button>
@@ -82,8 +82,8 @@
         >
           <img 
             :src="isPlaying && playbackSpeed === 2 
-              ? 'src/assets/icon/speed2 activated.svg' 
-              : 'src/assets/icon/speed2.svg'" 
+              ? speed2ActivatedIcon 
+              : speed2Icon" 
             alt="Speed 2x" 
           />
         </button>
@@ -94,8 +94,8 @@
         >
           <img 
             :src="isPlaying && playbackSpeed === 3 
-              ? 'src/assets/icon/speed3 activated.svg' 
-              : 'src/assets/icon/speed3.svg'" 
+              ? speed3ActivatedIcon 
+              : speed3Icon" 
             alt="Speed 3x" 
           />
         </button>
@@ -106,8 +106,8 @@
         >
           <img 
             :src="!isPlaying 
-              ? 'src/assets/icon/pause activated.svg' 
-              : 'src/assets/icon/pause.svg'" 
+              ? pauseActivatedIcon 
+              : pauseIcon" 
             alt="Pause" 
           />
         </button>
@@ -151,6 +151,21 @@ import MapSettingsControl from './MapSettingsControl.vue';
 import MapBasemapControl from './MapBasemapControl.vue';
 import SettingsModal from './SettingsModal.vue';
 import { debounce } from 'lodash-es';
+
+// Import icons
+import playIcon from '../assets/icon/play.svg'
+import playActivatedIcon from '../assets/icon/play activated.svg'
+import speed2Icon from '../assets/icon/speed2.svg'
+import speed2ActivatedIcon from '../assets/icon/speed2 activated.svg'
+import speed3Icon from '../assets/icon/speed3.svg'
+import speed3ActivatedIcon from '../assets/icon/speed3 activated.svg'
+import pauseIcon from '../assets/icon/pause.svg'
+import pauseActivatedIcon from '../assets/icon/pause activated.svg'
+import sesLogo from '../assets/icon/SES.svg'
+import utsLogo from '../assets/icon/UTS.svg'
+
+// Set Mapbox token
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
 // State
 const mapContainer = ref<HTMLElement | null>(null);

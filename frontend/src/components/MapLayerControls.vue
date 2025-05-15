@@ -5,10 +5,9 @@
       :class="{ active: isFloodLayerActive }"
       @click="toggleFloodLayer" 
       aria-label="Toggle flood layer"
-      
     >
       <img 
-        :src="isFloodLayerActive ? 'src/assets/icon/Flood1.svg' : 'src/assets/icon/Flood0.svg'" 
+        :src="isFloodLayerActive ? floodActiveIcon : floodInactiveIcon" 
         alt="Flood layer" 
       />
     </button>
@@ -19,7 +18,7 @@
       aria-label="Toggle weather layer"
     >
       <img 
-        :src="isWeatherLayerActive ? 'src/assets/icon/weather1.svg' : 'src/assets/icon/weather0.svg'" 
+        :src="isWeatherLayerActive ? weatherActiveIcon : weatherInactiveIcon" 
         alt="Weather layer" 
       />
     </button>
@@ -28,6 +27,10 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
+import floodActiveIcon from '../assets/icon/Flood1.svg';
+import floodInactiveIcon from '../assets/icon/Flood0.svg';
+import weatherActiveIcon from '../assets/icon/weather1.svg';
+import weatherInactiveIcon from '../assets/icon/weather0.svg';
 
 const { isFloodLayerActive, isWeatherLayerActive } = defineProps<{
   isFloodLayerActive: boolean

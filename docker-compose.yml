@@ -1,12 +1,12 @@
-version: '3.8'
-
 services:
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - backend
 
@@ -14,6 +14,8 @@ services:
     build:
       context: ./backend_python
       dockerfile: Dockerfile
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     ports:
       - "8000:8000"
     environment:

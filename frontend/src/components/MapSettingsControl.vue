@@ -5,7 +5,7 @@
     aria-label="Toggle settings"
   >
     <img 
-      src="../assets/icon/setting.svg"
+      :src="settingsIcon"
       alt="Settings" 
     />
   </button>
@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import { defineEmits } from 'vue';
+import settingsIcon from '../assets/icon/setting.svg';
 
 const emit = defineEmits<{
   (e: 'toggle-settings'): void

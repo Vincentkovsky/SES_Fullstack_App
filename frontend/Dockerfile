@@ -7,14 +7,20 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with cache mount
+RUN --mount=type=cache,target=/root/.npm \
+    npm install
 
-# Copy the rest of the application
-COPY . .
+# Copy only necessary files
+COPY tsconfig*.json ./
+COPY vite.config.ts ./
+COPY index.html ./
+COPY src/ src/
+COPY public/ public/
 
-# Build the application (skip type checking)
-RUN npm run build -- --skipTypeCheck
+# Build the application
+RUN --mount=type=cache,target=/root/.npm \
+    npm run build
 
 # Production stage
 FROM nginx:alpine
@@ -22,8 +28,8 @@ FROM nginx:alpine
 # Copy built files from build stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port
 EXPOSE 80

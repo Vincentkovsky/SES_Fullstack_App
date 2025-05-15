@@ -6,7 +6,7 @@
       :aria-label="isSatellite ? 'Switch to street view' : 'Switch to satellite view'"
     >
       <img 
-        :src="isSatellite ? 'src/assets/icon/street.svg' : 'src/assets/icon/satellite.svg'"
+        :src="isSatellite ? streetIcon : satelliteIcon"
         :alt="isSatellite ? 'Street' : 'Satellite'" 
       />
     </button>
@@ -15,6 +15,8 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
+import streetIcon from '../assets/icon/street.svg';
+import satelliteIcon from '../assets/icon/satellite.svg';
 
 const { isSatellite } = defineProps<{
   isSatellite: boolean
