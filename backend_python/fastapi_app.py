@@ -41,8 +41,24 @@ from api_fastapi import (
     raster_router
 )
 
-# 加载环境变量
-load_dotenv()
+def load_environment_variables(env_mode: str = None):
+    """
+    根据环境模式加载对应的环境变量文件
+    
+    Args:
+        env_mode: 环境模式 ('development' 或 'production')
+    """
+    # 默认加载 .env 文件
+    load_dotenv()
+    
+    # 根据模式加载对应的环境变量文件
+    if env_mode:
+        env_file = f".env.{env_mode}"
+        if os.path.exists(env_file):
+            load_dotenv(env_file)
+            logger.info(f"已加载 {env_file} 环境配置")
+        else:
+            logger.warning(f"未找到 {env_file} 配置文件")
 
 # 设置日志
 logger = setup_logging()
@@ -152,6 +168,12 @@ def create_app() -> FastAPI:
     return app
 
 if __name__ == "__main__":
+    # 获取运行模式
+    env_mode = os.getenv("ENV_MODE", "development")
+    
+    # 加载对应环境的配置
+    load_environment_variables(env_mode)
+    
     # 验证配置
     if not Config.validate():
         logger.warning("配置验证失败，但应用仍将继续启动。某些功能可能不可用。")
@@ -163,7 +185,7 @@ if __name__ == "__main__":
     workers = os.getenv("API_WORKERS", "4")  # 默认4个工作进程
     
     # 显示应用配置信息
-    logger.info(f"启动应用 - 模式: {'调试' if Config.DEBUG else '生产'}, 地址: {host}:{port}, 工作进程: {workers}")
+    logger.info(f"启动应用 - 模式: {env_mode}, 地址: {host}:{port}, 工作进程: {workers}")
     
     # 创建并运行应用
     app = create_app()

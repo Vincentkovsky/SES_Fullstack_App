@@ -21,7 +21,6 @@ ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
 # Copy requirements files
-COPY requirements.txt requirements.txt
 COPY requirements_fastapi.txt requirements_fastapi.txt
 
 # Install dependencies with pip cache
@@ -40,7 +39,7 @@ COPY fastapi_app.py ./
 COPY __init__.py ./
 
 # Expose port
-EXPOSE 8000
+EXPOSE 3000
 
 # Command to run the application
-CMD ["uvicorn", "fastapi_app:create_app", "--host", "0.0.0.0", "--port", "8000", "--factory"] 
+CMD ["uvicorn", "fastapi_app:create_app", "--host", "0.0.0.0", "--port", "3000", "--factory"] 

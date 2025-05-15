@@ -144,6 +144,7 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import mapboxgl from 'mapbox-gl';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
+import type { _Tile2DHeader } from '@deck.gl/geo-layers';
 import { fetchTilesList, runInference, fetchWaterDepth, fetchRainfallTilesList } from '../services/api';
 import MapZoomControls from './MapZoomControls.vue';
 import MapLayerControls from './MapLayerControls.vue';
@@ -165,7 +166,7 @@ import sesLogo from '../assets/icon/SES.svg'
 import utsLogo from '../assets/icon/UTS.svg'
 
 // Set Mapbox token
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+mapboxgl.accessToken = import.meta.env.VITE_SHARED_MAPBOX_ACCESS_TOKEN;
 
 // State
 const mapContainer = ref<HTMLElement | null>(null);
@@ -176,6 +177,11 @@ const currentTimestamp = ref('');
 const progress = ref(0);
 const isSteedMode = ref(false);
 let map: mapboxgl.Map | null = null;
+
+// Add environment variables
+const API_HOST = import.meta.env.VITE_HOST || 'localhost';
+const API_PORT = import.meta.env.VITE_BACKEND_PORT || 3000;
+const API_BASE_URL = `http://${API_HOST}:${API_PORT}/api`;
 
 // Layers
 let currentLayer: TileLayer | null = null;
@@ -387,26 +393,21 @@ const formattedWaterDepth = computed(() => {
 
 // Methods
 const createTileLayer = (timestamp: string) => {
-  // 构建URL时，添加currentSimulation参数（如果有）
   let tileUrl = '';
   
-  // 检查是否有选择的模拟
   if (currentSimulation.value) {
     console.log(`使用模拟: ${currentSimulation.value}`);
-    // 使用后端API路径
-    tileUrl = `http://127.0.0.1:3000/api/tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}.png`;
+    tileUrl = `${API_BASE_URL}/tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}.png`;
   } else {
-    // 默认使用第一个可用的模拟(通常是20221024_20221022)
     const defaultSimulation = '20221024_20221022';
     console.log(`使用默认模拟: ${defaultSimulation}`);
-    tileUrl = `http://127.0.0.1:3000/api/tiles/${defaultSimulation}/${timestamp}/{z}/{x}/{y}.png`;
+    tileUrl = `${API_BASE_URL}/tiles/${defaultSimulation}/${timestamp}/{z}/{x}/{y}.png`;
   }
-  
   
   return new TileLayer({
     id: `TileLayer-${timestamp}`,
     data: tileUrl,
-    maxZoom: 16,  // 增加最大缩放级别以支持更高精度
+    maxZoom: 16,
     minZoom: 12,
     tileSize: 256,
     maxCacheSize: 100,
@@ -424,8 +425,9 @@ const createTileLayer = (timestamp: string) => {
       console.warn(`Tile loading error for timestamp ${timestamp}:`, err);
       return null;
     },
-    onTileLoad: (tile: { index: number[] }) => {
-      console.debug(`Tile loaded successfully for timestamp ${timestamp} at z=${tile.index[0]}, x=${tile.index[1]}, y=${tile.index[2]}`);
+    onTileLoad: (tile: _Tile2DHeader<any>) => {
+      const { x, y, z } = tile.index;
+      console.debug(`Tile loaded successfully for timestamp ${timestamp} at z=${z}, x=${x}, y=${y}`);
     },
     renderSubLayers: (props: any) => {
       const { boundingBox, data } = props.tile;
@@ -459,10 +461,8 @@ const createRainfallLayer = (timestamp: string) => {
   
   console.log(`Creating rainfall layer for simulation ${currentSimulation.value} with timestamp ${timestamp}`);
   
-  // Update the rainfall tile URL to include the timestamp in the format rainfall_YYYYMMDDHHMMSS
-  const tileUrl = `http://localhost:3000/api/rainfall-tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}`;
+  const tileUrl = `${API_BASE_URL}/rainfall-tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}`;
   
-
   return new TileLayer({
     id: `RainfallLayer-${currentSimulation.value}-${timestamp}`,
     data: tileUrl,
@@ -484,8 +484,9 @@ const createRainfallLayer = (timestamp: string) => {
       console.warn(`Rainfall tile loading error for ${currentSimulation.value} ${timestamp}:`, err);
       return null;
     },
-    onTileLoad: (tile: { index: number[] }) => {
-      console.debug(`Rainfall tile loaded successfully for ${currentSimulation.value} ${timestamp} at z=${tile.index[0]}, x=${tile.index[1]}, y=${tile.index[2]}`);
+    onTileLoad: (tile: _Tile2DHeader<any>) => {
+      const { x, y, z } = tile.index;
+      console.debug(`Rainfall tile loaded successfully for ${currentSimulation.value} ${timestamp} at z=${z}, x=${x}, y=${y}`);
     },
     renderSubLayers: (props: any) => {
       const { boundingBox, data } = props.tile;
@@ -656,8 +657,10 @@ const initializeMap = async () => {
     zoom: 12,
     minZoom: 12,
     maxZoom: 16,
-    accessToken: 'pk.eyJ1IjoidmluY2VudDEyOCIsImEiOiJjbHo4ZHhtcWswMXh0MnBvbW5vM2o0d2djIn0.Qj9VErbIh7yNL-DjTnAUFA'
+    accessToken: import.meta.env.VITE_SHARED_MAPBOX_ACCESS_TOKEN
   });
+
+  console.log("mapbox access token", import.meta.env.VITE_SHARED_MAPBOX_ACCESS_TOKEN);
 
   deckOverlay = new MapboxOverlay({ layers: [] });
   map.addControl(deckOverlay);
@@ -696,7 +699,7 @@ const initializeMap = async () => {
 const preloadFirstFrame = async (firstTimestamp: string) => {
   // 确定使用哪个模拟
   const simulation = currentSimulation.value || '20221024_20221022';
-  const baseUrl = `http://127.0.0.1:3000/api/tiles/${simulation}/${firstTimestamp}`;
+  const baseUrl = `${API_BASE_URL}/tiles/${simulation}/${firstTimestamp}`;
   
   try {
     // 预加载一些瓦片来加速初始显示
@@ -824,12 +827,10 @@ onMounted(async () => {
     
     // 获取时间步列表
     try {
-      // 默认使用第一个可用的模拟(通常是20221024_20221022)
       const defaultSimulation = '20221024_20221022';
       currentSimulation.value = defaultSimulation;
       
-      // 直接调用后端API
-      const response = await fetch(`http://127.0.0.1:3000/api/simulations/${defaultSimulation}/timesteps`);
+      const response = await fetch(`${API_BASE_URL}/simulations/${defaultSimulation}/timesteps`);
       if (!response.ok) {
         throw new Error(`HTTP错误: ${response.status}`);
       }
@@ -912,7 +913,7 @@ watch(isSteedMode, async (newMode) => {
     const simulation = currentSimulation.value || '20221024_20221022';
     
     // 刷新时间步列表
-    const response = await fetch(`http://127.0.0.1:3000/api/simulations/${simulation}/timesteps`);
+    const response = await fetch(`${API_BASE_URL}/simulations/${simulation}/timesteps`);
     if (!response.ok) {
       throw new Error(`HTTP错误: ${response.status}`);
     }
@@ -1030,7 +1031,7 @@ const handleHistoricalSimulation = async (simulation: string) => {
     // 调用后端API获取时间步列表
     try {
       // 直接调用后端API
-      const response = await fetch(`http://127.0.0.1:3000/api/simulations/${simulation}/timesteps`);
+      const response = await fetch(`${API_BASE_URL}/simulations/${simulation}/timesteps`);
       if (!response.ok) {
         throw new Error(`HTTP错误: ${response.status}`);
       }
@@ -1084,7 +1085,7 @@ const handleHistoricalSimulation = async (simulation: string) => {
   }
 };
 
-const OPENWEATHERMAP_API_KEY = import.meta.env.SHARED_OPENWEATHERMAP_API_KEY;
+const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_SHARED_OPENWEATHERMAP_API_KEY;
 </script>
 
 <style scoped>

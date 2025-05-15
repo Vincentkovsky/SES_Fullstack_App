@@ -28,7 +28,12 @@ let lastFrameTime = 0;
 const FRAME_DELAY = 500; // 500ms between frames
 
 // Methods
-const MAPBOX_ACCESS_TOKEN = import.meta.env.SHARED_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_SHARED_MAPBOX_ACCESS_TOKEN;
+
+// Add environment variables
+const API_HOST = import.meta.env.VITE_HOST || 'localhost';
+const API_PORT = import.meta.env.VITE_BACKEND_PORT || 3000;
+const API_BASE_URL = `http://${API_HOST}:${API_PORT}/api`;
 
 // Start animation
 const startAnimation = () => {
@@ -194,7 +199,7 @@ const updateRainfallLayer = (timestamp: string) => {
   map.addSource('rainfall', {
     type: 'raster',
     tiles: [
-      `http://localhost:3000/api/rainfall-tiles/${props.simulation}/${timestamp}/{z}/{x}/{y}`
+      `${API_BASE_URL}/rainfall-tiles/${props.simulation}/${timestamp}/{z}/{x}/{y}`
     ],
     tileSize: 256,
     attribution: '© Flood Model'

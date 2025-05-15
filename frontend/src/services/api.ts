@@ -4,7 +4,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
  * API配置常量
  */
 const API_CONFIG = {
-  BASE_URL: 'http://localhost:8000',
+  BASE_URL: `http://${import.meta.env.VITE_HOST || 'localhost'}:${import.meta.env.VITE_BACKEND_PORT || 3000}/api`,
   WEATHER_BASE_URL: 'https://api.openweathermap.org/data/2.5',
   WAGGA_COORDINATES: {
     lat: -35.117,
@@ -256,8 +256,7 @@ export const fetchGaugingData = async (
 export const fetchRainfallData = async (timestamp: string): Promise<number> => {
   try {
     // 获取环境变量中的API密钥
-    // @ts-ignore - 环境变量在vite-env.d.ts中定义
-    const apiKey = import.meta.env.SHARED_OPENWEATHERMAP_API_KEY;
+    const apiKey = import.meta.env.VITE_SHARED_OPENWEATHERMAP_API_KEY;
     if (!apiKey) {
       throw new Error('OpenWeatherMap API key is missing');
     }

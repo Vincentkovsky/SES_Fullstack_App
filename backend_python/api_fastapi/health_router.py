@@ -45,21 +45,27 @@ async def sync_env_endpoint(background_tasks: BackgroundTasks) -> Dict[str, Any]
 
 async def sync_frontend_env_vars():
     """
-    将前端需要的环境变量从后端.env文件同步到前端.env文件
-    同步以SHARED_开头的变量
-    
-    使用异步IO操作以避免阻塞
+    将环境变量从后端同步到前端
+    1. 读取后端的环境变量
+    2. 为所有变量添加VITE_前缀
+    3. 写入到前端的单个.env文件中
     """
-    backend_env_path = Path(__file__).parent.parent / ".env"
+    # 获取当前环境模式
+    env_mode = Config.ENV_MODE
+    
+    # 确定源文件和目标文件路径
+    backend_env_path = Path(__file__).parent.parent / f".env.{env_mode}"
     frontend_env_path = Path(__file__).parent.parent.parent / "frontend" / ".env"
     
-    if not backend_env_path.exists():
-        logger.warning("后端.env文件不存在，无法同步前端环境变量")
-        return
-    
     try:
-        # 读取后端.env文件
-        shared_vars = {}
+        # 读取后端环境变量
+        env_vars = {}
+        
+        if not backend_env_path.exists():
+            logger.warning(f"后端配置文件不存在: {backend_env_path}")
+            return
+            
+        logger.info(f"正在读取后端配置文件: {backend_env_path}")
         with open(backend_env_path, 'r') as f:
             for line in f:
                 line = line.strip()
@@ -67,41 +73,31 @@ async def sync_frontend_env_vars():
                     continue
                 if '=' in line:
                     key, value = line.split('=', 1)
-                    if key.startswith('SHARED_'):
-                        shared_vars[key] = value
+                    key = key.strip()
+                    value = value.strip()
+                    
+                    # 添加VITE_前缀（如果还没有）
+                    if not key.startswith('VITE_'):
+                        key = f'VITE_{key}'
+                    
+                    env_vars[key] = value
         
-        # 如果前端.env文件存在，读取并保留其他变量
-        existing_vars = {}
-        if frontend_env_path.exists():
-            with open(frontend_env_path, 'r') as f:
-                for line in f:
-                    line = line.strip()
-                    if not line or line.startswith('#'):
-                        continue
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        if not key.startswith('SHARED_'):
-                            existing_vars[key] = value
+        # 写入前端配置文件
+        os.makedirs(os.path.dirname(frontend_env_path), exist_ok=True)
         
-        # 合并变量并写入前端.env文件
         with open(frontend_env_path, 'w') as f:
-            # 首先写入注释
+            # 写入文件头注释
             f.write("# 此文件由后端自动生成，包含前端所需的环境变量\n")
-            f.write("# 请勿直接修改，应该修改后端的.env文件\n\n")
+            f.write(f"# 基于后端 {env_mode} 环境的配置自动生成\n")
+            f.write("# 请勿直接修改此文件，应该修改后端的对应.env文件\n\n")
             
-            # 写入VITE_和SHARED_变量
-            if shared_vars:
-                f.write("# 共享环境变量\n")
-                for key, value in shared_vars.items():
-                    f.write(f"{key}={value}\n")
-            
-            # 写入其他非共享变量
-            if existing_vars:
-                f.write("\n# 其他前端特定变量\n")
-                for key, value in existing_vars.items():
-                    f.write(f"{key}={value}\n")
+            # 写入环境变量，按字母顺序排序
+            for key, value in sorted(env_vars.items()):
+                f.write(f"{key}={value}\n")
         
-        logger.info(f"已同步前端环境变量到 {frontend_env_path}")
+        logger.info(f"已同步环境变量到前端 ({len(env_vars)} 个变量)")
+        logger.info(f"目标文件: {frontend_env_path}")
+        
     except Exception as e:
         logger.error(f"同步前端环境变量失败: {str(e)}")
         raise e 
