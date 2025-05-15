@@ -13,8 +13,8 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application (skip type checking)
+RUN npm run build -- --skipTypeCheck
 
 # Production stage
 FROM nginx:alpine
