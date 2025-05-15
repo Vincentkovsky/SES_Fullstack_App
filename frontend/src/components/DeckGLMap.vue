@@ -337,32 +337,24 @@ const fetchWaterDepthInfo = debounce(async (lat: number, lng: number) => {
   
   try {
     // 确保有当前时间戳和模拟ID
-    if (!currentTimestamp.value) {
-      console.warn('无法获取水深：当前时间戳为空');
+    const simulation = currentSimulation.value;
+
+    if (!currentTimestamp.value || !simulation) {
+      console.warn('无法获取水深：当前时间戳或模拟ID为空');
       return;
     }
     
-    const simulation = currentSimulation.value || '20221024_20221022';
+    // 调用API获取水深信息
+    const result = await fetchWaterDepth(lat, lng, currentTimestamp.value, simulation);
     
-    // 构建API URL
-    const url = `http://127.0.0.1:3000/api/water-depth?lat=${lat}&lng=${lng}&simulation=${simulation}&timestamp=${currentTimestamp.value}`;
-    
-    // 发送请求
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP错误: ${response.status}`);
-    }
-    
-    // 解析响应
-    const data = await response.json();
-    if (data.success) {
+    if (result.success) {
       // 保存结果
-      waterDepth.value = data.depth !== undefined ? data.depth : null;
+      waterDepth.value = result.depth;
       
       // 记录日志
       console.debug(`坐标(${lat}, ${lng})处的水深: ${waterDepth.value}米`);
     } else {
-      throw new Error(data.message || '获取水深失败');
+      throw new Error(result.message || '获取水深失败');
     }
   } catch (error) {
     console.error('获取水深度失败:', error);
@@ -395,13 +387,12 @@ const createTileLayer = (timestamp: string) => {
     tileUrl = `http://127.0.0.1:3000/api/tiles/${defaultSimulation}/${timestamp}/{z}/{x}/{y}.png`;
   }
   
-  console.log(`瓦片URL: ${tileUrl}`);
   
   return new TileLayer({
     id: `TileLayer-${timestamp}`,
     data: tileUrl,
     maxZoom: 16,  // 增加最大缩放级别以支持更高精度
-    minZoom: 13,
+    minZoom: 12,
     tileSize: 256,
     maxCacheSize: 100,
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -461,7 +452,7 @@ const createRainfallLayer = (timestamp: string) => {
     id: `RainfallLayer-${currentSimulation.value}-${timestamp}`,
     data: tileUrl,
     maxZoom: 16,
-    minZoom: 13,
+    minZoom: 12,
     tileSize: 256,
     maxCacheSize: 100,
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -516,6 +507,11 @@ const updateLayers = (index: number) => {
     if (isFloodLayerActive.value) {
       newLayer = createTileLayer(timestamps[index]);
       currentTimestamp.value = timestamps[index];
+      
+      // 如果有当前鼠标位置，更新水深信息
+      if (cursorLat.value !== null && cursorLng.value !== null) {
+        fetchWaterDepthInfo(cursorLat.value, cursorLng.value);
+      }
     } else if (isWeatherLayerActive.value && currentSimulation.value && rainfallTimestamps.value.length > 0) {
       // For rainfall, use the rainfall timestamps
       const rainfallTimestamp = rainfallTimestamps.value[currentRainfallIndex.value];

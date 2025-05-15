@@ -310,28 +310,31 @@ export const fetchWaterDepth = async (
   lng: number,
   timestamp?: string,
   simulation?: string
-): Promise<WaterDepthInfo> => {
+): Promise<{ success: boolean; depth: number | null; message?: string }> => {
   try {
+    if (!timestamp || !simulation) {
+      throw new Error('时间戳和模拟ID不能为空');
+    }
+
     const params = new URLSearchParams({
       lat: lat.toString(),
-      lng: lng.toString()
+      lng: lng.toString(),
+      simulation,
+      timestamp
     });
     
-    if (timestamp) {
-      params.append('timestamp', timestamp);
-    }
-    
-    if (simulation) {
-      params.append('simulation', simulation);
-    }
-    
-    const response = await axios.get<WaterDepthInfo>(
-      `${API_CONFIG.BASE_URL}/water-depth/point?${params.toString()}`
+    const response = await axios.get(
+      `${API_CONFIG.BASE_URL}/water-depth?${params.toString()}`
     );
     
     return response.data;
   } catch (error) {
-    return handleApiError(error, 'Failed to fetch water depth data');
+    console.error('获取水深度失败:', error);
+    return {
+      success: false,
+      depth: null,
+      message: error instanceof Error ? error.message : '获取水深失败'
+    };
   }
 };
 
