@@ -136,7 +136,6 @@ def create_app() -> FastAPI:
         logger.info("应用关闭中...")
         
         try:
-            # 清理资源
             # 获取当前任务
             current_task = asyncio.current_task()
             
@@ -145,25 +144,34 @@ def create_app() -> FastAPI:
                       if task is not current_task and not task.done()]
             
             if pending:
-                logger.info(f"等待 {len(pending)} 个异步任务完成（最多5秒）...")
-                # 设置超时，最多等待5秒
+                logger.info(f"等待 {len(pending)} 个异步任务完成...")
                 try:
-                    # 取消所有任务并等待它们完成
-                    for task in pending:
-                        task.cancel()
-                    # 使用超时等待任务完成
-                    await asyncio.wait_for(
-                        asyncio.gather(*pending, return_exceptions=True),
-                        timeout=5.0
-                    )
-                except asyncio.TimeoutError:
-                    logger.warning("等待任务超时，强制关闭")
+                    # 给任务一个机会优雅地完成
+                    done, pending = await asyncio.wait(pending, timeout=2.0)
+                    
+                    # 如果还有未完成的任务，则取消它们
+                    if pending:
+                        logger.warning(f"强制取消 {len(pending)} 个未完成的任务")
+                        
+                        cancelled_tasks = []
+                        for task in pending:
+                            if not task.done():
+                                task.cancel()
+                                cancelled_tasks.append(task)
+                        
+                        # 等待被取消的任务完成，但忽略CancelledError异常
+                        if cancelled_tasks:
+                            try:
+                                await asyncio.gather(*cancelled_tasks, return_exceptions=True)
+                            except Exception as e:
+                                logger.warning(f"取消任务时发生错误: {str(e)}")
                 except Exception as e:
                     logger.error(f"等待任务完成时出错: {str(e)}")
+                    # 继续执行关闭流程
         except Exception as e:
             logger.error(f"关闭过程中出错: {str(e)}")
-        
-        logger.info("应用已关闭")
+        finally:
+            logger.info("应用已关闭")
     
     return app
 

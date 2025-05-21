@@ -25,7 +25,6 @@ COPY requirements_fastapi.txt requirements_fastapi.txt
 
 # Install dependencies with pip cache
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir -r requirements_fastapi.txt
 
 # Copy application files
