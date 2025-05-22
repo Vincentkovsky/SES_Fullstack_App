@@ -1,0 +1,35 @@
+/projects/TCCTVS/Anaconda3/envs/flood_new/lib/python3.10/site-packages/pydantic/_internal/_fields.py:151: UserWarning: Field "model_path" has conflict with protected namespace "model_".
+
+You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
+  warnings.warn(
+加载颜色映射失败: No color mapping found in environment variables
+2025-05-23 01:39:50 - root - WARNING - 未找到 .env.development 配置文件
+2025-05-23 01:39:50 - root - INFO - 启动应用 - 模式: development, 地址: localhost:3000, 工作进程: 16
+/projects/TCCTVS/FSI/SES_Fullstack_App/backend_python/fastapi_app.py:120: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+/projects/TCCTVS/FSI/SES_Fullstack_App/backend_python/fastapi_app.py:133: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("shutdown")
+INFO:     Will watch for changes in these directories: ['/projects/TCCTVS/FSI/SES_Fullstack_App']
+WARNING:  "workers" flag is ignored when reloading is enabled.
+INFO:     Uvicorn running on http://localhost:3000 (Press CTRL+C to quit)
+INFO:     Started reloader process [2518426] using WatchFiles
+/projects/TCCTVS/Anaconda3/envs/flood_new/lib/python3.10/site-packages/pydantic/_internal/_fields.py:151: UserWarning: Field "model_path" has conflict with protected namespace "model_".
+
+You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
+  warnings.warn(
+加载颜色映射失败: No color mapping found in environment variables
+INFO:     Started server process [2518661]
+INFO:     Waiting for application startup.
+2025-05-23 01:39:54 - root - INFO - 应用启动中...
+2025-05-23 01:39:54 - root - INFO - 应用启动完成
+INFO:     Application startup complete.

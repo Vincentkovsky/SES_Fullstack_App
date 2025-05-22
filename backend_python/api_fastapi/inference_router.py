@@ -105,65 +105,79 @@ class InferenceAPI:
     @async_handle_exceptions
     async def run_inference_task(
         background_tasks: BackgroundTasks,
-        parameters: Dict[str, Any] = Body(..., description="Inference parameters")
+        model_path: str = Body('best.pt', description="模型文件路径"),
+        data_dir: str = Body('rainfall_20221024', description="输入数据目录"),
+        device: str = Body(None, description="计算设备 (默认: cuda:0 或 cpu)"),
+        pred_length: int = Body(48, description="预测时间步数")
     ):
         """
-        Run inference task
-        
-        Parameters can include:
-        - model_path: Model file path (default: best.pt)
-        - data_dir: Input data directory (default: rainfall_20221024)
-        - device: Computing device (default: cuda:0 or cpu)
-        - pred_length: Number of prediction timesteps (default: 48)
+        运行推理任务
         
         Args:
-            background_tasks: Background task manager
-            parameters: Inference parameter dictionary
+            background_tasks: 后台任务管理器
+            model_path: 模型文件路径 (默认: best.pt)
+            data_dir: 输入数据目录 (默认: rainfall_20221024)
+            device: 计算设备 (默认: cuda:0 或 cpu)
+            pred_length: 预测时间步数 (默认: 48)
         
         Returns:
-            Task ID and status information
+            任务ID和状态信息
         """
-        logger.info(f"Preparing to start inference task, parameters: {parameters}")
+        # 构建参数字典用于日志记录和保存
+        parameters = {
+            'model_path': model_path,
+            'data_dir': data_dir,
+            'device': device,
+            'pred_length': pred_length
+        }
         
-        # Validate necessary model and data files
-        model_path = parameters.get('model_path', 'best.pt')
+        logger.info(f"准备开始推理任务，参数: {parameters}")
+        
+        # 使用默认设备如果未指定
+        if device is None:
+            device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+            parameters['device'] = device
+        
+        # 验证模型文件
         model_full_path = FilePath(MODEL_DIR) / model_path
         if not model_full_path.exists():
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Model file does not exist: {model_full_path}"
+                detail=f"模型文件不存在: {model_full_path}"
             )
         
-        # Validate data directory
-        data_dir = parameters.get('data_dir', 'rainfall_20221024')
+        # 验证数据目录
         data_dir_path = FilePath(MODEL_DIR) / data_dir
         if not data_dir_path.exists():
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Data directory does not exist: {data_dir_path}"
+                detail=f"数据目录不存在: {data_dir_path}"
             )
         
-        # Generate task ID
-        task_id = f"inference_{int(time.time())}_{parameters.get('data_dir', 'default')}"
+        # 生成任务ID
+        task_id = f"inference_{int(time.time())}_{data_dir}"
         
-        # Prepare output directory
+        # 准备输出目录
         task_dir = INFERENCE_RESULTS_DIR / task_id
         task_dir.mkdir(exist_ok=True)
         
-        # Save parameters to JSON file
+        # 保存参数到JSON文件
         params_file = task_dir / "parameters.json"
         with open(params_file, 'w') as f:
             json.dump(parameters, f, indent=2)
         
-        # Add to background tasks
+        # 添加到后台任务
         background_tasks.add_task(
             execute_inference_task,
             task_id=task_id,
-            params=parameters,
+            model_path=model_path,
+            data_dir=data_dir,
+            device=device,
+            pred_length=pred_length,
             task_dir=task_dir
         )
         
-        # Mark task as running
+        # 标记任务为运行中
         running_tasks[task_id] = {
             "status": "running",
             "start_time": time.time(),
@@ -176,7 +190,7 @@ class InferenceAPI:
             "data": {
                 "task_id": task_id,
                 "status": "running",
-                "message": "Inference task started"
+                "message": "推理任务已开始"
             }
         }
     
@@ -312,55 +326,73 @@ class InferenceAPI:
         }
 
 
-async def execute_inference_task(task_id: str, params: Dict[str, Any], task_dir: FilePath):
+async def execute_inference_task(
+    task_id: str, 
+    model_path: str, 
+    data_dir: str, 
+    device: str, 
+    pred_length: int, 
+    task_dir: FilePath
+):
     """
-    Execute inference task
+    执行推理任务
     
     Args:
-        task_id: Task ID
-        params: Inference parameters
-        task_dir: Task output directory
+        task_id: 任务ID
+        model_path: 模型文件路径
+        data_dir: 输入数据目录
+        device: 计算设备
+        pred_length: 预测时间步数
+        task_dir: 任务输出目录
     """
     start_time = time.time()
     
-    # Update task status
+    # 更新任务状态
     running_tasks[task_id]["status"] = "running"
     
+    # 构建参数字典用于记录
+    params = {
+        'model_path': model_path,
+        'data_dir': data_dir,
+        'device': device,
+        'pred_length': pred_length
+    }
+    
     try:
-        # Execute inference function in thread pool
+        # 在线程池中执行推理函数
         def run_process():
             try:
                 # 使用新的参数格式调用推理函数
                 return InferenceService.run_inference(
-                    model_path=params.get('model_path', 'best.pt'),
-                    data_dir=params.get('data_dir', 'rainfall_20221024'),
-                    device=params.get('device', 'cuda:0' if torch.cuda.is_available() else 'cpu'),
-                    start_tmp=params.get('start_tmp', None),
+                    model_path=model_path,
+                    data_dir=data_dir,
+                    device=device,
+                    start_tmp=None,  # 使用默认生成的时间戳
                     output_dir=task_dir,
-                    pred_length=params.get('pred_length', 48)
+                    pred_length=pred_length
                 )
             except Exception as e:
-                logger.error(f"Inference execution failed: {str(e)}")
+                logger.error(f"推理执行失败: {str(e)}")
                 return {
                     "success": False,
-                    "message": f"Inference execution failed: {str(e)}"
+                    "message": f"推理执行失败: {str(e)}"
                 }
         
-        # Execute in thread pool
+        # 在线程池中执行
         result = await run_in_threadpool(run_process)
         
-        # Calculate execution time
+        # 计算执行时间
         end_time = time.time()
         elapsed_time = end_time - start_time
         
-        # Determine task status
+        # 确定任务状态
         status = "completed" if result.get("success", False) else "failed"
         
-        # Update task status
+        # 更新任务状态
         if task_id in running_tasks:
             running_tasks[task_id]["status"] = status
         
-        # Save status information
+        # 保存状态信息
         status_info = {
             "task_id": task_id,
             "status": status,
@@ -374,17 +406,17 @@ async def execute_inference_task(task_id: str, params: Dict[str, Any], task_dir:
         with open(task_dir / "status.json", 'w') as f:
             json.dump(status_info, f, indent=2)
             
-        logger.info(f"Inference task {task_id} completed, status: {status}, time: {elapsed_time:.2f} seconds")
+        logger.info(f"推理任务 {task_id} 已完成，状态: {status}，用时: {elapsed_time:.2f} 秒")
         
     except Exception as e:
-        # Record error
-        logger.error(f"Failed to execute inference task {task_id}: {str(e)}")
+        # 记录错误
+        logger.error(f"执行推理任务 {task_id} 失败: {str(e)}")
         
-        # Update status
+        # 更新状态
         if task_id in running_tasks:
             running_tasks[task_id]["status"] = "failed"
         
-        # Save error information
+        # 保存错误信息
         end_time = time.time()
         elapsed_time = end_time - start_time
         
@@ -402,6 +434,6 @@ async def execute_inference_task(task_id: str, params: Dict[str, Any], task_dir:
             json.dump(error_info, f, indent=2)
     
     finally:
-        # Remove running task
+        # 移除运行中的任务
         if task_id in running_tasks:
             del running_tasks[task_id] 
