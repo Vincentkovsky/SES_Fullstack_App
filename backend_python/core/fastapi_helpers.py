@@ -23,34 +23,38 @@ logger = logging.getLogger(__name__)
 # 类型变量，用于泛型函数
 T = TypeVar('T')
 
-def async_handle_exceptions(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
+def async_handle_exceptions(func: Callable) -> Callable:
     """
     异步函数异常处理装饰器
-    捕获并转换异常为适当的HTTP响应
-
+    
+    捕获异步路由函数中的异常，并返回标准化的错误响应
+    
     Args:
         func: 要装饰的异步函数
-
+        
     Returns:
-        装饰后的异步函数
+        装饰后的函数
     """
     @functools.wraps(func)
-    async def wrapper(*args, **kwargs) -> T:
+    async def wrapper(*args, **kwargs) -> Dict[str, Any]:
         try:
             return await func(*args, **kwargs)
-        except HTTPException:
-            # 传递现有的HTTPException
-            raise
+        except HTTPException as e:
+            # 重新抛出FastAPI的HTTP异常
+            raise e
         except Exception as e:
-            # 记录详细的错误信息
-            error_msg = f"调用{func.__name__}时出错: {str(e)}"
-            logger.error(error_msg)
-            logger.error(traceback.format_exc())
+            # 记录异常
+            error_details = traceback.format_exc()
+            logger.error(f"异步路由发生错误: {str(e)}\n{error_details}")
             
-            # 转换为HTTP异常
-            raise HTTPException(
+            # 返回标准化错误响应
+            return JSONResponse(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error_msg
+                content={
+                    "success": False,
+                    "error": "内部服务器错误",
+                    "message": str(e)
+                }
             )
     
     return wrapper

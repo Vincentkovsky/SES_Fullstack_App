@@ -73,7 +73,7 @@ def create_app() -> FastAPI:
     # 创建FastAPI应用
     app = FastAPI(
         title="水深度API服务",
-        description="提供水深度数据和相关服务的REST API",
+        description ="提供水深度数据和相关服务的REST API",
         version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     host = Config.HOST
     port = Config.PORT
     reload = Config.DEBUG
-    workers = os.getenv("API_WORKERS", "4")  # 默认4个工作进程
+    workers = os.getenv("API_WORKERS", "16")  # 默认4个工作进程
     
     # 显示应用配置信息
     logger.info(f"启动应用 - 模式: {env_mode}, 地址: {host}:{port}, 工作进程: {workers}")

@@ -11,7 +11,6 @@ from fastapi import APIRouter, Body, HTTPException, status, BackgroundTasks, Pat
 from fastapi.responses import JSONResponse
 from typing import Dict, Any, List, Optional
 import os
-import subprocess
 import json
 import logging
 from pathlib import Path as FilePath
@@ -22,6 +21,8 @@ from starlette.concurrency import run_in_threadpool
 # 导入自定义工具
 from core.fastapi_helpers import async_handle_exceptions
 from core.config import Config
+from services.inference_service import run_inference, get_latest_inference_dir, execute_inference_script
+from ai_inference.model import get_model_path, get_data_file, list_available_files, MODEL_DIR
 
 # 设置日志
 logger = logging.getLogger(__name__)
@@ -43,12 +44,30 @@ running_tasks = {}
 @async_handle_exceptions
 async def get_inference_status():
     """获取推理服务状态"""
-    # 检查推理脚本是否存在
-    inference_script_exists = os.path.exists(Config.INFERENCE_SCRIPT)
+    # 检查必要的模型文件是否存在
+    model_path = FilePath(get_model_path())
+    model_exists = model_path.exists()
+    
+    # 检查必要的数据文件
+    data_files = {
+        "dem_embeddings": FilePath(get_data_file("dem_embeddings")).exists(),
+        "side_lengths": FilePath(get_data_file("side_lengths")).exists(),
+        "square_centers": FilePath(get_data_file("square_centers")).exists(),
+        "dem_min_tensor": FilePath(get_data_file("dem_min_tensor")).exists(),
+        "water_level_min": FilePath(get_data_file("water_level_min")).exists(),
+        "dem_file": FilePath(get_data_file("dem_file")).exists(),
+        "gridadmin_file": FilePath(get_data_file("gridadmin_file")).exists(),
+    }
+    
+    # 检查数据目录
+    rainfall_data_dir = FilePath(get_data_file("rainfall_data"))
+    rainfall_data_exists = rainfall_data_dir.exists() if rainfall_data_dir else False
     
     status_info = {
-        "script_path": str(Config.INFERENCE_SCRIPT),
-        "script_exists": inference_script_exists,
+        "model_path": str(model_path),
+        "model_exists": model_exists,
+        "data_files": data_files,
+        "rainfall_data_exists": rainfall_data_exists,
         "running_tasks": len(running_tasks),
         "task_ids": list(running_tasks.keys()),
         "results_directory": str(INFERENCE_RESULTS_DIR)
@@ -59,9 +78,23 @@ async def get_inference_status():
         "data": status_info
     }
 
+@router.get("/available_data", response_model=Dict[str, Any])
+@async_handle_exceptions
+async def get_available_data():
+    """获取可用的数据文件和模型"""
+    data_files = list_available_files()
+    data_files = {k: FilePath(v).exists() for k, v in data_files.items()}
+    
+    return {
+        "success": True,
+        "data": {
+            "available_files": data_files
+        }
+    }
+
 @router.post("/run", response_model=Dict[str, Any])
 @async_handle_exceptions
-async def run_inference(
+async def run_inference_task(
     background_tasks: BackgroundTasks,
     parameters: Dict[str, Any] = Body(..., description="推理参数")
 ):
@@ -77,15 +110,26 @@ async def run_inference(
     """
     logger.info(f"准备启动推理任务，参数: {parameters}")
     
-    # 验证推理脚本是否存在
-    if not os.path.exists(Config.INFERENCE_SCRIPT):
+    # 验证必要的模型和数据文件是否存在
+    model_path = parameters.get('model_path', 'best.pt')
+    model_full_path = FilePath(MODEL_DIR) / model_path
+    if not model_full_path.exists():
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"推理脚本不存在: {Config.INFERENCE_SCRIPT}"
+            detail=f"模型文件不存在: {model_full_path}"
+        )
+    
+    # 验证数据目录是否存在
+    data_dir = parameters.get('data_dir', 'rainfall_20221024')
+    data_dir_path = FilePath(MODEL_DIR) / data_dir
+    if not data_dir_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"数据目录不存在: {data_dir_path}"
         )
     
     # 生成任务ID
-    task_id = f"inference_{int(time.time())}_{parameters.get('model', 'default')}"
+    task_id = f"inference_{int(time.time())}_{parameters.get('data_dir', 'default')}"
     
     # 准备输出目录
     task_dir = INFERENCE_RESULTS_DIR / task_id
@@ -265,38 +309,17 @@ async def execute_inference_task(task_id: str, params: Dict[str, Any], task_dir:
     running_tasks[task_id]["status"] = "running"
     
     try:
-        # 构建命令
-        # 在线程池中运行外部进程
+        # 在线程池中执行推理函数
         def run_process():
-            # 构建命令
-            cmd = [Config.INFERENCE_SCRIPT]
-            
-            # 添加必要的参数
-            cmd.extend([
-                "--output-dir", str(task_dir),
-                "--params-file", str(task_dir / "parameters.json")
-            ])
-            
-            # 开始执行
-            logger.info(f"开始执行推理任务 {task_id}，命令: {' '.join(cmd)}")
-            
-            # 运行进程并捕获输出
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
-            
-            # 读取输出
-            stdout, stderr = process.communicate()
-            
-            # 返回结果
-            return {
-                "return_code": process.returncode,
-                "stdout": stdout,
-                "stderr": stderr
-            }
+            try:
+                # 直接调用推理函数
+                return run_inference(params, task_dir)
+            except Exception as e:
+                logger.error(f"推理执行失败: {str(e)}")
+                return {
+                    "success": False,
+                    "message": f"推理执行失败: {str(e)}"
+                }
         
         # 在线程池中执行
         result = await run_in_threadpool(run_process)
@@ -305,15 +328,8 @@ async def execute_inference_task(task_id: str, params: Dict[str, Any], task_dir:
         end_time = time.time()
         elapsed_time = end_time - start_time
         
-        # 保存日志
-        with open(task_dir / "stdout.log", 'w') as f:
-            f.write(result["stdout"])
-            
-        with open(task_dir / "stderr.log", 'w') as f:
-            f.write(result["stderr"])
-        
         # 确定任务状态
-        status = "completed" if result["return_code"] == 0 else "failed"
+        status = "completed" if result.get("success", False) else "failed"
         
         # 更新任务状态
         if task_id in running_tasks:
@@ -326,12 +342,8 @@ async def execute_inference_task(task_id: str, params: Dict[str, Any], task_dir:
             "start_time": start_time,
             "end_time": end_time,
             "elapsed_time": elapsed_time,
-            "return_code": result["return_code"],
             "parameters": params,
-            "results": {
-                "stdout": str(task_dir / "stdout.log"),
-                "stderr": str(task_dir / "stderr.log")
-            }
+            "results": result.get("results", {})
         }
         
         with open(task_dir / "status.json", 'w') as f:

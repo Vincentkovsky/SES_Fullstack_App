@@ -23,6 +23,12 @@ wheels/
 .env
 venv/
 .venv/
+demoJC/
+ai_inference/
+ai_inference*
+
+
+
 
 # Vue/TypeScript Frontend
 .DS_Store
@@ -58,3 +64,4 @@ backend_python/data
 
 *.json
 *.xml
+
