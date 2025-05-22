@@ -1,7 +1,6 @@
 import os
-import subprocess
 import logging
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple, Optional, List
 from http import HTTPStatus
 from pathlib import Path
 import torch
@@ -12,6 +11,7 @@ from datetime import datetime, timedelta
 import multiprocessing as mp
 from tqdm import tqdm
 from threedidepth.calculate import calculate_waterdepth
+import shutil
 
 from core.config import Config
 from utils.helpers import get_timestamp
@@ -26,354 +26,445 @@ INFERENCE_CONFIG = {
     'water_level_scale': 1.0, 
 }
 
-def load_model(model_path, device, dtype):
-    """
-    加载模型
-    
-    Args:
-        model_path: 模型文件路径
-        device: 设备 (cuda:0, cpu等)
-        dtype: 数据类型 (torch.float32, torch.bfloat16等)
-    
-    Returns:
-        加载的模型
-    """
-    try:
-        # 动态导入模型类，避免直接依赖
-        import sys
-        sys.path.append(str(MODEL_DIR))
-        from model import FloodTransformer
-        
-        # 创建与训练相同配置的模型
-        model = FloodTransformer(
-            context_length=47791,
-            dem_input_dim=1280,
-            rain_num_steps=48,
-            width=768,
-            heads=12,
-            layers=12,
-            pred_length=48
-        )
-        
-        # 加载检查点
-        checkpoint = torch.load(model_path, map_location='cpu')
-        model.load_state_dict(checkpoint['model_state_dict'])
-        model = model.to(device).to(dtype)
-        model.eval()
-        
-        logger.info(f"模型已从{model_path}加载到{device}设备上")
-        return model
-    except Exception as e:
-        logger.error(f"加载模型失败: {str(e)}")
-        raise
 
-def write_results_to_nc(water_level, data_dir, output_dir):
-    """
-    将预测结果写入NetCDF文件
+class ModelLoader:
+    """Model loading and management class"""
     
-    Args:
-        water_level: 水位预测结果
-        data_dir: 输入数据目录
-        output_dir: 输出目录
-    
-    Returns:
-        结果文件路径
-    """
-    try:
-        wl_array = water_level[0][0].transpose(1,0)  # (48, 47791)
+    @staticmethod
+    def load_model(model_path: str, device: torch.device, dtype: torch.dtype) -> torch.nn.Module:
+        """
+        Load the flood prediction model
         
-        # 读取初始水位
-        data_dir_path = MODEL_DIR / data_dir
-        with nc.Dataset(f'{data_dir_path}/{data_dir}.nc', 'r') as dataset:
-            wl_0 = dataset.variables['Mesh2D_s1'][0,:-12]  # 47791 初始水位
+        Args:
+            model_path: Path to the model file
+            device: Device to load the model to (cuda:0, cpu, etc.)
+            dtype: Data type for model (torch.float32, torch.bfloat16, etc.)
         
-        # 加载预处理的数据
-        dem_min = torch.load(f'{MODEL_DIR}/dem_min_tensor.pt', weights_only=True).numpy()
-        water_level_min = torch.load(f'{MODEL_DIR}/water_level_min.pt', weights_only=True).numpy()
+        Returns:
+            Loaded model
         
-        # 处理初始水位
-        wl_0 = np.ma.masked_where(wl_0 < dem_min, wl_0)
-        wl_0 = (wl_0 - water_level_min)
-        wl_0 = wl_0.filled(0)  # 初始水深
-        
-        # 计算水深
-        water_depths = np.zeros((48, 47791))  # 形状: (timesteps, nodes)
-        water_depths[0] = wl_0 + wl_array[0]  # 第一个时间步是初始值加上第一个差值
-        
-        for t in range(1, 48):
-            water_depths[t] = water_depths[t-1] + wl_array[t]  # 将差值添加到前一个时间步
-        
-        # 转换为实际水位
-        wl_masked = water_depths + water_level_min
-        
-        # 构建结果文件路径
-        result_file = Path(output_dir) / 'result.nc'
-        
-        # 复制原始nc文件到结果目录
-        import shutil
-        source_file = Path(data_dir_path) / f'{data_dir}.nc'
-        if not result_file.exists():
-            shutil.copy(source_file, result_file)
-        
-        # 写入预测结果
-        with nc.Dataset(result_file, 'r+') as dataset:
-            # 获取原始数据
-            mesh2d_s1 = dataset.variables['Mesh2D_s1'][:]
-            # 替换前48个时间步的所有节点（除了最后12个）
-            pred_steps = wl_masked.shape[0]
-            mesh2d_s1[:pred_steps,:-12] = wl_masked
-            # 写回文件
-            dataset.variables['Mesh2D_s1'][:pred_steps] = mesh2d_s1[:pred_steps]
-        
-        logger.info(f"结果已写入到: {result_file}")
-        return str(result_file)
-    except Exception as e:
-        logger.error(f"写入结果到NetCDF文件失败: {str(e)}")
-        raise
+        Raises:
+            RuntimeError: If model loading fails
+        """
+        try:
+            # Dynamically import model class
+            import sys
+            sys.path.append(str(MODEL_DIR))
+            from model import FloodTransformer
+            
+            # Create model with the same configuration as training
+            model = FloodTransformer(
+                context_length=47791,
+                dem_input_dim=1280,
+                rain_num_steps=48,
+                width=768,
+                heads=12,
+                layers=12,
+                pred_length=48
+            )
+            
+            # Load checkpoint
+            checkpoint = torch.load(model_path, map_location='cpu')
+            model.load_state_dict(checkpoint['model_state_dict'])
+            model = model.to(device).to(dtype)
+            model.eval()
+            
+            logger.info(f"Model loaded from {model_path} to {device} device")
+            return model
+        except Exception as e:
+            logger.error(f"Failed to load model: {str(e)}")
+            raise RuntimeError(f"Model loading failed: {str(e)}") from e
 
-def process_timestep(args):
-    """
-    处理单个时间步的函数
-    
-    Args:
-        args: 包含处理所需参数的元组
-        
-    Returns:
-        处理结果信息
-    """
-    gridadmin_path, results_path, dem_path, output_dir, timestamp, step = args
-    
-    time_str = timestamp.strftime("%Y%m%d_%H%M%S")
-    output_path = os.path.join(output_dir, f"waterdepth_{time_str}.tif")
-    
-    try:
-        # 执行水深计算
-        calculate_waterdepth(
-            gridadmin_path=gridadmin_path,
-            results_3di_path=results_path,
-            dem_path=dem_path,
-            waterdepth_path=output_path,
-            calculation_steps=[step]
-        )
-        return f"步骤 {step} 计算完成: {output_path}"
-    except Exception as e:
-        logger.error(f"处理时间步 {step} 失败: {str(e)}")
-        return f"步骤 {step} 计算出错: {str(e)}"
 
-def generate_tif_files(start_tmp, output_dir):
-    """
-    从NetCDF结果生成TIF文件
+class ResultsProcessor:
+    """Process and save inference results"""
     
-    Args:
-        start_tmp: 开始时间戳
-        output_dir: 输出目录
-    
-    Returns:
-        生成的TIF文件路径列表
-    """
-    try:
-        # 输入路径
-        gridadmin_path = f"{MODEL_DIR}/gridadmin.h5"
-        results_path = f"{output_dir}/result.nc"
-        dem_path = f"{MODEL_DIR}/5m_dem.tif"
-        tif_output_dir = f"{output_dir}/{start_tmp}"
-        num_workers = min(mp.cpu_count() - 2, 24)  # 留出2个核心给系统
-        infer_steps = 48
+    @staticmethod
+    def write_results_to_nc(water_level: np.ndarray, data_dir: str, output_dir: Path) -> str:
+        """
+        Write prediction results to NetCDF file
         
-        # 创建输出目录
-        os.makedirs(tif_output_dir, exist_ok=True)
+        Args:
+            water_level: Water level prediction results
+            data_dir: Input data directory
+            output_dir: Output directory
         
-        # 从NetCDF文件中读取时间戳
-        with nc.Dataset(results_path, mode="r") as nc_dataset:
-            time_var = nc_dataset.variables["time"]
-            time_units = time_var.units
-            time_values = time_var[:]
-            base_time = datetime.strptime(time_units.split("since")[1].strip(), "%Y-%m-%d %H:%M:%S")
-            timestamps = [base_time + timedelta(seconds=float(t*1800)) for t in range(infer_steps)]
+        Returns:
+            Path to the result file
         
-        # 准备并行处理的参数
-        args_list = [
-            (gridadmin_path, results_path, dem_path, tif_output_dir, timestamps[i], i)
-            for i in range(infer_steps)
-        ]
-        
-        # 使用进程池进行并行处理
-        logger.info(f"使用 {num_workers} 个进程生成TIF文件")
-        
-        generated_files = []
-        with mp.Pool(processes=num_workers) as pool:
-            # 使用tqdm显示进度条
-            results = list(tqdm(
-                pool.imap(process_timestep, args_list),
-                total=len(args_list),
-                desc="处理时间步"
-            ))
-        
-        # 收集生成的文件路径
-        for i in range(infer_steps):
-            time_str = timestamps[i].strftime("%Y%m%d_%H%M%S")
-            tif_path = os.path.join(tif_output_dir, f"waterdepth_{time_str}.tif")
-            if os.path.exists(tif_path):
-                generated_files.append(tif_path)
-        
-        logger.info(f"生成了 {len(generated_files)} 个TIF文件")
-        return generated_files
-        
-    except Exception as e:
-        logger.error(f"生成TIF文件时出错: {str(e)}")
-        raise
+        Raises:
+            RuntimeError: If writing results fails
+        """
+        try:
+            wl_array = water_level[0][0].transpose(1, 0)  # (48, 47791)
+            
+            # Read initial water level
+            data_dir_path = MODEL_DIR / data_dir
+            with nc.Dataset(f'{data_dir_path}/{data_dir}.nc', 'r') as dataset:
+                wl_0 = dataset.variables['Mesh2D_s1'][0, :-12]  # 47791 initial water level
+            
+            # Load preprocessed data
+            dem_min = torch.load(f'{MODEL_DIR}/dem_min_tensor.pt', weights_only=True).numpy()
+            water_level_min = torch.load(f'{MODEL_DIR}/water_level_min.pt', weights_only=True).numpy()
+            
+            # Process initial water level
+            wl_0 = np.ma.masked_where(wl_0 < dem_min, wl_0)
+            wl_0 = (wl_0 - water_level_min)
+            wl_0 = wl_0.filled(0)  # Initial water depth
+            
+            # Calculate water depths
+            water_depths = np.zeros((48, 47791))  # Shape: (timesteps, nodes)
+            water_depths[0] = wl_0 + wl_array[0]  # First timestep is initial value plus first difference
+            
+            for t in range(1, 48):
+                water_depths[t] = water_depths[t-1] + wl_array[t]  # Add difference to previous timestep
+            
+            # Convert to actual water level
+            wl_masked = water_depths + water_level_min
+            
+            # Build result file path
+            result_file = Path(output_dir) / 'result.nc'
+            
+            # Copy original nc file to result directory
+            source_file = Path(data_dir_path) / f'{data_dir}.nc'
+            if not result_file.exists():
+                shutil.copy(source_file, result_file)
+            
+            # Write prediction results
+            with nc.Dataset(result_file, 'r+') as dataset:
+                # Get original data
+                mesh2d_s1 = dataset.variables['Mesh2D_s1'][:]
+                # Replace first 48 timesteps for all nodes (except last 12)
+                pred_steps = wl_masked.shape[0]
+                mesh2d_s1[:pred_steps, :-12] = wl_masked
+                # Write back to file
+                dataset.variables['Mesh2D_s1'][:pred_steps] = mesh2d_s1[:pred_steps]
+            
+            logger.info(f"Results written to: {result_file}")
+            return str(result_file)
+        except Exception as e:
+            logger.error(f"Failed to write results to NetCDF file: {str(e)}")
+            raise RuntimeError(f"Failed to write results: {str(e)}") from e
 
-def run_inference(params: Dict[str, Any], output_dir: Path) -> Dict[str, Any]:
-    """
-    运行推理流程
+    @staticmethod
+    def process_timestep(args: Tuple) -> str:
+        """
+        Process a single timestep
+        
+        Args:
+            args: Tuple containing (gridadmin_path, results_path, dem_path, output_dir, timestamp, step)
+        
+        Returns:
+            Processing result information
+        """
+        gridadmin_path, results_path, dem_path, output_dir, timestamp, step = args
+        
+        time_str = timestamp.strftime("%Y%m%d_%H%M%S")
+        output_path = os.path.join(output_dir, f"waterdepth_{time_str}.tif")
+        
+        try:
+            # Execute water depth calculation
+            calculate_waterdepth(
+                gridadmin_path=gridadmin_path,
+                results_3di_path=results_path,
+                dem_path=dem_path,
+                waterdepth_path=output_path,
+                calculation_steps=[step]
+            )
+            return f"Step {step} calculation completed: {output_path}"
+        except Exception as e:
+            logger.error(f"Failed to process timestep {step}: {str(e)}")
+            return f"Step {step} calculation error: {str(e)}"
+
+    @staticmethod
+    def generate_tif_files(start_tmp: str, output_dir: Path) -> List[str]:
+        """
+        Generate TIF files from NetCDF results
+        
+        Args:
+            start_tmp: Start timestamp
+            output_dir: Output directory
+        
+        Returns:
+            List of generated TIF file paths
+        
+        Raises:
+            RuntimeError: If TIF file generation fails
+        """
+        try:
+            # Input paths
+            gridadmin_path = f"{MODEL_DIR}/gridadmin.h5"
+            results_path = f"{output_dir}/result.nc"
+            dem_path = f"{MODEL_DIR}/5m_dem.tif"
+            tif_output_dir = f"{output_dir}/{start_tmp}"
+            num_workers = min(mp.cpu_count() - 2, 24)  # Reserve 2 cores for system
+            infer_steps = 48
+            
+            # Create output directory
+            os.makedirs(tif_output_dir, exist_ok=True)
+            
+            # Read timestamps from NetCDF file
+            with nc.Dataset(results_path, mode="r") as nc_dataset:
+                time_var = nc_dataset.variables["time"]
+                time_units = time_var.units
+                base_time = datetime.strptime(time_units.split("since")[1].strip(), "%Y-%m-%d %H:%M:%S")
+                timestamps = [base_time + timedelta(seconds=float(t*1800)) for t in range(infer_steps)]
+            
+            # Prepare parallel processing parameters
+            args_list = [
+                (gridadmin_path, results_path, dem_path, tif_output_dir, timestamps[i], i)
+                for i in range(infer_steps)
+            ]
+            
+            # Use process pool for parallel processing
+            logger.info(f"Using {num_workers} processes to generate TIF files")
+            
+            generated_files = []
+            with mp.Pool(processes=num_workers) as pool:
+                # Use tqdm to display progress bar
+                results = list(tqdm(
+                    pool.imap(ResultsProcessor.process_timestep, args_list),
+                    total=len(args_list),
+                    desc="Processing timesteps"
+                ))
+            
+            # Collect generated file paths
+            for i in range(infer_steps):
+                time_str = timestamps[i].strftime("%Y%m%d_%H%M%S")
+                tif_path = os.path.join(tif_output_dir, f"waterdepth_{time_str}.tif")
+                if os.path.exists(tif_path):
+                    generated_files.append(tif_path)
+            
+            logger.info(f"Generated {len(generated_files)} TIF files")
+            return generated_files
+            
+        except Exception as e:
+            logger.error(f"Error generating TIF files: {str(e)}")
+            raise RuntimeError(f"TIF file generation failed: {str(e)}") from e
+
+
+class InferenceService:
+    """Main inference service class"""
     
-    Args:
-        params: 推理参数
-        output_dir: 输出目录
-    
-    Returns:
-        推理结果信息
-    """
-    try:
-        # 提取参数，如果没有则使用默认值
-        model_path = params.get('model_path', 'best.pt')
-        data_dir = params.get('data_dir', 'rainfall_20221024')
-        device = params.get('device', 'cuda:0' if torch.cuda.is_available() else 'cpu')
+    @staticmethod
+    def run_inference(
+        model_path: str = 'best.pt', 
+        data_dir: str = 'rainfall_20221024', 
+        device: str = None, 
+        start_tmp: str = None, 
+        output_dir: Path = None, 
+        pred_length: int = 48
+    ) -> Dict[str, Any]:
+        """
+        Run inference process
+        
+        Args:
+            model_path: Path to the model file (default: best.pt)
+            data_dir: Input data directory (default: rainfall_20221024)
+            device: Computing device (default: cuda:0 if available, otherwise cpu)
+            start_tmp: Start timestamp (default: auto-generated)
+            output_dir: Output directory (default: created based on data_dir and timestamp)
+            pred_length: Number of prediction timesteps (default: 48)
+        
+        Returns:
+            Inference result information
+        """
+        try:
+            # Use defaults if not provided
+            if device is None:
+                device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+            if start_tmp is None:
+                start_tmp = get_timestamp()
+            if output_dir is None:
+                output_dir = Path(Config.DATA_DIR) / "inference_results" / start_tmp
+            
+            # Create output directory
+            os.makedirs(output_dir, exist_ok=True)
+            
+            # Update inference config with pred_length
+            inference_config = INFERENCE_CONFIG.copy()
+            inference_config['pred_length'] = pred_length
+            
+            # Record start time
+            start_time = datetime.now()
+            logger.info(f"Starting inference, model: {model_path}, data: {data_dir}, device: {device}, pred_length: {pred_length}")
+            
+            # Configure device and data type
+            torch_device = torch.device(device)
+            dtype = torch.bfloat16 if device.startswith('cuda') else torch.float32
+            
+            # Dynamically import Dataset class
+            import sys
+            sys.path.append(str(MODEL_DIR))
+            from dataset import FloodDataset
+            
+            # Create dataset and data loader
+            val_dataset = FloodDataset(f'{MODEL_DIR}/{data_dir}', inference_config)
+            val_loader = DataLoader(
+                val_dataset,
+                batch_size=1,
+                shuffle=False,
+                num_workers=4,
+                pin_memory=False
+            )
+            
+            # Load model
+            model = ModelLoader.load_model(f'{MODEL_DIR}/{model_path}', torch_device, dtype)
+            
+            # Load static data and convert to correct data type
+            dem_embed = torch.load(f'{MODEL_DIR}/dem_embeddings.pt', weights_only=True).to(torch_device, dtype=dtype)
+            side_lens = torch.load(f'{MODEL_DIR}/side_lengths.pt', weights_only=True).to(torch_device)
+            square_centers = torch.load(f'{MODEL_DIR}/square_centers.pt', weights_only=True).to(torch_device, dtype=dtype)
+            
+            all_water_levels = []  # Store (pred, target) tuples
+            
+            with torch.no_grad():
+                for data, rain, u_target, v_target, water_level_target, has_water_target in val_loader:
+                    # Move data to device and convert to correct data type
+                    data = data.to(torch_device, dtype=dtype)
+                    rain = rain.to(torch_device, dtype=dtype)
+                    water_level_target = water_level_target.to(torch_device, dtype=dtype)
+                    
+                    # Forward pass
+                    water_level_pred, has_water_pred, u_pred, v_pred = model(data, rain, dem_embed, side_lens, square_centers)
+                    
+                    all_water_levels.append((
+                        water_level_pred.cpu().to(dtype=torch.float32).numpy(),
+                        water_level_target.cpu().to(dtype=torch.float32).numpy()
+                    ))
+            
+            # Write results to NetCDF file
+            nc_file = ResultsProcessor.write_results_to_nc(all_water_levels[0], data_dir, output_dir)
+            
+            # Generate TIF files
+            tif_files = ResultsProcessor.generate_tif_files(start_tmp, output_dir)
+            
+            # Calculate total time
+            end_time = datetime.now()
+            elapsed_time = (end_time - start_time).total_seconds()
+            
+            # Return result information
+            return {
+                "success": True,
+                "message": "Inference completed successfully",
+                "timestamp": start_tmp,
+                "duration_seconds": elapsed_time,
+                "results": {
+                    "nc_file": nc_file,
+                    "tif_files": tif_files,
+                    "tif_count": len(tif_files)
+                }
+            }
+        except Exception as e:
+            logger.error(f"Error during inference: {str(e)}")
+            return {
+                "success": False,
+                "message": f"Error during inference: {str(e)}",
+                "timestamp": get_timestamp()
+            }
+
+    @staticmethod
+    def execute_inference_script(params: Dict[str, Any] = None) -> Tuple[Dict[str, Any], int]:
+        """
+        Execute inference and return timestamped results
+        
+        Args:
+            params: Inference parameters
+            
+        Returns:
+            Tuple[Dict[str, Any], int]: Response data and HTTP status code
+        """
+        if params is None:
+            params = {}
+        
+        # Generate current timestamp
         start_tmp = params.get('start_tmp', get_timestamp())
         
-        # 创建输出目录
-        os.makedirs(output_dir, exist_ok=True)
+        # Determine output directory
+        output_dir = Path(Config.DATA_DIR) / "inference_results" / start_tmp
         
-        # 记录开始时间
-        start_time = datetime.now()
-        logger.info(f"开始推理，模型: {model_path}, 数据: {data_dir}, 设备: {device}")
-        
-        # 配置设备和数据类型
-        torch_device = torch.device(device)
-        dtype = torch.bfloat16 if device.startswith('cuda') else torch.float32
-        
-        # 动态导入Dataset类
-        import sys
-        sys.path.append(str(MODEL_DIR))
-        from dataset import FloodDataset
-        
-        # 创建数据集和数据加载器
-        val_dataset = FloodDataset(f'{MODEL_DIR}/{data_dir}', INFERENCE_CONFIG)
-        val_loader = DataLoader(
-            val_dataset,
-            batch_size=1,
-            shuffle=False,
-            num_workers=4,
-            pin_memory=False
-        )
-        
-        # 加载模型
-        model = load_model(f'{MODEL_DIR}/{model_path}', torch_device, dtype)
-        
-        # 加载静态数据并转换为正确的数据类型
-        dem_embed = torch.load(f'{MODEL_DIR}/dem_embeddings.pt', weights_only=True).to(torch_device, dtype=dtype)
-        side_lens = torch.load(f'{MODEL_DIR}/side_lengths.pt', weights_only=True).to(torch_device)
-        square_centers = torch.load(f'{MODEL_DIR}/square_centers.pt', weights_only=True).to(torch_device, dtype=dtype)
-        
-        all_water_levels = []  # 存储 (pred, target) 元组
-        
-        with torch.no_grad():
-            for data, rain, u_target, v_target, water_level_target, has_water_target in val_loader:
-                # 将数据移至设备并转换为正确的数据类型
-                data = data.to(torch_device, dtype=dtype)
-                rain = rain.to(torch_device, dtype=dtype)
-                water_level_target = water_level_target.to(torch_device, dtype=dtype)
-                
-                # 前向传递
-                water_level_pred, has_water_pred, u_pred, v_pred = model(data, rain, dem_embed, side_lens, square_centers)
-                
-                all_water_levels.append((
-                    water_level_pred.cpu().to(dtype=torch.float32).numpy(),
-                    water_level_target.cpu().to(dtype=torch.float32).numpy()
-                ))
-        
-        # 写入结果到NetCDF文件
-        nc_file = write_results_to_nc(all_water_levels[0], data_dir, output_dir)
-        
-        # 生成TIF文件
-        tif_files = generate_tif_files(start_tmp, output_dir)
-        
-        # 计算总耗时
-        end_time = datetime.now()
-        elapsed_time = (end_time - start_time).total_seconds()
-        
-        # 返回结果信息
-        return {
-            "success": True,
-            "message": "推理成功完成",
-            "timestamp": start_tmp,
-            "duration_seconds": elapsed_time,
-            "results": {
-                "nc_file": nc_file,
-                "tif_files": tif_files,
-                "tif_count": len(tif_files)
-            }
-        }
-    except Exception as e:
-        logger.error(f"推理过程中发生错误: {str(e)}")
-        return {
-            "success": False,
-            "message": f"推理过程中发生错误: {str(e)}",
-            "timestamp": get_timestamp()
-        }
-
-def execute_inference_script(params: Dict[str, Any] = None) -> Tuple[Dict[str, Any], int]:
-    """
-    执行推理并返回带有时间戳的结果
-    
-    Args:
-        params: 推理参数
-        
-    Returns:
-        Tuple[Dict[str, Any], int]: 响应数据和HTTP状态码
-    """
-    if params is None:
-        params = {}
-    
-    # 生成当前时间戳
-    start_tmp = params.get('start_tmp', get_timestamp())
-    
-    # 确定输出目录
-    output_dir = Path(Config.DATA_DIR) / "inference_results" / start_tmp
-    
-    try:
-        # 运行推理
-        result = run_inference(params, output_dir)
-        
-        if result["success"]:
-            return result, HTTPStatus.OK
-        else:
-            return result, HTTPStatus.INTERNAL_SERVER_ERROR
+        try:
+            # Run inference
+            result = InferenceService.run_inference(
+                model_path=params.get('model_path', 'best.pt'),
+                data_dir=params.get('data_dir', 'rainfall_20221024'),
+                device=params.get('device', 'cuda:0' if torch.cuda.is_available() else 'cpu'),
+                start_tmp=start_tmp,
+                output_dir=output_dir,
+                pred_length=params.get('pred_length', 48)
+            )
             
-    except Exception as e:
-        logger.error(f"执行推理过程中发生意外错误: {str(e)}")
-        return {
-            "error": "推理过程中发生意外错误",
-            "details": str(e)
-        }, HTTPStatus.INTERNAL_SERVER_ERROR
+            if result["success"]:
+                return result, HTTPStatus.OK
+            else:
+                return result, HTTPStatus.INTERNAL_SERVER_ERROR
+                
+        except Exception as e:
+            logger.error(f"Unexpected error during inference execution: {str(e)}")
+            return {
+                "error": "Unexpected error during inference",
+                "details": str(e)
+            }, HTTPStatus.INTERNAL_SERVER_ERROR
 
-def get_latest_inference_dir() -> Path:
-    """
-    获取最新的推理目录
-    
-    Returns:
-        Path: 最新推理目录的路径，如果不存在则返回None
-    """
-    try:
-        inference_dirs = sorted([
-            d for d in os.listdir(Path(Config.DATA_DIR) / "inference_results")
-            if (Path(Config.DATA_DIR) / "inference_results" / d).is_dir()
-        ], reverse=True)
+    @staticmethod
+    def get_latest_inference_dir() -> Optional[Path]:
+        """
+        Get the latest inference directory
         
-        if not inference_dirs:
+        Returns:
+            Path: Path to the latest inference directory, or None if it doesn't exist
+        """
+        try:
+            inference_dirs = sorted([
+                d for d in os.listdir(Path(Config.DATA_DIR) / "inference_results")
+                if (Path(Config.DATA_DIR) / "inference_results" / d).is_dir()
+            ], reverse=True)
+            
+            if not inference_dirs:
+                return None
+                
+            return Path(Config.DATA_DIR) / "inference_results" / inference_dirs[0]
+        except (FileNotFoundError, PermissionError):
+            logger.error(f"Cannot access inference directory: {Path(Config.DATA_DIR) / 'inference_results'}")
             return None
-            
-        return Path(Config.DATA_DIR) / "inference_results" / inference_dirs[0]
-    except (FileNotFoundError, PermissionError):
-        logger.error(f"无法访问推理目录: {Path(Config.DATA_DIR) / 'inference_results'}")
-        return None 
+
+
+# Export function interfaces for backward compatibility
+def load_model(model_path, device, dtype):
+    """Backward compatibility function for model loading"""
+    return ModelLoader.load_model(model_path, device, dtype)
+
+def write_results_to_nc(water_level, data_dir, output_dir):
+    """Backward compatibility function for writing results"""
+    return ResultsProcessor.write_results_to_nc(water_level, data_dir, output_dir)
+
+def process_timestep(args):
+    """Backward compatibility function for processing timesteps"""
+    return ResultsProcessor.process_timestep(args)
+
+def generate_tif_files(start_tmp, output_dir):
+    """Backward compatibility function for generating TIF files"""
+    return ResultsProcessor.generate_tif_files(start_tmp, output_dir)
+
+def run_inference(params, output_dir):
+    """Backward compatibility function for running inference"""
+    if isinstance(params, dict):
+        return InferenceService.run_inference(
+            model_path=params.get('model_path', 'best.pt'),
+            data_dir=params.get('data_dir', 'rainfall_20221024'),
+            device=params.get('device', 'cuda:0' if torch.cuda.is_available() else 'cpu'),
+            start_tmp=params.get('start_tmp', get_timestamp()),
+            output_dir=output_dir,
+            pred_length=params.get('pred_length', 48)
+        )
+    else:
+        # 假设 params 是 model_path 参数
+        return InferenceService.run_inference(model_path=params, output_dir=output_dir)
+
+def execute_inference_script(params=None):
+    """Backward compatibility function for executing inference script"""
+    return InferenceService.execute_inference_script(params)
+
+def get_latest_inference_dir():
+    """Backward compatibility function for getting the latest inference directory"""
+    return InferenceService.get_latest_inference_dir() 

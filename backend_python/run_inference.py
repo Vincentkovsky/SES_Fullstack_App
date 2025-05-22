@@ -21,7 +21,7 @@ base_dir = current_dir
 sys.path.append(str(base_dir))
 
 # 导入推理服务
-from services.inference_service import run_inference
+from services.inference_service import InferenceService
 from core.config import Config
 from utils.helpers import get_timestamp
 
@@ -52,6 +52,9 @@ def parse_args():
     parser.add_argument('--timestamp', type=str, default=None,
                         help='时间戳 (默认: 自动生成)')
     
+    parser.add_argument('--pred_length', type=int, default=48,
+                        help='预测时间步数 (默认: 48)')
+    
     return parser.parse_args()
 
 def main():
@@ -71,18 +74,18 @@ def main():
     # 确保输出目录存在
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    logger.info(f"开始运行推理，模型: {args.model_path}, 数据: {args.data_dir}")
+    logger.info(f"开始运行推理，模型: {args.model_path}, 数据: {args.data_dir}, 预测时间步数: {args.pred_length}")
     logger.info(f"输出目录: {output_dir}")
     
-    # 构建参数字典
+    # 保存参数到JSON
     params = {
         'model_path': args.model_path,
         'data_dir': args.data_dir,
         'device': args.device,
-        'start_tmp': timestamp
+        'start_tmp': timestamp,
+        'pred_length': args.pred_length
     }
     
-    # 保存参数到JSON
     with open(output_dir / "parameters.json", 'w') as f:
         json.dump(params, f, indent=2)
     
@@ -90,8 +93,15 @@ def main():
     start_time = datetime.now()
     
     try:
-        # 运行推理
-        result = run_inference(params, output_dir)
+        # 运行推理 - 使用新的参数格式
+        result = InferenceService.run_inference(
+            model_path=args.model_path,
+            data_dir=args.data_dir,
+            device=args.device,
+            start_tmp=timestamp,
+            output_dir=output_dir,
+            pred_length=args.pred_length
+        )
         
         # 结束时间
         end_time = datetime.now()
