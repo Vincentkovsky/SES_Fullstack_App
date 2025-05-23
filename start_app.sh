@@ -1,9 +1,39 @@
 #!/bin/bash
-source /projects/TCCTVS/.bashrc
-conda activate flood_new
 
-# 创建日志目录
-mkdir -p logs
+source /projects/TCCTVS/.bashrc
+
+# 检查conda环境
+if ! command -v conda &> /dev/null; then
+    echo "错误: 未找到conda命令，请确保已安装conda"
+    exit 1
+fi
+
+# 检查flood_new环境是否存在
+if ! conda env list | grep -q "flood_new"; then
+    echo "错误: 未找到flood_new环境，请先创建该环境"
+    exit 1
+fi
+
+# 激活conda环境
+eval "$(conda shell.bash hook)"
+conda activate flood_new || { echo "错误: 无法激活flood_new环境"; exit 1; }
+
+# 创建日志目录并设置权限
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LOGS_DIR="$SCRIPT_DIR/logs"
+
+if [ ! -d "$LOGS_DIR" ]; then
+    mkdir -p "$LOGS_DIR"
+    # 设置目录权限为777，允许所有用户读写
+    chmod 777 "$LOGS_DIR"
+elif [ ! -w "$LOGS_DIR" ]; then
+    echo "警告: logs目录不可写，尝试修改权限..."
+    chmod 777 "$LOGS_DIR" || {
+        echo "错误: 无法修改logs目录权限，请使用sudo运行此命令："
+        echo "sudo chmod 777 $LOGS_DIR"
+        exit 1
+    }
+fi
 
 # 先检查端口是否被占用，如果被占用则先释放
 echo "检查端口占用情况..."
@@ -30,7 +60,7 @@ fi
 
 # 在一个终端运行后端，强制使用3000端口
 echo "启动后端服务 (端口3000)..."
-(cd $(dirname $0) && BACKEND_PORT=3000 python backend_python/fastapi_app.py > logs/backend.log 2>&1) &
+(cd "$SCRIPT_DIR" && BACKEND_PORT=3000 python backend_python/fastapi_app.py > "$LOGS_DIR/backend.log" 2>&1) &
 BACKEND_PID=$!
 echo "后端服务已启动，PID: $BACKEND_PID，日志保存在 logs/backend.log"
 
@@ -39,7 +69,13 @@ sleep 3
 
 # 在另一个终端运行前端，强制使用5173端口
 echo "启动前端服务 (端口5173)..."
-(cd $(dirname $0)/frontend && npm run dev -- --port 5173 > ../logs/frontend.log 2>&1) &
+if ! command -v npm &> /dev/null; then
+    echo "错误: 未找到npm命令，请确保已安装Node.js和npm"
+    kill $BACKEND_PID
+    exit 1
+fi
+
+(cd "$SCRIPT_DIR/frontend" && npm run dev -- --port 5173 > "$LOGS_DIR/frontend.log" 2>&1) &
 FRONTEND_PID=$!
 echo "前端服务已启动，PID: $FRONTEND_PID，日志保存在 logs/frontend.log"
 

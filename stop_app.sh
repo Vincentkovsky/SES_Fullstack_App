@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# 检查是否有足够权限终止进程
+check_permission() {
+    local TEST_PID=$1
+    if [ -n "$TEST_PID" ] && ! kill -0 "$TEST_PID" 2>/dev/null; then
+        echo "警告: 可能没有足够的权限终止某些进程"
+        echo "建议使用sudo运行此脚本"
+        return 1
+    fi
+    return 0
+}
+
 # 检查PM2是否在运行并停止它
 echo "检查PM2进程管理器..."
 PM2_PID=$(ps -ef | grep "PM2 v" | grep -v grep | awk '{print $2}')
@@ -30,13 +41,21 @@ fi
 # 定义一个终止端口上所有进程的函数
 kill_port() {
     local PORT=$1
-    local PIDS=$(lsof -t -i:$PORT)
+    local PIDS=$(lsof -t -i:$PORT 2>/dev/null)
     
     if [ -n "$PIDS" ]; then
         echo "终止端口 $PORT 上的所有进程..."
+        # 检查权限
+        if ! check_permission "$(echo "$PIDS" | head -n1)"; then
+            return 1
+        fi
+        
         for PID in $PIDS; do
             echo "  尝试终止进程 PID: $PID"
-            kill $PID 2>/dev/null
+            kill $PID 2>/dev/null || {
+                echo "  警告: 无法终止进程 $PID，可能需要更高权限"
+                continue
+            }
         done
         
         # 等待一秒后检查是否还有进程
@@ -71,9 +90,17 @@ kill_process() {
     
     if [ -n "$PIDS" ]; then
         echo "清理匹配 '$PROCESS_PATTERN' 的进程..."
+        # 检查权限
+        if ! check_permission "$(echo "$PIDS" | head -n1)"; then
+            return 1
+        fi
+        
         for PID in $PIDS; do
             echo "  尝试终止进程 PID: $PID"
-            kill $PID 2>/dev/null
+            kill $PID 2>/dev/null || {
+                echo "  警告: 无法终止进程 $PID，可能需要更高权限"
+                continue
+            }
         done
         
         # 等待一秒后检查是否还有进程
