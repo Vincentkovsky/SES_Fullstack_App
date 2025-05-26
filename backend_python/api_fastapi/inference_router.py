@@ -35,6 +35,7 @@ router = APIRouter(prefix="/api/inference")
 # Base paths
 BASE_DIR = FilePath(__file__).parent.parent
 INFERENCE_RESULTS_DIR = BASE_DIR / "data/inference_results"
+RAINFALL_DATA_DIR = BASE_DIR / "data/rainfall"
 
 # Ensure inference results directory exists
 INFERENCE_RESULTS_DIR.mkdir(exist_ok=True, parents=True)
@@ -97,6 +98,101 @@ class InferenceAPI:
             "success": True,
             "data": {
                 "available_files": data_files
+            }
+        }
+    
+    @staticmethod
+    @router.get("/cuda_info", response_model=Dict[str, Any])
+    @async_handle_exceptions
+    async def get_cuda_info():
+        """Get information about available CUDA devices and their utilization"""
+        cuda_available = torch.cuda.is_available()
+        device_count = torch.cuda.device_count() if cuda_available else 0
+        
+        devices_info = []
+        
+        if cuda_available:
+            for i in range(device_count):
+                # Get basic device information
+                device_name = torch.cuda.get_device_name(i)
+                device_props = torch.cuda.get_device_properties(i)
+                total_memory = device_props.total_memory / (1024 ** 3)  # Convert to GB
+                
+                # Get memory usage
+                torch.cuda.set_device(i)
+                reserved_memory = torch.cuda.memory_reserved() / (1024 ** 3)  # Convert to GB
+                allocated_memory = torch.cuda.memory_allocated() / (1024 ** 3)  # Convert to GB
+                free_memory = total_memory - reserved_memory
+                
+                # Calculate utilization percentages
+                reserved_percent = (reserved_memory / total_memory) * 100 if total_memory > 0 else 0
+                allocated_percent = (allocated_memory / total_memory) * 100 if total_memory > 0 else 0
+                
+                devices_info.append({
+                    "device_id": i,
+                    "device_name": device_name,
+                    "compute_capability": f"{device_props.major}.{device_props.minor}",
+                    "total_memory_gb": round(total_memory, 2),
+                    "reserved_memory_gb": round(reserved_memory, 2),
+                    "allocated_memory_gb": round(allocated_memory, 2),
+                    "free_memory_gb": round(free_memory, 2),
+                    "reserved_percent": round(reserved_percent, 2),
+                    "allocated_percent": round(allocated_percent, 2),
+                    "multiprocessor_count": device_props.multi_processor_count,
+                    "current_device": i == torch.cuda.current_device()
+                })
+        
+        return {
+            "success": True,
+            "data": {
+                "cuda_available": cuda_available,
+                "device_count": device_count,
+                "devices": devices_info,
+                "current_device": torch.cuda.current_device() if cuda_available else None
+            }
+        }
+    
+    @staticmethod
+    @router.get("/rainfall_folders", response_model=Dict[str, Any])
+    @async_handle_exceptions
+    async def get_rainfall_folders():
+        """Get a list of available rainfall data folders"""
+        rainfall_folders = []
+        
+        # Check if rainfall data directory exists
+        if RAINFALL_DATA_DIR.exists() and RAINFALL_DATA_DIR.is_dir():
+            try:
+                # List all subdirectories in the rainfall data directory
+                for item in RAINFALL_DATA_DIR.iterdir():
+                    if item.is_dir() and not item.name.startswith('.'):
+                        # Get folder stats
+                        folder_info = {
+                            "name": item.name,
+                            "path": str(item.relative_to(BASE_DIR)),
+                            "file_count": sum(1 for _ in item.glob('*.*')),
+                            "size_mb": round(sum(f.stat().st_size for f in item.glob('**/*') if f.is_file()) / (1024 * 1024), 2),
+                            "last_modified": time.ctime(item.stat().st_mtime)
+                        }
+                        rainfall_folders.append(folder_info)
+                
+                # Sort folders by name
+                rainfall_folders.sort(key=lambda x: x["name"])
+                
+            except Exception as e:
+                logger.error(f"Error reading rainfall folders: {str(e)}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Error reading rainfall folders: {str(e)}"
+                )
+        else:
+            logger.warning(f"Rainfall data directory not found: {RAINFALL_DATA_DIR}")
+        
+        return {
+            "success": True,
+            "data": {
+                "rainfall_folders": rainfall_folders,
+                "total_count": len(rainfall_folders),
+                "base_path": str(RAINFALL_DATA_DIR)
             }
         }
     

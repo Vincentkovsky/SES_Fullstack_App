@@ -1,7 +1,8 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError } from 'axios';
+import type { AxiosResponse } from 'axios';
 
 /**
- * API配置常量
+ * API configuration constants
  */
 const API_CONFIG = {
   BASE_URL: `http://${import.meta.env.VITE_HOST || 'localhost'}:${import.meta.env.VITE_BACKEND_PORT || 3000}/api`,
@@ -13,7 +14,7 @@ const API_CONFIG = {
 };
 
 /**
- * 响应类型接口
+ * Response type interface
  */
 export interface ApiResponse<T> {
   message: T;
@@ -21,7 +22,7 @@ export interface ApiResponse<T> {
 }
 
 /**
- * 时间序列数据点接口
+ * Time series data point interface
  */
 export interface TimeSeriesPoint {
   timestamp: string;
@@ -30,7 +31,7 @@ export interface TimeSeriesPoint {
 }
 
 /**
- * 测量数据接口
+ * Gauging data interface
  */
 export interface GaugingData {
   data_count: number;
@@ -49,7 +50,7 @@ export interface GaugingData {
 }
 
 /**
- * 推断设置接口
+ * Inference settings interface
  */
 export interface InferenceSettings {
   area: string;
@@ -57,7 +58,31 @@ export interface InferenceSettings {
 }
 
 /**
- * 水深信息接口
+ * Inference task interface
+ */
+export interface InferenceTask {
+  task_id: string;
+  status: string;
+  start_time: number;
+  elapsed_time?: number;
+  end_time?: number;
+  parameters?: any;
+  results?: any;
+  results_dir?: string;
+}
+
+/**
+ * Inference parameters interface
+ */
+export interface InferenceParams {
+  model_path?: string;
+  data_dir?: string;
+  device?: string;
+  pred_length?: number;
+}
+
+/**
+ * Water depth information interface
  */
 export interface WaterDepthInfo {
   latitude: number;
@@ -70,9 +95,62 @@ export interface WaterDepthInfo {
 }
 
 /**
- * 格式化日期为 'dd-MMM-yyyy HH:mm' 格式
- * @param date 日期字符串或Date对象
- * @returns 格式化后的日期字符串
+ * CUDA device information interface
+ */
+export interface CudaDeviceInfo {
+  device_id: number;
+  device_name: string;
+  compute_capability: string;
+  total_memory_gb: number;
+  reserved_memory_gb: number;
+  allocated_memory_gb: number;
+  free_memory_gb: number;
+  reserved_percent: number;
+  allocated_percent: number;
+  multiprocessor_count: number;
+  current_device: boolean;
+}
+
+/**
+ * CUDA information response interface
+ */
+export interface CudaInfoResponse {
+  success: boolean;
+  data: {
+    cuda_available: boolean;
+    device_count: number;
+    devices: CudaDeviceInfo[];
+    current_device: number | null;
+  };
+}
+
+/**
+ * Rainfall folder information interface
+ */
+export interface RainfallFolderInfo {
+  name: string;
+  path: string;
+  file_count: number;
+  size_mb: number;
+  last_modified: string;
+}
+
+/**
+ * Rainfall folders response interface
+ */
+export interface RainfallFoldersResponse {
+  success: boolean;
+  data: {
+    rainfall_folders: RainfallFolderInfo[];
+    total_count: number;
+    base_path: string;
+  };
+}
+
+/**
+ * Format date to 'dd-MMM-yyyy HH:mm' format
+ * @param date Date string or Date object
+ * @returns Formatted date string
  */
 const formatDateForApi = (date: string | Date): string => {
   const d = date instanceof Date ? date : new Date(date);
@@ -87,10 +165,10 @@ const formatDateForApi = (date: string | Date): string => {
 };
 
 /**
- * 从时间戳字符串中提取日期时间
- * @param timestamp 时间戳字符串 (格式: waterdepth_yyyyMMdd_HHmm)
- * @returns 解析的日期时间对象
- * @throws 如果时间戳格式无效
+ * Extract date and time from timestamp string
+ * @param timestamp Timestamp string (format: waterdepth_yyyyMMdd_HHmm)
+ * @returns Parsed date time object
+ * @throws If timestamp format is invalid
  */
 const parseDateFromTimestamp = (timestamp: string): Date => {
   const match = timestamp.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
@@ -101,10 +179,10 @@ const parseDateFromTimestamp = (timestamp: string): Date => {
 };
 
 /**
- * 通用错误处理函数
- * @param error 捕获的错误
- * @param customMessage 自定义错误消息
- * @throws 重新抛出带有上下文的错误
+ * Generic error handling function
+ * @param error Caught error
+ * @param customMessage Custom error message
+ * @throws Re-throws error with context
  */
 const handleApiError = (error: unknown, customMessage: string): never => {
   console.error(`${customMessage}:`, error);
@@ -119,10 +197,10 @@ const handleApiError = (error: unknown, customMessage: string): never => {
 };
 
 /**
- * 获取图块列表
- * @param isSteedMode 是否启用Steed模式
- * @param simulation 可选的模拟参数
- * @returns 图块列表数据
+ * Get tiles list
+ * @param isSteedMode Whether to enable Steed mode
+ * @param simulation Optional simulation parameter
+ * @returns Tiles list data
  */
 export const fetchTilesList = async (isSteedMode: boolean = false, simulation?: string): Promise<ApiResponse<string[]>> => {
   try {
@@ -143,37 +221,16 @@ export const fetchTilesList = async (isSteedMode: boolean = false, simulation?: 
   }
 };
 
-/**
- * 运行推断
- * @param settings 可选的推断设置
- * @returns 推断结果消息
- */
-export const runInference = async (settings?: InferenceSettings): Promise<ApiResponse<string>> => {
-  try {
-    const response: AxiosResponse<ApiResponse<string>> = await axios.post(
-      `${API_CONFIG.BASE_URL}/run-inference`,
-      settings || {},
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    return handleApiError(error, 'Inference failed');
-  }
-};
 
 /**
- * 按坐标获取瓦片
- * @param timestamp 时间戳
- * @param z 缩放级别
- * @param x X坐标
- * @param y Y坐标
- * @param isSteedMode 是否启用Steed模式
- * @param simulation 可选的模拟参数
- * @returns 瓦片数据（Blob）
+ * Get tile by coordinates
+ * @param timestamp Timestamp
+ * @param z Zoom level
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param isSteedMode Whether to enable Steed mode
+ * @param simulation Optional simulation parameter
+ * @returns Tile data (Blob)
  */
 export const fetchTileByCoordinates = async (
   timestamp: string, 
@@ -184,18 +241,18 @@ export const fetchTileByCoordinates = async (
   simulation?: string
 ): Promise<Blob> => {
   try {
-    // 准备请求参数
+    // Prepare request parameters
     const params: Record<string, string | boolean> = { isSteedMode };
     
-    // 如果提供了simulation参数，添加到请求中
+    // If simulation parameter is provided, add to request
     if (simulation) {
       params.simulation = simulation;
-      console.log(`使用simulation参数: ${simulation}`);
+      console.log(`Using simulation parameter: ${simulation}`);
     }
     
-    // 如果有simulation参数且不为null/undefined/空字符串，使用新的路由
+    // If simulation parameter is provided and not null/undefined/empty string, use new route
     if (simulation && simulation.trim() !== '') {
-      console.log(`使用simulation路径: /tiles/simulation/${simulation}/${timestamp}/${z}/${x}/${y}`);
+      console.log(`Using simulation path: /tiles/simulation/${simulation}/${timestamp}/${z}/${x}/${y}`);
       const response = await axios.get(
         `${API_CONFIG.BASE_URL}/tiles/simulation/${simulation}/${timestamp}/${z}/${x}/${y}`, 
         {
@@ -204,7 +261,7 @@ export const fetchTileByCoordinates = async (
       );
       return response.data;
     } else {
-      // 否则使用原始路由
+      // Otherwise use original route
       const response = await axios.get(
         `${API_CONFIG.BASE_URL}/tiles/${timestamp}/${z}/${x}/${y}`, 
         {
@@ -220,11 +277,11 @@ export const fetchTileByCoordinates = async (
 };
 
 /**
- * 获取测量数据
- * @param startDate 开始日期
- * @param endDate 结束日期
- * @param frequency 数据频率，默认为"Instantaneous"
- * @returns 测量数据
+ * Get gauging data
+ * @param startDate Start date
+ * @param endDate End date
+ * @param frequency Data frequency, default is "Instantaneous"
+ * @returns Gauging data
  */
 export const fetchGaugingData = async (
   startDate: string | Date, 
@@ -249,13 +306,13 @@ export const fetchGaugingData = async (
 };
 
 /**
- * 获取降雨数据
- * @param timestamp 时间戳
- * @returns 降雨量（毫米/小时）
+ * Get rainfall data
+ * @param timestamp Timestamp
+ * @returns Rainfall amount (mm/hour)
  */
 export const fetchRainfallData = async (timestamp: string): Promise<number> => {
   try {
-    // 获取环境变量中的API密钥
+    // Get API key from environment variables
     const apiKey = import.meta.env.VITE_SHARED_OPENWEATHERMAP_API_KEY;
     if (!apiKey) {
       throw new Error('OpenWeatherMap API key is missing');
@@ -275,15 +332,15 @@ export const fetchRainfallData = async (timestamp: string): Promise<number> => {
       `${API_CONFIG.WEATHER_BASE_URL}/weather/history?${params.toString()}`
     );
 
-    return response.data.rain?.['1h'] || 0; // 返回最近一小时的降雨量（毫米）
+    return response.data.rain?.['1h'] || 0; // Return rainfall amount for the last hour (mm)
   } catch (error) {
     return handleApiError(error, 'Failed to fetch rainfall data');
   }
 };
 
 /**
- * 获取历史模拟列表
- * @returns 历史模拟文件夹名称列表
+ * Get historical simulation list
+ * @returns Historical simulation folder names list
  */
 export const fetchHistoricalSimulations = async (): Promise<string[]> => {
   try {
@@ -297,12 +354,12 @@ export const fetchHistoricalSimulations = async (): Promise<string[]> => {
 };
 
 /**
- * 获取指定位置的水深信息
- * @param lat 纬度
- * @param lng 经度
- * @param timestamp 可选的时间戳 (格式: waterdepth_yyyyMMdd_HHmmss)
- * @param simulation 可选的模拟ID
- * @returns 水深信息数据
+ * Get water depth information for specific location
+ * @param lat Latitude
+ * @param lng Longitude
+ * @param timestamp Optional timestamp (format: waterdepth_yyyyMMdd_HHmmss)
+ * @param simulation Optional simulation ID
+ * @returns Water depth information data
  */
 export const fetchWaterDepth = async (
   lat: number,
@@ -312,7 +369,7 @@ export const fetchWaterDepth = async (
 ): Promise<{ success: boolean; depth: number | null; message?: string }> => {
   try {
     if (!timestamp || !simulation) {
-      throw new Error('时间戳和模拟ID不能为空');
+      throw new Error('Timestamp and simulation ID cannot be empty');
     }
 
     const params = new URLSearchParams({
@@ -328,24 +385,24 @@ export const fetchWaterDepth = async (
     
     return response.data;
   } catch (error) {
-    console.error('获取水深度失败:', error);
+    console.error('Failed to get water depth:', error);
     return {
       success: false,
       depth: null,
-      message: error instanceof Error ? error.message : '获取水深失败'
+      message: error instanceof Error ? error.message : 'Failed to get water depth'
     };
   }
 };
 
 /**
- * 获取特定模拟的降雨瓦片时间戳列表
- * @param simulation 模拟名称
- * @returns 降雨瓦片时间戳列表
+ * Get rainfall tiles list for specific simulation
+ * @param simulation Simulation name
+ * @returns Rainfall tiles timestamps list
  */
 export const fetchRainfallTilesList = async (simulation: string): Promise<string[]> => {
   try {
     if (!simulation) {
-      throw new Error('模拟名称不能为空');
+      throw new Error('Simulation name cannot be empty');
     }
     
     const response: AxiosResponse<ApiResponse<string[]>> = await axios.get(
@@ -353,17 +410,17 @@ export const fetchRainfallTilesList = async (simulation: string): Promise<string
     );
     return response.data.message || [];
   } catch (error) {
-    return handleApiError(error, `无法获取模拟 ${simulation} 的降雨瓦片列表`);
+    return handleApiError(error, `Unable to get rainfall tiles list for simulation ${simulation}`);
   }
 };
 
 /**
- * 根据坐标获取降雨瓦片
- * @param simulation 模拟名称
- * @param z 缩放级别
- * @param x X坐标
- * @param y Y坐标
- * @returns 降雨瓦片图像数据（Blob）
+ * Get rainfall tile by coordinates
+ * @param simulation Simulation name
+ * @param z Zoom level
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @returns Rainfall tile image data (Blob)
  */
 export const fetchRainfallTile = async (
   simulation: string,
@@ -381,6 +438,135 @@ export const fetchRainfallTile = async (
     
     return response.data;
   } catch (error) {
-    return handleApiError(error, `无法获取降雨瓦片: ${simulation}/${z}/${x}/${y}`);
+    return handleApiError(error, `Failed to get rainfall tile: ${simulation}/${z}/${x}/${y}`);
+  }
+};
+
+/**
+ * Run inference task (new API)
+ * @param params Inference parameters
+ * @returns Inference task information
+ */
+export const runInferenceTask = async (params: InferenceParams = {}): Promise<{ success: boolean; data: { task_id: string; status: string; message: string } }> => {
+  try {
+    const response = await axios.post(
+      `${API_CONFIG.BASE_URL}/inference/run`,
+      {
+        model_path: params.model_path || 'best.pt',
+        data_dir: params.data_dir || 'rainfall_20221024',
+        device: params.device || null,
+        pred_length: params.pred_length || 48
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Inference task start failed:', error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const responseData = axiosError.response?.data as any;
+      throw new Error(responseData?.detail || responseData?.message || axiosError.message);
+    }
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+};
+
+/**
+ * Get inference task status
+ * @param taskId Task ID
+ * @returns Task status information
+ */
+export const getInferenceTaskStatus = async (taskId: string): Promise<{ success: boolean; data: InferenceTask }> => {
+  try {
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/inference/tasks/${taskId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to get task ${taskId} status:`, error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const responseData = axiosError.response?.data as any;
+      throw new Error(responseData?.detail || responseData?.message || axiosError.message);
+    }
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+};
+
+/**
+ * Get all inference tasks list
+ * @returns Tasks list
+ */
+export const getInferenceTasksList = async (): Promise<{ success: boolean; data: { tasks: InferenceTask[]; total: number } }> => {
+  try {
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/inference/tasks`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get tasks list:', error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const responseData = axiosError.response?.data as any;
+      throw new Error(responseData?.detail || responseData?.message || axiosError.message);
+    }
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+};
+
+/**
+ * Get inference service status
+ * @returns Service status information
+ */
+export const getInferenceServiceStatus = async (): Promise<{ success: boolean; data: any }> => {
+  try {
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/inference/status`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get inference service status:', error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const responseData = axiosError.response?.data as any;
+      throw new Error(responseData?.detail || responseData?.message || axiosError.message);
+    }
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+};
+
+/**
+ * Get CUDA device information and utilization
+ * @returns CUDA information including available devices and their utilization
+ */
+export const getCudaInfo = async (): Promise<CudaInfoResponse> => {
+  try {
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/inference/cuda_info`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get CUDA information:', error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const responseData = axiosError.response?.data as any;
+      throw new Error(responseData?.detail || responseData?.message || axiosError.message);
+    }
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+};
+
+/**
+ * Get available rainfall data folders
+ * @returns List of available rainfall data folders with their information
+ */
+export const getRainfallFolders = async (): Promise<RainfallFoldersResponse> => {
+  try {
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/inference/rainfall_folders`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get rainfall folders:', error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const responseData = axiosError.response?.data as any;
+      throw new Error(responseData?.detail || responseData?.message || axiosError.message);
+    }
+    throw error instanceof Error ? error : new Error(String(error));
   }
 };

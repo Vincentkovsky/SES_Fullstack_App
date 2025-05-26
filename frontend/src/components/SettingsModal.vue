@@ -15,60 +15,128 @@
               <div class="inference-panel">
                 <!-- Removed the panel-header with Inference Settings title -->
                 
-                <!-- Tabs for inference mode -->
-                <div class="tabs">
-                  <button 
-                    class="tab-button" 
-                    :class="{ active: activeTab === 'live' }"
-                    @click="activeTab = 'live'"
-                  >
-                    Live Inference
-                  </button>
-                  <button 
-                    class="tab-button" 
-                    :class="{ active: activeTab === 'historical' }"
-                    @click="activeTab = 'historical'"
-                  >
-                    Historical Floods
-                  </button>
-                </div>
-                
-                <!-- Live Tab Content -->
-                <div v-if="activeTab === 'live'" class="tab-content">
-                  <div class="setting-item">
-                    <label for="area">Area</label>
-                    <select id="area" v-model="inferenceSettings.area">
-                      <option value="wagga">Wagga Wagga</option>
-                    </select>
+                <!-- Inference Progress Section -->
+                <div v-if="inferenceTaskRunning" class="inference-progress-container">
+                  <h3>Inference Task Running</h3>
+                  <div class="progress-info">
+                    <p>Task ID: {{ currentInferenceTask.taskId }}</p>
+                    <p>Status: {{ inferenceStatusText }}</p>
+                    <p>Running time: {{ formatElapsedTime(currentInferenceTask.elapsed) }}</p>
                   </div>
-                  <div class="setting-item">
-                    <label for="window">Inference Window</label>
-                    <select id="window" v-model="inferenceSettings.window">
-                      <option value="24">24 Hours</option>
-                      <option value="48">48 Hours</option>
-                      <option value="72">72 Hours</option>
-                    </select>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar">
+                      <div 
+                        class="progress-fill" 
+                        :style="{ 
+                          width: inferenceTaskRunning ? '100%' : '0%',
+                          animation: inferenceTaskRunning ? 'progress-animation 2s infinite' : 'none'
+                        }"
+                      ></div>
+                    </div>
+                  </div>
+                  <div v-if="inferenceTaskError" class="error-message">
+                    {{ inferenceTaskError }}
                   </div>
                 </div>
                 
-                <!-- Historical Tab Content -->
-                <div v-if="activeTab === 'historical'" class="tab-content">
-                  <div class="setting-item">
-                    <label for="historical-simulation">Historical Floods</label>
-                    <select id="historical-simulation" v-model="selectedHistoricalSimulation">
-                      <option value="">Select a flood event</option>
-                      <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
-                        {{ simulation }}
-                      </option>
-                    </select>
+                <!-- Tabs for inference mode (hidden when task is running) -->
+                <div v-if="!inferenceTaskRunning">
+                  <div class="tabs">
+                    <button 
+                      class="tab-button" 
+                      :class="{ active: activeTab === 'live' }"
+                      @click="activeTab = 'live'"
+                    >
+                      Live Inference
+                    </button>
+                    <button 
+                      class="tab-button" 
+                      :class="{ active: activeTab === 'historical' }"
+                      @click="activeTab = 'historical'"
+                    >
+                      Historical Floods
+                    </button>
                   </div>
-                </div>
-                
-                <div class="inference-buttons">
-                  <button class="primary-button" @click="activeTab === 'live' ? startInference() : loadHistoricalSimulation()">
-                    Start Inference
-                  </button>
-                  <button class="secondary-button" @click="close">Cancel</button>
+                  
+                  <!-- Live Tab Content -->
+                  <div v-if="activeTab === 'live'" class="tab-content">
+                    <div class="setting-item">
+                      <label for="area">Area</label>
+                      <select id="area" v-model="inferenceSettings.area">
+                        <option value="wagga">Wagga Wagga</option>
+                      </select>
+                    </div>
+                    <div class="setting-item">
+                      <label for="window">Inference Window</label>
+                      <select id="window" v-model="inferenceSettings.window">
+                        <option value="24">24 Hours</option>
+                        <option value="48">48 Hours</option>
+                        <option value="72">72 Hours</option>
+                      </select>
+                    </div>
+                    
+                    <!-- CUDA Device Dropdown -->
+                    <div class="setting-item">
+                      <label for="cuda-device">Inference Device</label>
+                      <select id="cuda-device" v-model="inferenceSettings.device" :disabled="!cudaInfo.cuda_available">
+                        <option v-if="!cudaInfo.cuda_available" value="cpu">CPU (CUDA not available)</option>
+                        <option v-else value="cpu">CPU</option>
+                        <option 
+                          v-for="device in cudaInfo.devices" 
+                          :key="device.device_id" 
+                          :value="`cuda:${device.device_id}`"
+                        >
+                          {{ "CUDA:" + device.device_id + " - "+ device.device_name }} ({{ device.free_memory_gb.toFixed(1) }}GB free)
+                        </option>
+                      </select>
+                      <div v-if="cudaInfo.cuda_available && cudaInfo.devices.length > 0" class="device-utilization">
+                        <div v-for="device in cudaInfo.devices" :key="`util-${device.device_id}`" class="device-stats">
+                          <div class="device-name">CUDA: {{ device.device_id }}: {{ device.device_name }}</div>
+                          <div class="utilization-bar">
+                            <div class="utilization-fill" :style="{ width: `${device.allocated_percent}%` }"></div>
+                            <span class="utilization-text">{{ device.allocated_percent.toFixed(1) }}% used</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div v-if="isLoadingCudaInfo" class="loading-indicator">Loading CUDA information...</div>
+                    </div>
+                    
+                    <!-- Rainfall Data Folder Dropdown -->
+                    <div class="setting-item">
+                      <label for="rainfall-folder">Rainfall Data</label>
+                      <select id="rainfall-folder" v-model="inferenceSettings.dataDir">
+                        <option value="">Select a rainfall data folder</option>
+                        <option 
+                          v-for="folder in rainfallFolders" 
+                          :key="folder.name" 
+                          :value="folder.name"
+                        >
+                          {{ folder.name }} ({{ folder.file_count }} files, {{ folder.size_mb.toFixed(1) }} MB)
+                        </option>
+                      </select>
+                      <div v-if="isLoadingRainfallFolders" class="loading-indicator">Loading rainfall folders...</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Historical Tab Content -->
+                  <div v-if="activeTab === 'historical'" class="tab-content">
+                    <div class="setting-item">
+                      <label for="historical-simulation">Historical Floods</label>
+                      <select id="historical-simulation" v-model="selectedHistoricalSimulation">
+                        <option value="">Select a flood event</option>
+                        <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
+                          {{ simulation }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="inference-buttons">
+                    <button class="primary-button" @click="activeTab === 'live' ? startInference() : loadHistoricalSimulation()">
+                      {{ activeTab === 'live' ? 'Start Inference' : 'Load Simulation' }}
+                    </button>
+                    <button class="secondary-button" @click="close">Cancel</button>
+                  </div>
                 </div>
               </div>
 
@@ -106,11 +174,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, onMounted, watch, computed } from 'vue';
+import { ref, defineProps, defineEmits, onMounted, watch, computed, onBeforeUnmount } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList } from '../services/api';
-import type { GaugingData } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFolders } from '../services/api';
+import type { GaugingData, CudaInfoResponse, RainfallFoldersResponse, CudaDeviceInfo, RainfallFolderInfo } from '../services/api';
 
 // Types
 type Settings = {
@@ -124,7 +192,19 @@ type Settings = {
 type InferenceSettings = {
   area: string;
   window: string;
+  device: string;
+  dataDir: string;
 };
+
+// 推理任务状态接口
+interface InferenceTaskStatus {
+  taskId: string;
+  status: string;
+  message?: string;
+  elapsed?: number;
+  results?: any;
+  error?: string;
+}
 
 // Props and Emits
 const props = defineProps<{
@@ -152,6 +232,33 @@ const gaugingData = ref<GaugingData | null>(null);
 const rainfallData = ref<string[]>([]);
 const hasRainfallData = ref(false);
 
+// CUDA information state
+const isLoadingCudaInfo = ref(false);
+const cudaInfo = ref<{
+  cuda_available: boolean;
+  device_count: number;
+  devices: CudaDeviceInfo[];
+  current_device: number | null;
+}>({
+  cuda_available: false,
+  device_count: 0,
+  devices: [],
+  current_device: null
+});
+
+// Rainfall folders state
+const isLoadingRainfallFolders = ref(false);
+const rainfallFolders = ref<RainfallFolderInfo[]>([]);
+
+// 推理任务状态
+const inferenceTaskRunning = ref(false);
+const currentInferenceTask = ref<InferenceTaskStatus>({
+  taskId: '',
+  status: '',
+  elapsed: 0
+});
+const inferenceTaskError = ref<string | null>(null);
+
 const settings = ref<Settings>({
   animationSpeed: '1',
   mapStyle: 'satellite',
@@ -162,7 +269,23 @@ const settings = ref<Settings>({
 
 const inferenceSettings = ref<InferenceSettings>({
   area: 'wagga',
-  window: '24'
+  window: '24',
+  device: 'cpu',
+  dataDir: ''
+});
+
+// 计算属性：推理状态文本
+const inferenceStatusText = computed(() => {
+  switch (currentInferenceTask.value.status) {
+    case 'running':
+      return 'Running';
+    case 'completed':
+      return 'Completed';
+    case 'failed':
+      return 'Failed';
+    default:
+      return currentInferenceTask.value.status || 'Unknown';
+  }
 });
 
 // Utility functions
@@ -177,6 +300,20 @@ const formatDate = (date: Date): string => {
   return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
+// 格式化已运行时间
+const formatElapsedTime = (seconds?: number): string => {
+  if (seconds === undefined) return '0s';
+  
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  
+  if (minutes === 0) {
+    return `${remainingSeconds} seconds`;
+  }
+  
+  return `${minutes} min ${remainingSeconds} sec`;
+};
+
 const getDateFromTimestamp = (timestamp: string): Date | null => {
   const match = timestamp.match(/waterdepth_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
   if (match) {
@@ -184,6 +321,44 @@ const getDateFromTimestamp = (timestamp: string): Date | null => {
     return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
   }
   return null;
+};
+
+// 处理推理任务事件
+const handleInferenceTaskStarted = (data: { taskId: string; status: string; message: string }) => {
+  inferenceTaskRunning.value = true;
+  inferenceTaskError.value = null;
+  currentInferenceTask.value = {
+    taskId: data.taskId,
+    status: data.status,
+    message: data.message,
+    elapsed: 0
+  };
+  console.log('Inference task started:', data);
+};
+
+const handleInferenceTaskProgress = (data: { taskId: string; status: string; elapsed: number; results?: any }) => {
+  currentInferenceTask.value = {
+    ...currentInferenceTask.value,
+    ...data
+  };
+  console.log('Inference task progress update:', data);
+};
+
+const handleInferenceTaskCompleted = (data: { taskId: string }) => {
+  inferenceTaskRunning.value = false;
+  console.log('Inference task completed:', data);
+  
+  // Close modal
+  setTimeout(() => {
+    if (inferenceTaskError.value === null) {
+      close();
+    }
+  }, 1000);
+};
+
+const handleInferenceTaskError = (data: { error: string }) => {
+  inferenceTaskError.value = data.error;
+  console.error('Inference task error:', data.error);
 };
 
 // Data fetching functions
@@ -208,6 +383,70 @@ const fetchGaugeData = async (startDate: string, endDate: string) => {
   } catch (error) {
     console.error('Error fetching gauge data:', error);
     throw error; // Re-throw to be handled by caller
+  }
+};
+
+// New function to fetch CUDA information
+const fetchCudaInfo = async () => {
+  try {
+    isLoadingCudaInfo.value = true;
+    console.log('Fetching CUDA information...');
+    const response = await getCudaInfo();
+    
+    if (response.success) {
+      cudaInfo.value = response.data;
+      console.log('CUDA information fetched:', response.data);
+      
+      // If CUDA is available, set the default device to the first CUDA device
+      if (response.data.cuda_available && response.data.devices.length > 0) {
+        inferenceSettings.value.device = `cuda:${response.data.devices[0].device_id}`;
+      } else {
+        inferenceSettings.value.device = 'cpu';
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching CUDA information:', error);
+    cudaInfo.value = {
+      cuda_available: false,
+      device_count: 0,
+      devices: [],
+      current_device: null
+    };
+    inferenceSettings.value.device = 'cpu';
+  } finally {
+    isLoadingCudaInfo.value = false;
+  }
+};
+
+// New function to fetch rainfall folders
+const fetchRainfallFolders = async () => {
+  try {
+    isLoadingRainfallFolders.value = true;
+    console.log('Fetching rainfall folders...');
+    const response = await getRainfallFolders();
+    
+    if (response.success) {
+      rainfallFolders.value = response.data.rainfall_folders;
+      console.log('Rainfall folders fetched:', response.data.rainfall_folders);
+      
+      // Set default rainfall folder if available
+      if (response.data.rainfall_folders.length > 0) {
+        // Look for a folder with name starting with 'rainfall_'
+        const defaultFolder = response.data.rainfall_folders.find(folder => 
+          folder.name.startsWith('rainfall_'));
+        
+        if (defaultFolder) {
+          inferenceSettings.value.dataDir = defaultFolder.name;
+        } else {
+          inferenceSettings.value.dataDir = response.data.rainfall_folders[0].name;
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching rainfall folders:', error);
+    rainfallFolders.value = [];
+  } finally {
+    isLoadingRainfallFolders.value = false;
   }
 };
 
@@ -261,7 +500,8 @@ const close = () => {
 
 const startInference = () => {
   emit('start-inference', inferenceSettings.value);
-  close();
+  // 注意：不要关闭模态框，以便显示推理进度
+  // close() 将由任务完成事件处理器调用
 };
 
 // Add rainfall toggle function
@@ -283,6 +523,12 @@ const loadData = async () => {
   try {
     // Load historical simulations first
     await fetchHistoricalSimulationsData();
+
+    // Fetch CUDA information
+    await fetchCudaInfo();
+    
+    // Fetch rainfall folders
+    await fetchRainfallFolders();
 
     // Only fetch gauge data if we have timestamps
     if (props.timestamps.length > 0) {
@@ -365,6 +611,26 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
   }
 });
 
+// Periodically refresh CUDA information when the modal is open and the Live tab is active
+let cudaRefreshInterval: number | null = null;
+
+// Setup auto-refresh for CUDA info when modal is open and in 'live' tab
+watch([() => props.isOpen, () => activeTab.value], ([isOpen, tab]) => {
+  // Clear any existing interval
+  if (cudaRefreshInterval !== null) {
+    clearInterval(cudaRefreshInterval);
+    cudaRefreshInterval = null;
+  }
+  
+  // If modal is open and on the live tab, set up auto-refresh
+  if (isOpen && tab === 'live') {
+    // Refresh every 5 seconds
+    cudaRefreshInterval = window.setInterval(() => {
+      fetchCudaInfo();
+    }, 5000);
+  }
+}, { immediate: true });
+
 // Initial setup
 onMounted(() => {
   // Set initial tab based on modelValue prop
@@ -373,6 +639,26 @@ onMounted(() => {
   if (props.isOpen) {
     loadData();
   }
+  
+  // 设置全局事件监听器，用于接收来自DeckGLMap的推理任务事件
+  window.addEventListener('inference-task-started', (e: any) => handleInferenceTaskStarted(e.detail));
+  window.addEventListener('inference-task-progress', (e: any) => handleInferenceTaskProgress(e.detail));
+  window.addEventListener('inference-task-completed', (e: any) => handleInferenceTaskCompleted(e.detail));
+  window.addEventListener('inference-task-error', (e: any) => handleInferenceTaskError(e.detail));
+});
+
+// 清理事件监听器
+onBeforeUnmount(() => {
+  // Clear CUDA refresh interval
+  if (cudaRefreshInterval !== null) {
+    clearInterval(cudaRefreshInterval);
+    cudaRefreshInterval = null;
+  }
+  
+  window.removeEventListener('inference-task-started', (e: any) => handleInferenceTaskStarted(e.detail));
+  window.removeEventListener('inference-task-progress', (e: any) => handleInferenceTaskProgress(e.detail));
+  window.removeEventListener('inference-task-completed', (e: any) => handleInferenceTaskCompleted(e.detail));
+  window.removeEventListener('inference-task-error', (e: any) => handleInferenceTaskError(e.detail));
 });
 </script>
 
@@ -610,6 +896,78 @@ onMounted(() => {
   opacity: 0;
 }
 
+/* Inference progress styles */
+.inference-progress-container {
+  padding: 1rem;
+  background: rgba(249, 250, 251, 0.8);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(209, 213, 219, 0.4);
+}
+
+.inference-progress-container h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1E3D78;
+  margin-bottom: 1rem;
+}
+
+.progress-info {
+  margin-bottom: 1rem;
+}
+
+.progress-info p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.progress-bar-container {
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 6px;
+  background: rgba(209, 213, 219, 0.4);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #1E3D78;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+@keyframes progress-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.progress-fill.animated {
+  background: linear-gradient(to right, #1E3D78, #3663B0, #1E3D78);
+  background-size: 200% 200%;
+  animation: progress-animation 2s infinite;
+}
+
+.error-message {
+  padding: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #B91C1C;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
 .graph-container {
   display: flex;
   flex-direction: column;
@@ -751,5 +1109,59 @@ onMounted(() => {
 
 .rainfall-toggle-button:hover {
   opacity: 0.9;
+}
+
+/* Device utilization styles */
+.device-utilization {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(249, 250, 251, 0.7);
+  border-radius: 6px;
+  border: 1px solid rgba(209, 213, 219, 0.4);
+}
+
+.device-stats {
+  margin-bottom: 8px;
+}
+
+.device-stats:last-child {
+  margin-bottom: 0;
+}
+
+.device-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #4b5563;
+}
+
+.utilization-bar {
+  height: 8px;
+  background: rgba(229, 231, 235, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.utilization-fill {
+  height: 100%;
+  background: linear-gradient(to right, #1E3D78, #3663B0);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.utilization-text {
+  position: absolute;
+  right: 4px;
+  top: -16px;
+  font-size: 0.7rem;
+  color: #4b5563;
+}
+
+.loading-indicator {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
 }
 </style> 

@@ -138,14 +138,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount, defineEmits } from 'vue';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import mapboxgl from 'mapbox-gl';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import type { _Tile2DHeader } from '@deck.gl/geo-layers';
-import { fetchTilesList, runInference, fetchWaterDepth, fetchRainfallTilesList } from '../services/api';
+import { fetchTilesList, runInferenceTask, getInferenceTaskStatus, fetchWaterDepth, fetchRainfallTilesList } from '../services/api';
+import type { InferenceParams } from '../services/api';
 import MapZoomControls from './MapZoomControls.vue';
 import MapLayerControls from './MapLayerControls.vue';
 import MapSettingsControl from './MapSettingsControl.vue';
@@ -249,6 +250,17 @@ const currentRainfallTimestamp = ref('');
 const isLegendVisible = computed(() => {
   return isFloodLayerActive.value || (isWeatherLayerActive.value && rainfallTimestamps.value.length > 0);
 });
+
+// Add state for tracking current inference task
+const currentInferenceTaskId = ref<string | null>(null);
+
+// Define emit
+const emit = defineEmits<{
+  (e: 'inference-task-started', data: { taskId: string; status: string; message: string }): void;
+  (e: 'inference-task-progress', data: { taskId: string; status: string; elapsed: number; results?: any }): void;
+  (e: 'inference-task-completed', data: { taskId: string }): void;
+  (e: 'inference-task-error', data: { error: string }): void;
+}>();
 
 // Computed
 const formattedTimestamp = computed(() => {
@@ -965,9 +977,16 @@ const handleSettingsUpdate = (newSettings: {
   document.querySelector('.coordinates')?.classList.toggle('hidden', !newSettings.showCoordinates);
 };
 
+// 将emit替换为自定义事件
+const dispatchInferenceEvent = (eventName: string, detail: any) => {
+  window.dispatchEvent(new CustomEvent(eventName, { detail }));
+};
+
 const handleInferenceStart = async (inferenceSettings: {
   area: string;
   window: string;
+  device: string;
+  dataDir: string;
 }) => {
   try {
     console.log('Inference Start');
@@ -979,31 +998,108 @@ const handleInferenceStart = async (inferenceSettings: {
       animationIntervalId = null;
     }
     
-    await runInference();
-    console.log('Inference completed successfully');
+    // Convert window to pred_length parameter
+    const predLength = parseInt(inferenceSettings.window) * 2;
     
-    // Refresh the tiles list after successful inference
-    const newTilesResponse = await fetchTilesList();
-
-    console.log(newTilesResponse);
-    timestamps = newTilesResponse.message || [];
+    // Prepare inference parameters
+    const inferenceParams: InferenceParams = {
+      model_path: 'best.pt',
+      data_dir: inferenceSettings.dataDir || 'rainfall_20221024', // Use selected rainfall folder
+      device: inferenceSettings.device || 'cuda:0', // Use selected CUDA device
+      pred_length: predLength
+    };
     
-    // Reset animation state
-    currentTimeIndex = 0;
-    if (timestamps.length > 0) {
-      currentTimestamp.value = timestamps[0];
-      updateLayers(0);
-    }
+    console.log('Inference parameters:', inferenceParams);
     
-    // Restart animation with new timestamps if it was playing
-    if (isPlaying.value) {
-      startAnimation();
+    // Call new API to run inference task
+    const result = await runInferenceTask(inferenceParams);
+    
+    if (result.success) {
+      // Save task ID for status checking
+      currentInferenceTaskId.value = result.data.task_id;
+      console.log(`Inference task started, Task ID: ${result.data.task_id}`);
+      
+      // Dispatch event to notify settings modal to show progress
+      dispatchInferenceEvent('inference-task-started', {
+        taskId: result.data.task_id,
+        status: result.data.status,
+        message: result.data.message
+      });
+      
+      // Check task status until completion
+      await waitForTaskCompletion(result.data.task_id);
+      
+      // Refresh tiles list after task completion
+      const newTilesResponse = await fetchTilesList();
+      timestamps = newTilesResponse.message || [];
+      
+      // Reset animation state
+      currentTimeIndex = 0;
+      if (timestamps.length > 0) {
+        currentTimestamp.value = timestamps[0];
+        updateLayers(0);
+      }
+      
+      // Restart animation if it was playing
+      if (isPlaying.value) {
+        startAnimation();
+      }
+    } else {
+      throw new Error('Failed to start inference task');
     }
   } catch (error) {
     console.error('Error running inference:', error);
+    // Notify modal to show error
+    dispatchInferenceEvent('inference-task-error', {
+      error: error instanceof Error ? error.message : String(error)
+    });
   } finally {
     isInferenceRunning.value = false;
+    // Notify modal that task is completed
+    if (currentInferenceTaskId.value) {
+      dispatchInferenceEvent('inference-task-completed', {
+        taskId: currentInferenceTaskId.value
+      });
+      currentInferenceTaskId.value = null;
+    }
   }
+};
+
+// Function to wait for task completion
+const waitForTaskCompletion = async (taskId: string): Promise<void> => {
+  // Initial status check
+  let taskStatus = await getInferenceTaskStatus(taskId);
+  
+  // Check status every 3 seconds until completed or failed
+  while (taskStatus.data.status === 'running') {
+    // Notify modal to update progress
+    dispatchInferenceEvent('inference-task-progress', {
+      taskId,
+      status: taskStatus.data.status,
+      elapsed: taskStatus.data.elapsed_time || 0
+    });
+    
+    // Wait 3 seconds
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    // Check status again
+    taskStatus = await getInferenceTaskStatus(taskId);
+  }
+  
+  // Task completed, send final status
+  dispatchInferenceEvent('inference-task-progress', {
+    taskId,
+    status: taskStatus.data.status,
+    elapsed: taskStatus.data.elapsed_time || 0,
+    results: taskStatus.data.results
+  });
+  
+  // If task failed, throw error
+  if (taskStatus.data.status === 'failed') {
+    throw new Error(`Inference task failed: ${JSON.stringify(taskStatus.data.results)}`);
+  }
+  
+  return;
 };
 
 // Add the toggle function
