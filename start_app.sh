@@ -67,14 +67,44 @@ echo "后端服务已启动，PID: $BACKEND_PID，日志保存在 logs/backend.l
 # 等待后端启动
 sleep 3
 
-# 在另一个终端运行前端，强制使用5173端口
-echo "启动前端服务 (端口5173)..."
+# 检查和安装前端依赖
+echo "检查前端依赖..."
+
+# 检查并安装npm
 if ! command -v npm &> /dev/null; then
-    echo "错误: 未找到npm命令，请确保已安装Node.js和npm"
-    kill $BACKEND_PID
-    exit 1
+    echo "未找到npm命令，尝试通过conda安装nodejs..."
+    conda install -y nodejs || {
+        echo "错误: 通过conda安装nodejs失败"
+        echo "您可以尝试手动安装Node.js: https://nodejs.org/"
+        kill $BACKEND_PID
+        exit 1
+    }
+    echo "nodejs和npm安装完成"
+    
+    # 验证安装
+    if ! command -v npm &> /dev/null; then
+        echo "错误: npm安装失败，请手动安装Node.js: https://nodejs.org/"
+        kill $BACKEND_PID
+        exit 1
+    fi
 fi
 
+# 检查前端依赖是否已安装
+echo "检查前端依赖包..."
+if [ ! -d "$SCRIPT_DIR/frontend/node_modules" ]; then
+    echo "前端依赖包未安装，开始安装..."
+    (cd "$SCRIPT_DIR/frontend" && npm install) || {
+        echo "错误: 安装前端依赖包失败"
+        kill $BACKEND_PID
+        exit 1
+    }
+    echo "前端依赖包安装完成"
+else
+    echo "前端依赖包已存在"
+fi
+
+# 在另一个终端运行前端，强制使用5173端口
+echo "启动前端服务 (端口5173)..."
 (cd "$SCRIPT_DIR/frontend" && npm run dev -- --port 5173 > "$LOGS_DIR/frontend.log" 2>&1) &
 FRONTEND_PID=$!
 echo "前端服务已启动，PID: $FRONTEND_PID，日志保存在 logs/frontend.log"
