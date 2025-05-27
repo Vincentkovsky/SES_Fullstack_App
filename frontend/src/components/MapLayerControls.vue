@@ -26,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import floodActiveIcon from '../assets/icon/Flood1.svg';
 import floodInactiveIcon from '../assets/icon/Flood0.svg';
 import weatherActiveIcon from '../assets/icon/weather1.svg';

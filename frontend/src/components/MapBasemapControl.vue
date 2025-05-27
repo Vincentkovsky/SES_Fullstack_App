@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import streetIcon from '../assets/icon/street.svg';
 import satelliteIcon from '../assets/icon/satellite.svg';
 
