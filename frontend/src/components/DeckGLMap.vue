@@ -1004,7 +1004,7 @@ const handleInferenceStart = async (inferenceSettings: {
     // Prepare inference parameters
     const inferenceParams: InferenceParams = {
       model_path: 'best.pt',
-      data_dir: inferenceSettings.dataDir || 'rainfall_20221024', // Use selected rainfall folder
+      data_dir: inferenceSettings.dataDir, // Use selected rainfall NC file
       device: inferenceSettings.device || 'cuda:0', // Use selected CUDA device
       pred_length: predLength
     };

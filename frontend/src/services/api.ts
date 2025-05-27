@@ -125,23 +125,22 @@ export interface CudaInfoResponse {
 }
 
 /**
- * Rainfall folder information interface
+ * Rainfall file information interface
  */
-export interface RainfallFolderInfo {
+export interface RainfallFileInfo {
   name: string;
   path: string;
-  file_count: number;
   size_mb: number;
   last_modified: string;
 }
 
 /**
- * Rainfall folders response interface
+ * Rainfall files response interface
  */
-export interface RainfallFoldersResponse {
+export interface RainfallFilesResponse {
   success: boolean;
   data: {
-    rainfall_folders: RainfallFolderInfo[];
+    rainfall_files: RainfallFileInfo[];
     total_count: number;
     base_path: string;
   };
@@ -453,7 +452,7 @@ export const runInferenceTask = async (params: InferenceParams = {}): Promise<{ 
       `${API_CONFIG.BASE_URL}/inference/run`,
       {
         model_path: params.model_path || 'best.pt',
-        data_dir: params.data_dir || 'rainfall_20221024',
+        data_dir: params.data_dir || null,
         device: params.device || null,
         pred_length: params.pred_length || 48
       },
@@ -552,16 +551,17 @@ export const getCudaInfo = async (): Promise<CudaInfoResponse> => {
   }
 };
 
+
 /**
- * Get available rainfall data folders
- * @returns List of available rainfall data folders with their information
+ * Get available rainfall data files
+ * @returns List of available rainfall data files with their information
  */
-export const getRainfallFolders = async (): Promise<RainfallFoldersResponse> => {
+export const getRainfallFiles = async (): Promise<RainfallFilesResponse> => {
   try {
-    const response = await axios.get(`${API_CONFIG.BASE_URL}/inference/rainfall_folders`);
+    const response = await axios.get(`${API_CONFIG.BASE_URL}/inference/rainfall_files`);
     return response.data;
   } catch (error) {
-    console.error('Failed to get rainfall folders:', error);
+    console.error('Failed to get rainfall files:', error);
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError;
       const responseData = axiosError.response?.data as any;

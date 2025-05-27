@@ -153,36 +153,35 @@ class InferenceAPI:
         }
     
     @staticmethod
-    @router.get("/rainfall_folders", response_model=Dict[str, Any])
+    @router.get("/rainfall_files", response_model=Dict[str, Any])
     @async_handle_exceptions
-    async def get_rainfall_folders():
-        """Get a list of available rainfall data folders"""
-        rainfall_folders = []
+    async def get_rainfall_files():
+        """Get a list of available rainfall data files (NC files)"""
+        rainfall_files = []
         
         # Check if rainfall data directory exists
         if RAINFALL_DATA_DIR.exists() and RAINFALL_DATA_DIR.is_dir():
             try:
-                # List all subdirectories in the rainfall data directory
-                for item in RAINFALL_DATA_DIR.iterdir():
-                    if item.is_dir() and not item.name.startswith('.'):
-                        # Get folder stats
-                        folder_info = {
+                # List all NC files in the rainfall data directory
+                for item in RAINFALL_DATA_DIR.glob('**/*.nc'):
+                    if item.is_file() and not item.name.startswith('.'):
+                        # Get file stats
+                        file_info = {
                             "name": item.name,
                             "path": str(item.relative_to(BASE_DIR)),
-                            "file_count": sum(1 for _ in item.glob('*.*')),
-                            "size_mb": round(sum(f.stat().st_size for f in item.glob('**/*') if f.is_file()) / (1024 * 1024), 2),
+                            "size_mb": round(item.stat().st_size / (1024 * 1024), 2),
                             "last_modified": time.ctime(item.stat().st_mtime)
                         }
-                        rainfall_folders.append(folder_info)
+                        rainfall_files.append(file_info)
                 
-                # Sort folders by name
-                rainfall_folders.sort(key=lambda x: x["name"])
+                # Sort files by name
+                rainfall_files.sort(key=lambda x: x["name"])
                 
             except Exception as e:
-                logger.error(f"Error reading rainfall folders: {str(e)}")
+                logger.error(f"Error reading rainfall files: {str(e)}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Error reading rainfall folders: {str(e)}"
+                    detail=f"Error reading rainfall files: {str(e)}"
                 )
         else:
             logger.warning(f"Rainfall data directory not found: {RAINFALL_DATA_DIR}")
@@ -190,8 +189,8 @@ class InferenceAPI:
         return {
             "success": True,
             "data": {
-                "rainfall_folders": rainfall_folders,
-                "total_count": len(rainfall_folders),
+                "rainfall_files": rainfall_files,
+                "total_count": len(rainfall_files),
                 "base_path": str(RAINFALL_DATA_DIR)
             }
         }
@@ -202,7 +201,7 @@ class InferenceAPI:
     async def run_inference_task(
         background_tasks: BackgroundTasks,
         model_path: str = Body('best.pt', description="模型文件路径"),
-        data_dir: str = Body('rainfall_20221024', description="输入数据目录"),
+        data_dir: str = Body(None, description="输入数据文件名"),
         device: str = Body(None, description="计算设备 (默认: cuda:0 或 cpu)"),
         pred_length: int = Body(48, description="预测时间步数")
     ):
@@ -212,13 +211,32 @@ class InferenceAPI:
         Args:
             background_tasks: 后台任务管理器
             model_path: 模型文件路径 (默认: best.pt)
-            data_dir: 输入数据目录 (默认: rainfall_20221024)
+            data_dir: 输入数据文件名 (默认: 自动选择可用的NC文件)
             device: 计算设备 (默认: cuda:0 或 cpu)
             pred_length: 预测时间步数 (默认: 48)
         
         Returns:
             任务ID和状态信息
         """
+        # 使用默认设备如果未指定
+        if device is None:
+            device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+            
+        # 如果没有指定数据文件，查找可用的NC文件
+        if data_dir is None:
+            try:
+                # 查找第一个可用的NC文件
+                nc_files = list(RAINFALL_DATA_DIR.glob('**/*.nc'))
+                if nc_files:
+                    # 选择第一个NC文件
+                    data_dir = nc_files[0].name
+                else:
+                    # 如果没有找到NC文件，使用默认值
+                    data_dir = 'rainfall_20221024.nc'
+            except Exception as e:
+                logger.error(f"自动查找NC文件失败: {str(e)}")
+                data_dir = 'rainfall_20221024.nc'
+        
         # 构建参数字典用于日志记录和保存
         parameters = {
             'model_path': model_path,
@@ -229,11 +247,6 @@ class InferenceAPI:
         
         logger.info(f"准备开始推理任务，参数: {parameters}")
         
-        # 使用默认设备如果未指定
-        if device is None:
-            device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-            parameters['device'] = device
-        
         # 验证模型文件
         model_full_path = FilePath(MODEL_DIR) / model_path
         if not model_full_path.exists():
@@ -242,16 +255,16 @@ class InferenceAPI:
                 detail=f"模型文件不存在: {model_full_path}"
             )
         
-        # 验证数据目录
-        data_dir_path = FilePath(MODEL_DIR) / data_dir
-        if not data_dir_path.exists():
+        # 验证数据文件
+        data_file_path = RAINFALL_DATA_DIR / data_dir
+        if not data_file_path.exists():
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"数据目录不存在: {data_dir_path}"
+                detail=f"数据文件不存在: {data_file_path}"
             )
         
         # 生成任务ID
-        task_id = f"inference_{int(time.time())}_{data_dir}"
+        task_id = f"inference_{int(time.time())}_{data_dir.replace('.nc', '')}"
         
         # 准备输出目录
         task_dir = INFERENCE_RESULTS_DIR / task_id
@@ -436,7 +449,7 @@ async def execute_inference_task(
     Args:
         task_id: 任务ID
         model_path: 模型文件路径
-        data_dir: 输入数据目录
+        data_dir: 输入数据文件名
         device: 计算设备
         pred_length: 预测时间步数
         task_dir: 任务输出目录
@@ -454,6 +467,9 @@ async def execute_inference_task(
         'pred_length': pred_length
     }
     
+    # 完整的数据文件路径
+    data_file_path = str(RAINFALL_DATA_DIR / data_dir)
+    
     try:
         # 在线程池中执行推理函数
         def run_process():
@@ -461,7 +477,7 @@ async def execute_inference_task(
                 # 使用新的参数格式调用推理函数
                 return InferenceService.run_inference(
                     model_path=model_path,
-                    data_dir=data_dir,
+                    data_file=data_file_path,  # 使用完整的文件路径
                     device=device,
                     start_tmp=None,  # 使用默认生成的时间戳
                     output_dir=task_dir,

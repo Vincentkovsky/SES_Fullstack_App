@@ -101,20 +101,20 @@
                       <div v-if="isLoadingCudaInfo" class="loading-indicator">Loading CUDA information...</div>
                     </div>
                     
-                    <!-- Rainfall Data Folder Dropdown -->
+                    <!-- Rainfall Data Files Dropdown -->
                     <div class="setting-item">
-                      <label for="rainfall-folder">Rainfall Data</label>
-                      <select id="rainfall-folder" v-model="inferenceSettings.dataDir">
-                        <option value="">Select a rainfall data folder</option>
+                      <label for="rainfall-file">Rainfall Data</label>
+                      <select id="rainfall-file" v-model="inferenceSettings.dataDir">
+                        <option value="">Select a rainfall data file</option>
                         <option 
-                          v-for="folder in rainfallFolders" 
-                          :key="folder.name" 
-                          :value="folder.name"
+                          v-for="file in rainfallFiles" 
+                          :key="file.name" 
+                          :value="file.name"
                         >
-                          {{ folder.name }} ({{ folder.file_count }} files, {{ folder.size_mb.toFixed(1) }} MB)
+                          {{ file.name }} ({{ file.size_mb.toFixed(1) }} MB)
                         </option>
                       </select>
-                      <div v-if="isLoadingRainfallFolders" class="loading-indicator">Loading rainfall folders...</div>
+                      <div v-if="isLoadingRainfallFiles" class="loading-indicator">Loading rainfall files...</div>
                     </div>
                   </div>
                   
@@ -177,8 +177,8 @@
 import { ref, defineProps, defineEmits, onMounted, watch, computed, onBeforeUnmount } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFolders } from '../services/api';
-import type { GaugingData, CudaInfoResponse, RainfallFoldersResponse, CudaDeviceInfo, RainfallFolderInfo } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles } from '../services/api';
+import type { GaugingData, CudaInfoResponse, RainfallFilesResponse, CudaDeviceInfo, RainfallFileInfo } from '../services/api';
 
 // Types
 type Settings = {
@@ -246,9 +246,9 @@ const cudaInfo = ref<{
   current_device: null
 });
 
-// Rainfall folders state
-const isLoadingRainfallFolders = ref(false);
-const rainfallFolders = ref<RainfallFolderInfo[]>([]);
+// Rainfall files state
+const isLoadingRainfallFiles = ref(false);
+const rainfallFiles = ref<RainfallFileInfo[]>([]);
 
 // 推理任务状态
 const inferenceTaskRunning = ref(false);
@@ -418,35 +418,35 @@ const fetchCudaInfo = async () => {
   }
 };
 
-// New function to fetch rainfall folders
-const fetchRainfallFolders = async () => {
+// New function to fetch rainfall files
+const fetchRainfallFiles = async () => {
   try {
-    isLoadingRainfallFolders.value = true;
-    console.log('Fetching rainfall folders...');
-    const response = await getRainfallFolders();
+    isLoadingRainfallFiles.value = true;
+    console.log('Fetching rainfall files...');
+    const response = await getRainfallFiles();
     
     if (response.success) {
-      rainfallFolders.value = response.data.rainfall_folders;
-      console.log('Rainfall folders fetched:', response.data.rainfall_folders);
+      rainfallFiles.value = response.data.rainfall_files;
+      console.log('Rainfall files fetched:', response.data.rainfall_files);
       
-      // Set default rainfall folder if available
-      if (response.data.rainfall_folders.length > 0) {
-        // Look for a folder with name starting with 'rainfall_'
-        const defaultFolder = response.data.rainfall_folders.find(folder => 
-          folder.name.startsWith('rainfall_'));
+      // Set default rainfall file if available
+      if (response.data.rainfall_files.length > 0) {
+        // Look for a file with name starting with 'rainfall_'
+        const defaultFile = response.data.rainfall_files.find(file => 
+          file.name.startsWith('rainfall_'));
         
-        if (defaultFolder) {
-          inferenceSettings.value.dataDir = defaultFolder.name;
+        if (defaultFile) {
+          inferenceSettings.value.dataDir = defaultFile.name;
         } else {
-          inferenceSettings.value.dataDir = response.data.rainfall_folders[0].name;
+          inferenceSettings.value.dataDir = response.data.rainfall_files[0].name;
         }
       }
     }
   } catch (error) {
-    console.error('Error fetching rainfall folders:', error);
-    rainfallFolders.value = [];
+    console.error('Error fetching rainfall files:', error);
+    rainfallFiles.value = [];
   } finally {
-    isLoadingRainfallFolders.value = false;
+    isLoadingRainfallFiles.value = false;
   }
 };
 
@@ -527,8 +527,8 @@ const loadData = async () => {
     // Fetch CUDA information
     await fetchCudaInfo();
     
-    // Fetch rainfall folders
-    await fetchRainfallFolders();
+    // Fetch rainfall files
+    await fetchRainfallFiles();
 
     // Only fetch gauge data if we have timestamps
     if (props.timestamps.length > 0) {
