@@ -206,5 +206,7 @@ if __name__ == "__main__":
         reload=reload,
         workers=int(workers),
         factory=True,
-        log_level="info" if not Config.DEBUG else "debug"
+        log_level="info" if not Config.DEBUG else "debug",
+        reload_dirs=["./"],
+        reload_excludes=["*.log"]
     ) 

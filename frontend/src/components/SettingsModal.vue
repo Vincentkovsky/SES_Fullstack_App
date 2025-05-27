@@ -13,130 +13,134 @@
             <div class="settings-layout">
               <!-- Left Panel - Settings with tabs -->
               <div class="inference-panel">
-                <!-- Removed the panel-header with Inference Settings title -->
-                
-                <!-- Inference Progress Section -->
-                <div v-if="inferenceTaskRunning" class="inference-progress-container">
-                  <h3>Inference Task Running</h3>
-                  <div class="progress-info">
-                    <p>Task ID: {{ currentInferenceTask.taskId }}</p>
-                    <p>Status: {{ inferenceStatusText }}</p>
-                    <p>Running time: {{ formatElapsedTime(currentInferenceTask.elapsed) }}</p>
-                  </div>
-                  <div class="progress-bar-container">
-                    <div class="progress-bar">
-                      <div 
-                        class="progress-fill" 
-                        :style="{ 
-                          width: inferenceTaskRunning ? '100%' : '0%',
-                          animation: inferenceTaskRunning ? 'progress-animation 2s infinite' : 'none'
-                        }"
-                      ></div>
+                <!-- Panel content container -->
+                <div class="panel-content">
+                  <!-- Removed the panel-header with Inference Settings title -->
+                  
+                  <!-- Inference Progress Section -->
+                  <div v-if="inferenceTaskRunning" class="inference-progress-container">
+                    <h3>Inference Task Running</h3>
+                    <div class="progress-info">
+                      <p>Task ID: {{ currentInferenceTask.taskId }}</p>
+                      <p>Status: {{ inferenceStatusText }}</p>
+                      <p>Running time: {{ formatElapsedTime(currentInferenceTask.elapsed) }}</p>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar">
+                        <div 
+                          class="progress-fill" 
+                          :style="{ 
+                            width: inferenceTaskRunning ? '100%' : '0%',
+                            animation: inferenceTaskRunning ? 'progress-animation 2s infinite' : 'none'
+                          }"
+                        ></div>
+                      </div>
+                    </div>
+                    <div v-if="inferenceTaskError" class="error-message">
+                      {{ inferenceTaskError }}
                     </div>
                   </div>
-                  <div v-if="inferenceTaskError" class="error-message">
-                    {{ inferenceTaskError }}
+                  
+                  <!-- Tabs for inference mode (hidden when task is running) -->
+                  <div v-if="!inferenceTaskRunning">
+                    <div class="tabs">
+                      <button 
+                        class="tab-button" 
+                        :class="{ active: activeTab === 'live' }"
+                        @click="activeTab = 'live'"
+                      >
+                        Live Inference
+                      </button>
+                      <button 
+                        class="tab-button" 
+                        :class="{ active: activeTab === 'historical' }"
+                        @click="activeTab = 'historical'"
+                      >
+                        Historical Floods
+                      </button>
+                    </div>
+                    
+                    <!-- Live Tab Content -->
+                    <div v-if="activeTab === 'live'" class="tab-content">
+                      <div class="setting-item">
+                        <label for="area">Area</label>
+                        <select id="area" v-model="inferenceSettings.area">
+                          <option value="wagga">Wagga Wagga</option>
+                        </select>
+                      </div>
+                      <div class="setting-item">
+                        <label for="window">Inference Window</label>
+                        <select id="window" v-model="inferenceSettings.window">
+                          <option value="24">24 Hours</option>
+                          <option value="48">48 Hours</option>
+                          <option value="72">72 Hours</option>
+                        </select>
+                      </div>
+                      
+                      <!-- CUDA Device Dropdown -->
+                      <div class="setting-item">
+                        <label for="cuda-device">Inference Device</label>
+                        <select id="cuda-device" v-model="inferenceSettings.device" :disabled="!cudaInfo.cuda_available">
+                          <option v-if="!cudaInfo.cuda_available" value="cpu">CPU (CUDA not available)</option>
+                          <option v-else value="cpu">CPU</option>
+                          <option 
+                            v-for="device in cudaInfo.devices" 
+                            :key="device.device_id" 
+                            :value="`cuda:${device.device_id}`"
+                          >
+                            {{ "CUDA:" + device.device_id + " - "+ device.device_name }} ({{ device.free_memory_gb.toFixed(1) }}GB free)
+                          </option>
+                        </select>
+                        <div v-if="cudaInfo.cuda_available && cudaInfo.devices.length > 0" class="device-utilization">
+                          <div v-for="device in cudaInfo.devices" :key="`util-${device.device_id}`" class="device-stats">
+                            <div class="device-name">CUDA: {{ device.device_id }}: {{ device.device_name }}</div>
+                            <div class="utilization-bar">
+                              <div class="utilization-fill" :style="{ width: `${device.allocated_percent}%` }"></div>
+                              <span class="utilization-text">{{ device.allocated_percent.toFixed(1) }}% used</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div v-if="isLoadingCudaInfo" class="loading-indicator">Loading CUDA information...</div>
+                      </div>
+                      
+                      <!-- Rainfall Data Files Dropdown -->
+                      <div class="setting-item">
+                        <label for="rainfall-file">Rainfall Data</label>
+                        <select id="rainfall-file" v-model="inferenceSettings.dataDir">
+                          <option value="">Select a rainfall data file</option>
+                          <option 
+                            v-for="file in rainfallFiles" 
+                            :key="file.name" 
+                            :value="file.name"
+                          >
+                            {{ file.name }} ({{ file.size_mb.toFixed(1) }} MB)
+                          </option>
+                        </select>
+                        <div v-if="isLoadingRainfallFiles" class="loading-indicator">Loading rainfall files...</div>
+                      </div>
+                    </div>
+                    
+                    <!-- Historical Tab Content -->
+                    <div v-if="activeTab === 'historical'" class="tab-content">
+                      <div class="setting-item">
+                        <label for="historical-simulation">Historical Floods</label>
+                        <select id="historical-simulation" v-model="selectedHistoricalSimulation">
+                          <option value="">Select a flood event</option>
+                          <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
+                            {{ simulation }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <!-- Tabs for inference mode (hidden when task is running) -->
-                <div v-if="!inferenceTaskRunning">
-                  <div class="tabs">
-                    <button 
-                      class="tab-button" 
-                      :class="{ active: activeTab === 'live' }"
-                      @click="activeTab = 'live'"
-                    >
-                      Live Inference
-                    </button>
-                    <button 
-                      class="tab-button" 
-                      :class="{ active: activeTab === 'historical' }"
-                      @click="activeTab = 'historical'"
-                    >
-                      Historical Floods
-                    </button>
-                  </div>
-                  
-                  <!-- Live Tab Content -->
-                  <div v-if="activeTab === 'live'" class="tab-content">
-                    <div class="setting-item">
-                      <label for="area">Area</label>
-                      <select id="area" v-model="inferenceSettings.area">
-                        <option value="wagga">Wagga Wagga</option>
-                      </select>
-                    </div>
-                    <div class="setting-item">
-                      <label for="window">Inference Window</label>
-                      <select id="window" v-model="inferenceSettings.window">
-                        <option value="24">24 Hours</option>
-                        <option value="48">48 Hours</option>
-                        <option value="72">72 Hours</option>
-                      </select>
-                    </div>
-                    
-                    <!-- CUDA Device Dropdown -->
-                    <div class="setting-item">
-                      <label for="cuda-device">Inference Device</label>
-                      <select id="cuda-device" v-model="inferenceSettings.device" :disabled="!cudaInfo.cuda_available">
-                        <option v-if="!cudaInfo.cuda_available" value="cpu">CPU (CUDA not available)</option>
-                        <option v-else value="cpu">CPU</option>
-                        <option 
-                          v-for="device in cudaInfo.devices" 
-                          :key="device.device_id" 
-                          :value="`cuda:${device.device_id}`"
-                        >
-                          {{ "CUDA:" + device.device_id + " - "+ device.device_name }} ({{ device.free_memory_gb.toFixed(1) }}GB free)
-                        </option>
-                      </select>
-                      <div v-if="cudaInfo.cuda_available && cudaInfo.devices.length > 0" class="device-utilization">
-                        <div v-for="device in cudaInfo.devices" :key="`util-${device.device_id}`" class="device-stats">
-                          <div class="device-name">CUDA: {{ device.device_id }}: {{ device.device_name }}</div>
-                          <div class="utilization-bar">
-                            <div class="utilization-fill" :style="{ width: `${device.allocated_percent}%` }"></div>
-                            <span class="utilization-text">{{ device.allocated_percent.toFixed(1) }}% used</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div v-if="isLoadingCudaInfo" class="loading-indicator">Loading CUDA information...</div>
-                    </div>
-                    
-                    <!-- Rainfall Data Files Dropdown -->
-                    <div class="setting-item">
-                      <label for="rainfall-file">Rainfall Data</label>
-                      <select id="rainfall-file" v-model="inferenceSettings.dataDir">
-                        <option value="">Select a rainfall data file</option>
-                        <option 
-                          v-for="file in rainfallFiles" 
-                          :key="file.name" 
-                          :value="file.name"
-                        >
-                          {{ file.name }} ({{ file.size_mb.toFixed(1) }} MB)
-                        </option>
-                      </select>
-                      <div v-if="isLoadingRainfallFiles" class="loading-indicator">Loading rainfall files...</div>
-                    </div>
-                  </div>
-                  
-                  <!-- Historical Tab Content -->
-                  <div v-if="activeTab === 'historical'" class="tab-content">
-                    <div class="setting-item">
-                      <label for="historical-simulation">Historical Floods</label>
-                      <select id="historical-simulation" v-model="selectedHistoricalSimulation">
-                        <option value="">Select a flood event</option>
-                        <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
-                          {{ simulation }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-                  
-                  <div class="inference-buttons">
-                    <button class="primary-button" @click="activeTab === 'live' ? startInference() : loadHistoricalSimulation()">
-                      {{ activeTab === 'live' ? 'Start Inference' : 'Load Simulation' }}
-                    </button>
-                    <button class="secondary-button" @click="close">Cancel</button>
-                  </div>
+                <!-- Fixed buttons at the bottom -->
+                <div v-if="!inferenceTaskRunning" class="inference-buttons-fixed">
+                  <button class="primary-button" @click="activeTab === 'live' ? startInference() : loadHistoricalSimulation()">
+                    {{ activeTab === 'live' ? 'Start Inference' : 'Load Simulation' }}
+                  </button>
+                  <button class="secondary-button" @click="close">Cancel</button>
                 </div>
               </div>
 
@@ -504,16 +508,6 @@ const startInference = () => {
   // close() 将由任务完成事件处理器调用
 };
 
-// Add rainfall toggle function
-const toggleRainfallLayer = () => {
-  if (hasRainfallDataForSelection.value) {
-    // Toggle the rainfall layer visibility
-    emit('update-settings', {
-      ...settings.value,
-      showRainfallLayer: !settings.value.showRainfallLayer
-    });
-  }
-};
 
 // Data loading function
 const loadData = async () => {
@@ -749,13 +743,28 @@ onBeforeUnmount(() => {
 
 .inference-panel {
   flex: 1;
-  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
   background: rgba(249, 250, 251, 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-right: 1px solid rgba(229, 231, 235, 0.4);
+}
+
+.panel-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.inference-buttons-fixed {
+  padding: 1rem;
+  background: rgba(249, 250, 251, 0.9);
+  border-top: 1px solid rgba(229, 231, 235, 0.4);
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
 }
 
 .map-settings-panel {
@@ -823,17 +832,6 @@ onBeforeUnmount(() => {
   border-radius: 4px;
   border: 1px solid #d1d5db;
   cursor: pointer;
-}
-
-.inference-buttons {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.map-settings-footer {
-  display: none;
 }
 
 .primary-button, .secondary-button {
