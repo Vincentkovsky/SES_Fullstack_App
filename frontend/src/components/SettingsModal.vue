@@ -23,6 +23,7 @@
                     <div class="progress-info">
                       <p>Task ID: {{ currentInferenceTask.taskId }}</p>
                       <p>Status: {{ inferenceStatusText }}</p>
+                      <p>Stage: {{ currentInferenceTask.stage || 'Initializing' }}</p>
                       <p>Running time: {{ formatElapsedTime(currentInferenceTask.elapsed) }}</p>
                     </div>
                     <div class="progress-bar-container">
@@ -30,15 +31,24 @@
                         <div 
                           class="progress-fill" 
                           :style="{ 
-                            width: inferenceTaskRunning ? '100%' : '0%',
-                            animation: inferenceTaskRunning ? 'progress-animation 2s infinite' : 'none'
+                            width: `${currentInferenceTask.progress || 0}%`,
+                            background: currentInferenceTask.stage === 'reconnecting' ? 'linear-gradient(to right, #f59e0b, #b45309)' : 'linear-gradient(to right, #1E3D78, #3663B0)'
                           }"
                         ></div>
                       </div>
+                      <div class="progress-text">{{ currentInferenceTask.progress || 0 }}%</div>
+                    </div>
+                    <div class="progress-message">
+                      {{ currentInferenceTask.message || 'Processing...' }}
                     </div>
                     <div v-if="inferenceTaskError" class="error-message">
                       {{ inferenceTaskError }}
                     </div>
+                    
+                    <!-- Add cancel button if needed -->
+                    <button v-if="currentInferenceTask.status === 'running'" class="warning-button" @click="handleCancelInferenceTask">
+                      Cancel Task
+                    </button>
                   </div>
                   
                   <!-- Tabs for inference mode (hidden when task is running) -->
@@ -88,12 +98,12 @@
                             :key="device.device_id" 
                             :value="`cuda:${device.device_id}`"
                           >
-                            {{ "CUDA:" + device.device_id + " - "+ device.device_name }} ({{ device.free_memory_gb.toFixed(1) }}GB free)
+                            {{ "CUDA " + device.device_id + " - "+ device.device_name }} ({{ device.free_memory_gb.toFixed(1) }}GB Available)
                           </option>
                         </select>
                         <div v-if="cudaInfo.cuda_available && cudaInfo.devices.length > 0" class="device-utilization">
                           <div v-for="device in cudaInfo.devices" :key="`util-${device.device_id}`" class="device-stats">
-                            <div class="device-name">CUDA: {{ device.device_id }}: {{ device.device_name }}</div>
+                            <div class="device-name">CUDA {{ device.device_id }} - {{ device.device_name }}</div>
                             <div class="utilization-bar">
                               <div class="utilization-fill" :style="{ width: `${device.allocated_percent}%` }"></div>
                               <span class="utilization-text">{{ device.allocated_percent.toFixed(1) }}% used</span>
@@ -180,8 +190,12 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles, getInferenceTasksList } from '../services/api';
 import type { GaugingData, CudaInfoResponse, RainfallFilesResponse, CudaDeviceInfo, RainfallFileInfo } from '../services/api';
+
+// API配置常量
+const API_HOST = import.meta.env.VITE_HOST || 'localhost';
+const API_PORT = import.meta.env.VITE_BACKEND_PORT || 3000;
 
 // Types
 type Settings = {
@@ -203,6 +217,8 @@ type InferenceSettings = {
 interface InferenceTaskStatus {
   taskId: string;
   status: string;
+  progress: number;
+  stage: string;
   message?: string;
   elapsed?: number;
   results?: any;
@@ -258,6 +274,8 @@ const inferenceTaskRunning = ref(false);
 const currentInferenceTask = ref<InferenceTaskStatus>({
   taskId: '',
   status: '',
+  progress: 0,
+  stage: 'initialization',
   elapsed: 0
 });
 const inferenceTaskError = ref<string | null>(null);
@@ -326,30 +344,222 @@ const getDateFromTimestamp = (timestamp: string): Date | null => {
   return null;
 };
 
+// WebSocket connection for real-time progress tracking
+let progressWebSocket: WebSocket | null = null;
+let webSocketPingInterval: number | null = null;
+
+// Connect to WebSocket for progress tracking
+const connectProgressWebSocket = (taskId: string) => {
+  if (!taskId) {
+    console.error('Cannot connect WebSocket: Task ID is empty');
+    return;
+  }
+
+  // 关闭现有连接（如果有）
+  disconnectProgressWebSocket();
+  
+  // 构建与API配置一致的WebSocket URL
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const wsUrl = `${wsProtocol}://${API_HOST}:${API_PORT}/api/inference/ws/progress/${taskId}`;
+  
+  console.log(`Attempting to connect WebSocket at URL: ${wsUrl}`);
+  
+  try {
+    progressWebSocket = new WebSocket(wsUrl);
+    
+    progressWebSocket.onopen = () => {
+      console.log(`WebSocket successfully connected for task ${taskId}`);
+      
+      // Setup ping interval to keep connection alive
+      if (webSocketPingInterval) {
+        clearInterval(webSocketPingInterval);
+      }
+      
+      webSocketPingInterval = window.setInterval(() => {
+        if (progressWebSocket && progressWebSocket.readyState === WebSocket.OPEN) {
+          progressWebSocket.send('ping');
+          console.log('Ping sent to WebSocket server');
+        } else {
+          console.warn('Cannot send ping: WebSocket not open');
+          // 尝试重新连接
+          if (progressWebSocket && progressWebSocket.readyState !== WebSocket.OPEN) {
+            console.log('Attempting to reconnect WebSocket...');
+            connectProgressWebSocket(taskId);
+          }
+        }
+      }, 30000); // Send ping every 30 seconds
+    };
+    
+    progressWebSocket.onmessage = (event) => {
+      console.log('WebSocket message received:', event.data);
+      try {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'pong') {
+          console.log('Received pong response');
+          return; // Ignore pong responses
+        }
+        
+        // Update inference task status
+        currentInferenceTask.value = {
+          ...currentInferenceTask.value,
+          status: data.status,
+          progress: data.progress,
+          stage: data.stage,
+          message: data.message,
+          elapsed: data.elapsed_time,
+        };
+        
+        console.log('Updated task status:', currentInferenceTask.value);
+        
+        if (data.type === 'error') {
+          inferenceTaskError.value = data.message;
+          console.error('Inference task error from WebSocket:', data.message);
+        }
+        
+        if (data.status === 'completed') {
+          console.log('Task completed event from WebSocket');
+          handleInferenceTaskCompleted({ taskId: data.task_id, results: data.results });
+        } else if (data.status === 'failed') {
+          console.error('Task failed event from WebSocket');
+          inferenceTaskError.value = data.message;
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error, event.data);
+      }
+    };
+    
+    progressWebSocket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+    
+    progressWebSocket.onclose = (event) => {
+      console.log(`WebSocket connection closed: code=${event.code}, reason=${event.reason}`);
+      if (webSocketPingInterval) {
+        clearInterval(webSocketPingInterval);
+        webSocketPingInterval = null;
+      }
+      
+      // 如果意外关闭且任务仍在运行，尝试重新连接
+      if (event.code !== 1000 && event.code !== 1001 && inferenceTaskRunning.value) {
+        console.log('Unexpected WebSocket close, attempting to reconnect...');
+        setTimeout(() => {
+          connectProgressWebSocket(taskId);
+        }, 3000);
+      }
+    };
+  } catch (error) {
+    console.error('Error creating WebSocket connection:', error);
+  }
+};
+
+// Disconnect WebSocket
+const disconnectProgressWebSocket = () => {
+  console.log('Disconnecting WebSocket');
+  
+  // 先清除ping间隔
+  if (webSocketPingInterval) {
+    console.log('Clearing WebSocket ping interval');
+    clearInterval(webSocketPingInterval);
+    webSocketPingInterval = null;
+  }
+  
+  // 关闭WebSocket连接
+  if (progressWebSocket) {
+    // 移除所有事件监听器，防止意外重连
+    progressWebSocket.onclose = null;
+    progressWebSocket.onerror = null;
+    progressWebSocket.onmessage = null;
+    
+    // 如果连接仍然打开，正常关闭它
+    if (progressWebSocket.readyState === WebSocket.OPEN) {
+      console.log('Closing open WebSocket connection');
+      progressWebSocket.close(1000, 'Task completed or disconnected by user');
+    }
+    
+    progressWebSocket = null;
+    console.log('WebSocket connection nullified');
+  }
+};
+
 // 处理推理任务事件
 const handleInferenceTaskStarted = (data: { taskId: string; status: string; message: string }) => {
+  console.log('Inference task started event received:', data);
+  
+  if (!data || !data.taskId) {
+    console.error('Invalid task started data received:', data);
+    return;
+  }
+  
   inferenceTaskRunning.value = true;
   inferenceTaskError.value = null;
   currentInferenceTask.value = {
     taskId: data.taskId,
-    status: data.status,
-    message: data.message,
+    status: data.status || 'running',
+    message: data.message || 'Starting inference...',
+    progress: 0,
+    stage: 'initialization',
     elapsed: 0
   };
-  console.log('Inference task started:', data);
+  
+  console.log('Starting WebSocket connection for task:', data.taskId);
+  // Connect to WebSocket for real-time progress updates
+  connectProgressWebSocket(data.taskId);
 };
 
-const handleInferenceTaskProgress = (data: { taskId: string; status: string; elapsed: number; results?: any }) => {
+const handleInferenceTaskProgress = (data: { 
+  taskId: string; 
+  status: string; 
+  progress: number; 
+  stage: string;
+  message: string;
+  elapsed: number; 
+  results?: any 
+}) => {
+  console.log('Inference task progress event received:', data);
+  
+  if (!data || !data.taskId) {
+    console.error('Invalid task progress data received:', data);
+    return;
+  }
+  
+  // 如果WebSocket未连接，尝试连接
+  if (!progressWebSocket || progressWebSocket.readyState !== WebSocket.OPEN) {
+    console.log('WebSocket not connected during progress update, reconnecting...');
+    connectProgressWebSocket(data.taskId);
+  }
+  
   currentInferenceTask.value = {
     ...currentInferenceTask.value,
     ...data
   };
-  console.log('Inference task progress update:', data);
 };
 
-const handleInferenceTaskCompleted = (data: { taskId: string }) => {
+const handleInferenceTaskCompleted = (data: { taskId: string; results?: any }) => {
+  console.log('Inference task completed event received:', data);
+  
+  if (!data || !data.taskId) {
+    console.error('Invalid task completed data received:', data);
+    return;
+  }
+  
   inferenceTaskRunning.value = false;
-  console.log('Inference task completed:', data);
+  currentInferenceTask.value = {
+    ...currentInferenceTask.value,
+    status: 'completed',
+    progress: 100
+  };
+  
+  // 向 DeckGLMap 组件发送内部完成事件
+  window.dispatchEvent(new CustomEvent('inference-task-completed-internal', { 
+    detail: { 
+      taskId: data.taskId,
+      results: data.results
+    } 
+  }));
+  
+  // Disconnect WebSocket
+  disconnectProgressWebSocket();
   
   // Close modal
   setTimeout(() => {
@@ -359,9 +569,25 @@ const handleInferenceTaskCompleted = (data: { taskId: string }) => {
   }, 1000);
 };
 
-const handleInferenceTaskError = (data: { error: string }) => {
+const handleInferenceTaskError = (data: { error: string; taskId?: string }) => {
+  console.error('Inference task error event received:', data);
+  
   inferenceTaskError.value = data.error;
-  console.error('Inference task error:', data.error);
+  
+  // 向 DeckGLMap 组件发送内部错误事件
+  if (data.taskId || currentInferenceTask.value.taskId) {
+    window.dispatchEvent(new CustomEvent('inference-task-failed-internal', { 
+      detail: { 
+        taskId: data.taskId || currentInferenceTask.value.taskId,
+        error: data.error
+      } 
+    }));
+  }
+  
+  // Disconnect WebSocket only if the task is completed or failed
+  if (currentInferenceTask.value.status !== 'running') {
+    disconnectProgressWebSocket();
+  }
 };
 
 // Data fetching functions
@@ -523,10 +749,38 @@ const close = () => {
   emit('close');
 };
 
-const startInference = () => {
-  emit('start-inference', inferenceSettings.value);
-  // 注意：不要关闭模态框，以便显示推理进度
-  // close() 将由任务完成事件处理器调用
+const startInference = async () => {
+  try {
+    // 验证必要的输入
+    if (!inferenceSettings.value.dataDir) {
+      inferenceTaskError.value = "Please select a rainfall data file";
+      return;
+    }
+    
+    console.log('Starting inference with settings:', inferenceSettings.value);
+    
+    // 设置初始状态
+    inferenceTaskRunning.value = true;
+    inferenceTaskError.value = null;
+    currentInferenceTask.value = {
+      taskId: 'pending',
+      status: 'starting',
+      progress: 0,
+      stage: 'initialization',
+      elapsed: 0,
+      message: 'Starting inference task...'
+    };
+    
+    // 调用 API 启动推理
+    emit('start-inference', inferenceSettings.value);
+    
+    // 注意：WebSocket 连接将由事件处理程序在收到任务 ID 后建立
+    console.log('Inference started, waiting for task ID...');
+  } catch (error) {
+    console.error('Error starting inference:', error);
+    inferenceTaskError.value = error instanceof Error ? error.message : 'Failed to start inference';
+    inferenceTaskRunning.value = false;
+  }
 };
 
 
@@ -565,10 +819,57 @@ const loadData = async (preserveSelections = true) => {
   }
 };
 
-// Watchers
+// 添加检查运行中任务的函数
+const checkRunningTasks = async () => {
+  try {
+    console.log('Checking for running inference tasks...');
+    const response = await getInferenceTasksList();
+    
+    if (response.success && response.data.tasks.length > 0) {
+      // 查找状态为 'running' 的任务
+      const runningTask = response.data.tasks.find(task => task.status === 'running');
+      
+      if (runningTask) {
+        console.log('Found running inference task:', runningTask);
+        
+        // 自动连接到这个任务的WebSocket并显示进度
+        inferenceTaskRunning.value = true;
+        inferenceTaskError.value = null;
+        currentInferenceTask.value = {
+          taskId: runningTask.task_id,
+          status: runningTask.status,
+          progress: 0, // 初始进度，将通过WebSocket更新
+          stage: 'reconnecting',
+          message: 'Reconnecting to running task...',
+          elapsed: runningTask.elapsed_time || 0
+        };
+        
+        // 连接WebSocket获取实时进度
+        connectProgressWebSocket(runningTask.task_id);
+        
+        // 如果正在运行任务，强制切换到实时推理标签
+        activeTab.value = 'live';
+        return true;
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking for running tasks:', error);
+    return false;
+  }
+};
+
+// 在 watch 函数中调用
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
-    await loadData();
+    // 首先检查是否有正在运行的任务
+    const hasRunningTask = await checkRunningTasks();
+    
+    // 如果没有正在运行的任务，正常加载数据
+    if (!hasRunningTask) {
+      await loadData();
+    }
   }
 });
 
@@ -609,7 +910,6 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
       const firstTimestamp = props.timestamps[0];
       const lastTimestamp = props.timestamps[props.timestamps.length - 1];
       
-
       const startDate = getDateFromTimestamp(firstTimestamp);
       const endDate = getDateFromTimestamp(lastTimestamp);
       
@@ -645,6 +945,27 @@ watch([() => props.isOpen, () => activeTab.value], ([isOpen, tab]) => {
   }
 }, { immediate: true });
 
+// 为了能正确移除事件监听器，声明事件处理函数引用
+const inferenceTaskStartedHandler = ((e: CustomEvent) => {
+  console.log('Received inference-task-started event:', e.detail);
+  handleInferenceTaskStarted(e.detail);
+}) as EventListener;
+
+const inferenceTaskProgressHandler = ((e: CustomEvent) => {
+  console.log('Received inference-task-progress event:', e.detail);
+  handleInferenceTaskProgress(e.detail);
+}) as EventListener;
+
+const inferenceTaskCompletedHandler = ((e: CustomEvent) => {
+  console.log('Received inference-task-completed event:', e.detail);
+  handleInferenceTaskCompleted(e.detail);
+}) as EventListener;
+
+const inferenceTaskErrorHandler = ((e: CustomEvent) => {
+  console.log('Received inference-task-error event:', e.detail);
+  handleInferenceTaskError(e.detail);
+}) as EventListener;
+
 // Initial setup
 onMounted(() => {
   // Set initial tab based on modelValue prop
@@ -654,26 +975,68 @@ onMounted(() => {
     loadData();
   }
   
-  // 设置全局事件监听器，用于接收来自DeckGLMap的推理任务事件
-  window.addEventListener('inference-task-started', (e: any) => handleInferenceTaskStarted(e.detail));
-  window.addEventListener('inference-task-progress', (e: any) => handleInferenceTaskProgress(e.detail));
-  window.addEventListener('inference-task-completed', (e: any) => handleInferenceTaskCompleted(e.detail));
-  window.addEventListener('inference-task-error', (e: any) => handleInferenceTaskError(e.detail));
+  // 使用保存的函数引用添加事件监听器
+  console.log('Setting up inference task event listeners');
+  window.addEventListener('inference-task-started', inferenceTaskStartedHandler);
+  window.addEventListener('inference-task-progress', inferenceTaskProgressHandler);
+  window.addEventListener('inference-task-completed', inferenceTaskCompletedHandler);
+  window.addEventListener('inference-task-error', inferenceTaskErrorHandler);
 });
 
 // 清理事件监听器
 onBeforeUnmount(() => {
+  console.log('Cleaning up event listeners and intervals');
+  
   // Clear CUDA refresh interval
   if (cudaRefreshInterval !== null) {
     clearInterval(cudaRefreshInterval);
     cudaRefreshInterval = null;
   }
   
-  window.removeEventListener('inference-task-started', (e: any) => handleInferenceTaskStarted(e.detail));
-  window.removeEventListener('inference-task-progress', (e: any) => handleInferenceTaskProgress(e.detail));
-  window.removeEventListener('inference-task-completed', (e: any) => handleInferenceTaskCompleted(e.detail));
-  window.removeEventListener('inference-task-error', (e: any) => handleInferenceTaskError(e.detail));
+  // Disconnect WebSocket
+  disconnectProgressWebSocket();
+  
+  // 使用保存的函数引用移除事件监听器
+  window.removeEventListener('inference-task-started', inferenceTaskStartedHandler);
+  window.removeEventListener('inference-task-progress', inferenceTaskProgressHandler);
+  window.removeEventListener('inference-task-completed', inferenceTaskCompletedHandler);
+  window.removeEventListener('inference-task-error', inferenceTaskErrorHandler);
 });
+
+// 添加取消推理任务的函数
+const handleCancelInferenceTask = async () => {
+  if (!currentInferenceTask.value.taskId) {
+    console.error('Cannot cancel task: Task ID is empty');
+    return;
+  }
+  
+  try {
+    console.log(`Attempting to cancel inference task ${currentInferenceTask.value.taskId}`);
+    
+    // 这里需要实现API调用来取消任务
+    // 目前假设我们还没有实现这个API，所以我们只是关闭WebSocket连接
+    disconnectProgressWebSocket();
+    
+    // 重置状态
+    inferenceTaskRunning.value = false;
+    currentInferenceTask.value = {
+      taskId: '',
+      status: '',
+      progress: 0,
+      stage: 'initialization',
+      elapsed: 0
+    };
+    
+    // 提示用户
+    inferenceTaskError.value = "Task cancellation requested. The task might still be running on the server.";
+    
+    // 重新加载数据
+    await loadData();
+  } catch (error) {
+    console.error('Error cancelling inference task:', error);
+    inferenceTaskError.value = error instanceof Error ? error.message : 'Failed to cancel inference task';
+  }
+};
 </script>
 
 <style scoped>
@@ -942,20 +1305,36 @@ onBeforeUnmount(() => {
 
 .progress-bar-container {
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .progress-bar {
-  height: 6px;
+  height: 8px;
   background: rgba(209, 213, 219, 0.4);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   background: #1E3D78;
-  border-radius: 3px;
+  border-radius: 4px;
   transition: width 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  right: 0;
+  top: -20px;
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.progress-message {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+  font-style: italic;
 }
 
 @keyframes progress-animation {
@@ -1181,5 +1560,25 @@ onBeforeUnmount(() => {
   font-size: 0.8rem;
   color: #6b7280;
   font-style: italic;
+}
+
+.warning-button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 1rem;
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+  border: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.warning-button:hover {
+  background: rgba(220, 38, 38, 0.95);
 }
 </style> 

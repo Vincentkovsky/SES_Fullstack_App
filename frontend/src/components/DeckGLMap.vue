@@ -982,6 +982,46 @@ const dispatchInferenceEvent = (eventName: string, detail: any) => {
   window.dispatchEvent(new CustomEvent(eventName, { detail }));
 };
 
+// Function to wait for task completion
+const waitForTaskCompletion = async (taskId: string): Promise<void> => {
+  // 我们不再需要轮询，因为 SettingsModal 组件现在使用 WebSocket 获取进度更新
+  // 只需要等待任务完成的自定义事件
+  return new Promise((resolve, reject) => {
+    const taskCompletionHandler = (e: CustomEvent) => {
+      if (e.detail.taskId === taskId) {
+        console.log(`Task ${taskId} completion event received`);
+        window.removeEventListener('inference-task-completed-internal', taskCompletionHandler as EventListener);
+        window.removeEventListener('inference-task-failed-internal', taskErrorHandler as EventListener);
+        
+        if (e.detail.error) {
+          reject(new Error(e.detail.error));
+        } else {
+          resolve();
+        }
+      }
+    };
+    
+    const taskErrorHandler = (e: CustomEvent) => {
+      if (e.detail.taskId === taskId) {
+        console.log(`Task ${taskId} error event received`);
+        window.removeEventListener('inference-task-completed-internal', taskCompletionHandler as EventListener);
+        window.removeEventListener('inference-task-failed-internal', taskErrorHandler as EventListener);
+        reject(new Error(e.detail.error));
+      }
+    };
+    
+    window.addEventListener('inference-task-completed-internal', taskCompletionHandler as EventListener);
+    window.addEventListener('inference-task-failed-internal', taskErrorHandler as EventListener);
+    
+    // 设置超时，避免永久等待
+    setTimeout(() => {
+      window.removeEventListener('inference-task-completed-internal', taskCompletionHandler as EventListener);
+      window.removeEventListener('inference-task-failed-internal', taskErrorHandler as EventListener);
+      reject(new Error('Task completion timeout'));
+    }, 1800000); // 30分钟超时
+  });
+};
+
 const handleInferenceStart = async (inferenceSettings: {
   area: string;
   window: string;
@@ -1026,23 +1066,29 @@ const handleInferenceStart = async (inferenceSettings: {
         message: result.data.message
       });
       
-      // Check task status until completion
-      await waitForTaskCompletion(result.data.task_id);
-      
-      // Refresh tiles list after task completion
-      const newTilesResponse = await fetchTilesList();
-      timestamps = newTilesResponse.message || [];
-      
-      // Reset animation state
-      currentTimeIndex = 0;
-      if (timestamps.length > 0) {
-        currentTimestamp.value = timestamps[0];
-        updateLayers(0);
-      }
-      
-      // Restart animation if it was playing
-      if (isPlaying.value) {
-        startAnimation();
+      // SettingsModal 会连接 WebSocket 获取实时进度，我们只需等待任务完成事件
+      try {
+        await waitForTaskCompletion(result.data.task_id);
+        console.log(`Task ${result.data.task_id} completed successfully`);
+        
+        // Refresh tiles list after task completion
+        const newTilesResponse = await fetchTilesList();
+        timestamps = newTilesResponse.message || [];
+        
+        // Reset animation state
+        currentTimeIndex = 0;
+        if (timestamps.length > 0) {
+          currentTimestamp.value = timestamps[0];
+          updateLayers(0);
+        }
+        
+        // Restart animation if it was playing
+        if (isPlaying.value) {
+          startAnimation();
+        }
+      } catch (error) {
+        console.error(`Error waiting for task ${result.data.task_id} completion:`, error);
+        throw error;
       }
     } else {
       throw new Error('Failed to start inference task');
@@ -1051,55 +1097,13 @@ const handleInferenceStart = async (inferenceSettings: {
     console.error('Error running inference:', error);
     // Notify modal to show error
     dispatchInferenceEvent('inference-task-error', {
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
+      taskId: currentInferenceTaskId.value
     });
   } finally {
     isInferenceRunning.value = false;
-    // Notify modal that task is completed
-    if (currentInferenceTaskId.value) {
-      dispatchInferenceEvent('inference-task-completed', {
-        taskId: currentInferenceTaskId.value
-      });
-      currentInferenceTaskId.value = null;
-    }
+    // 这里不需要再发送完成事件，因为 SettingsModal 已经通过 WebSocket 获取了完成状态
   }
-};
-
-// Function to wait for task completion
-const waitForTaskCompletion = async (taskId: string): Promise<void> => {
-  // Initial status check
-  let taskStatus = await getInferenceTaskStatus(taskId);
-  
-  // Check status every 3 seconds until completed or failed
-  while (taskStatus.data.status === 'running') {
-    // Notify modal to update progress
-    dispatchInferenceEvent('inference-task-progress', {
-      taskId,
-      status: taskStatus.data.status,
-      elapsed: taskStatus.data.elapsed_time || 0
-    });
-    
-    // Wait 3 seconds
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Check status again
-    taskStatus = await getInferenceTaskStatus(taskId);
-  }
-  
-  // Task completed, send final status
-  dispatchInferenceEvent('inference-task-progress', {
-    taskId,
-    status: taskStatus.data.status,
-    elapsed: taskStatus.data.elapsed_time || 0,
-    results: taskStatus.data.results
-  });
-  
-  // If task failed, throw error
-  if (taskStatus.data.status === 'failed') {
-    throw new Error(`Inference task failed: ${JSON.stringify(taskStatus.data.results)}`);
-  }
-  
-  return;
 };
 
 // Add the toggle function

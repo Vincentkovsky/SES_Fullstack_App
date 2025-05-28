@@ -188,13 +188,15 @@ class ResultsProcessor:
             return f"Step {step} calculation error: {str(e)}"
 
     @staticmethod
-    def generate_tif_files(start_tmp: str, output_dir: Path) -> List[str]:
+    def generate_tif_files(start_tmp: str, output_dir: Path, progress_callback = None) -> List[str]:
         """
         Generate TIF files from NetCDF results
         
         Args:
             start_tmp: Start timestamp
             output_dir: Output directory
+            progress_callback: Optional callback function to report progress (default: None)
+                              Function signature: progress_callback(progress, message)
         
         Returns:
             List of generated TIF file paths
@@ -214,6 +216,15 @@ class ResultsProcessor:
             # Create output directory
             os.makedirs(tif_output_dir, exist_ok=True)
             
+            # Report progress if callback is available
+            if progress_callback:
+                try:
+                    progress_callback(5, "Preparing to generate TIF files")
+                except Exception as e:
+                    logger.error(f"Error calling progress_callback: {str(e)}")
+                    # If callback fails, set it to None to avoid further errors
+                    progress_callback = None
+            
             # Read timestamps from NetCDF file
             with nc.Dataset(results_path, mode="r") as nc_dataset:
                 time_var = nc_dataset.variables["time"]
@@ -227,17 +238,44 @@ class ResultsProcessor:
                 for i in range(infer_steps)
             ]
             
+            # Report progress if callback is available
+            if progress_callback:
+                try:
+                    progress_callback(10, f"Using {num_workers} processes to generate {infer_steps} TIF files")
+                except Exception as e:
+                    logger.error(f"Error calling progress_callback: {str(e)}")
+                    progress_callback = None
+            
             # Use process pool for parallel processing
             logger.info(f"Using {num_workers} processes to generate TIF files")
             
             generated_files = []
+            
+            # Track progress for the callback
+            completed_steps = 0
+            total_steps = len(args_list)
+            
+            # Define a callback for each completed step
+            def step_completed(result):
+                nonlocal completed_steps
+                completed_steps += 1
+                progress_percent = int((completed_steps / total_steps) * 80) + 10  # Scale from 10% to 90%
+                if progress_callback:
+                    try:
+                        progress_callback(progress_percent, f"Generated {completed_steps}/{total_steps} TIF files")
+                    except Exception as e:
+                        logger.error(f"Error calling progress_callback: {str(e)}")
+            
             with mp.Pool(processes=num_workers) as pool:
-                # Use tqdm to display progress bar
-                results = list(tqdm(
-                    pool.imap(ResultsProcessor.process_timestep, args_list),
-                    total=len(args_list),
-                    desc="Processing timesteps"
-                ))
+                # Create async results and add callback
+                async_results = []
+                for args in args_list:
+                    res = pool.apply_async(ResultsProcessor.process_timestep, (args,), callback=step_completed)
+                    async_results.append(res)
+                
+                # Wait for all to complete
+                for res in async_results:
+                    res.wait()
             
             # Collect generated file paths
             for i in range(infer_steps):
@@ -246,10 +284,24 @@ class ResultsProcessor:
                 if os.path.exists(tif_path):
                     generated_files.append(tif_path)
             
+            # Report final progress if callback is available
+            if progress_callback:
+                try:
+                    progress_callback(100, f"Generated {len(generated_files)} TIF files")
+                except Exception as e:
+                    logger.error(f"Error calling progress_callback: {str(e)}")
+            
             logger.info(f"Generated {len(generated_files)} TIF files")
             return generated_files
             
         except Exception as e:
+            # Report error in progress if callback is available
+            if progress_callback:
+                try:
+                    progress_callback(0, f"Error generating TIF files: {str(e)}")
+                except Exception as callback_error:
+                    logger.error(f"Error calling progress_callback: {str(callback_error)}")
+            
             logger.error(f"Error generating TIF files: {str(e)}")
             raise RuntimeError(f"TIF file generation failed: {str(e)}") from e
 
@@ -264,7 +316,8 @@ class InferenceService:
         device: str = None, 
         start_tmp: str = None, 
         output_dir: Path = None, 
-        pred_length: int = 48
+        pred_length: int = 48,
+        progress_callback = None
     ) -> Dict[str, Any]:
         """
         Run inference process
@@ -276,11 +329,22 @@ class InferenceService:
             start_tmp: Start timestamp (default: auto-generated)
             output_dir: Output directory (default: created based on data_dir and timestamp)
             pred_length: Number of prediction timesteps (default: 48)
+            progress_callback: Optional callback function to report progress (default: None)
+                               Function signature: progress_callback(stage, progress, message)
         
         Returns:
             Inference result information
         """
         try:
+            # Progress tracking function
+            def update_progress(stage, progress, message=None):
+                if progress_callback:
+                    progress_callback(stage, progress, message)
+                logger.info(f"Progress - {stage}: {progress}% - {message or ''}")
+            
+            # Update progress - Initialization
+            update_progress("initialization", 0, "Starting inference process")
+            
             # Use defaults if not provided
             if device is None:
                 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -300,18 +364,26 @@ class InferenceService:
             start_time = datetime.now()
             logger.info(f"Starting inference, model: {model_path}, data: {data_dir}, device: {device}, pred_length: {pred_length}")
             
+            # Progress - Configuration complete
+            update_progress("initialization", 5, "Configuration complete")
+            
             # Configure device and data type
             torch_device = torch.device(device)
             dtype = torch.bfloat16 if device.startswith('cuda') else torch.float32
+            
+            # Progress - Device configured
+            update_progress("initialization", 10, f"Using device: {device}")
             
             # Dynamically import Dataset class
             import sys
             sys.path.append(str(MODEL_DIR))
             from dataset import FloodDataset
             
+            # Progress - Loading dataset
+            update_progress("data_loading", 15, "Loading dataset")
+            
             # Create dataset and data loader
             val_dataset = FloodDataset(data_dir, inference_config)
-
             val_loader = DataLoader(
                 val_dataset,
                 batch_size=1,
@@ -320,6 +392,12 @@ class InferenceService:
                 pin_memory=False
             )
             
+            # Progress - Dataset loaded
+            update_progress("data_loading", 20, "Dataset loaded")
+            
+            # Progress - Loading model
+            update_progress("model_loading", 25, f"Loading model from {model_path}")
+            
             # Load model
             model = ModelLoader.load_model(f'{MODEL_DIR}/{model_path}', torch_device, dtype)
             
@@ -327,6 +405,12 @@ class InferenceService:
             dem_embed = torch.load(f'{MODEL_DIR}/dem_embeddings.pt', weights_only=True).to(torch_device, dtype=dtype)
             side_lens = torch.load(f'{MODEL_DIR}/side_lengths.pt', weights_only=True).to(torch_device)
             square_centers = torch.load(f'{MODEL_DIR}/square_centers.pt', weights_only=True).to(torch_device, dtype=dtype)
+            
+            # Progress - Model loaded
+            update_progress("model_loading", 30, "Model and static data loaded")
+            
+            # Progress - Running inference
+            update_progress("inference", 40, "Starting model inference")
             
             all_water_levels = []  # Store (pred, target) tuples
             
@@ -345,11 +429,26 @@ class InferenceService:
                         water_level_target.cpu().to(dtype=torch.float32).numpy()
                     ))
             
+            # Progress - Inference complete, writing results
+            update_progress("processing_results", 50, "Inference complete, writing results to NetCDF file")
+            
             # Write results to NetCDF file
             nc_file = ResultsProcessor.write_results_to_nc(all_water_levels[0], data_dir, output_dir)
             
+            # Progress - Generating TIF files
+            update_progress("generating_tif_files", 60, "Generating TIF files")
+            
+            # Generate TIF files with a wrapped callback for TIF generation progress
+            def tif_progress_callback(progress, message):
+                # Scale progress from 0-100 to 60-100 range for overall progress
+                scaled_progress = 60 + (progress * 0.4)
+                update_progress("generating_tif_files", scaled_progress, message)
+            
             # Generate TIF files
-            tif_files = ResultsProcessor.generate_tif_files(start_tmp, output_dir)
+            tif_files = ResultsProcessor.generate_tif_files(start_tmp, output_dir, progress_callback=tif_progress_callback)
+            
+            # Progress - Process complete
+            update_progress("completion", 100, "Processing complete")
             
             # Calculate total time
             end_time = datetime.now()
@@ -368,6 +467,10 @@ class InferenceService:
                 }
             }
         except Exception as e:
+            # Report error in progress if callback is available
+            if progress_callback:
+                progress_callback("error", 0, f"Error during inference: {str(e)}")
+            
             logger.error(f"Error during inference: {str(e)}")
             return {
                 "success": False,

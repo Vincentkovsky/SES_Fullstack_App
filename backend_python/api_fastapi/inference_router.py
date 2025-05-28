@@ -8,9 +8,9 @@ Provides HTTP API for machine learning model inference, supporting water depth p
 and flood inundation analysis.
 """
 
-from fastapi import APIRouter, Body, HTTPException, status, BackgroundTasks, Path, Query
+from fastapi import APIRouter, Body, HTTPException, status, BackgroundTasks, Path, Query, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Set
 import os
 import json
 import logging
@@ -43,9 +43,89 @@ INFERENCE_RESULTS_DIR.mkdir(exist_ok=True, parents=True)
 # Track running inference tasks
 running_tasks = {}
 
+# Task execution lock to ensure only one task runs at a time
+task_lock = asyncio.Lock()
+
+# Store active WebSocket connections by task_id
+active_connections: Dict[str, Set[WebSocket]] = {}
+
+# WebSocket manager
+class WebSocketManager:
+    @staticmethod
+    async def connect(websocket: WebSocket, task_id: str):
+        await websocket.accept()
+        if task_id not in active_connections:
+            active_connections[task_id] = set()
+        active_connections[task_id].add(websocket)
+    
+    @staticmethod
+    def disconnect(websocket: WebSocket, task_id: str):
+        if task_id in active_connections:
+            active_connections[task_id].discard(websocket)
+            if not active_connections[task_id]:
+                del active_connections[task_id]
+    
+    @staticmethod
+    async def broadcast_progress(task_id: str, data: Dict[str, Any]):
+        if task_id in active_connections:
+            disconnected_ws = set()
+            for websocket in active_connections[task_id]:
+                try:
+                    await websocket.send_json(data)
+                except WebSocketDisconnect:
+                    disconnected_ws.add(websocket)
+                except Exception as e:
+                    logger.error(f"Error sending to WebSocket: {str(e)}")
+                    disconnected_ws.add(websocket)
+            
+            # Remove disconnected WebSockets
+            for ws in disconnected_ws:
+                WebSocketManager.disconnect(ws, task_id)
+
 
 class InferenceAPI:
     """API methods for inference operations"""
+    
+    # Helper method to check if any inference task is running
+    @staticmethod
+    def is_any_task_running() -> bool:
+        """Check if any inference task is currently running"""
+        for task_id, task_info in running_tasks.items():
+            if task_info.get("status") == "running":
+                return True
+        return False
+    
+    # WebSocket endpoint for progress updates
+    @staticmethod
+    @router.websocket("/ws/progress/{task_id}")
+    async def websocket_progress(websocket: WebSocket, task_id: str):
+        """WebSocket endpoint for inference progress updates"""
+        await WebSocketManager.connect(websocket, task_id)
+        try:
+            # Send initial status if task exists
+            if task_id in running_tasks:
+                task_info = running_tasks[task_id]
+                await websocket.send_json({
+                    "type": "status",
+                    "task_id": task_id,
+                    "status": task_info.get("status", "unknown"),
+                    "progress": task_info.get("progress", 0),
+                    "stage": task_info.get("stage", ""),
+                    "message": task_info.get("message", ""),
+                    "elapsed_time": time.time() - task_info.get("start_time", time.time())
+                })
+            
+            # Keep connection open
+            while True:
+                data = await websocket.receive_text()
+                if data == "ping":
+                    await websocket.send_json({"type": "pong"})
+                    
+        except WebSocketDisconnect:
+            WebSocketManager.disconnect(websocket, task_id)
+        except Exception as e:
+            logger.error(f"WebSocket error: {str(e)}")
+            WebSocketManager.disconnect(websocket, task_id)
     
     @staticmethod
     @router.get("/status", response_model=Dict[str, Any])
@@ -71,6 +151,9 @@ class InferenceAPI:
         rainfall_data_dir = FilePath(get_data_file("rainfall_data"))
         rainfall_data_exists = rainfall_data_dir.exists() if rainfall_data_dir else False
         
+        # Check if any task is currently running
+        any_task_running = InferenceAPI.is_any_task_running()
+        
         status_info = {
             "model_path": str(model_path),
             "model_exists": model_exists,
@@ -78,6 +161,7 @@ class InferenceAPI:
             "rainfall_data_exists": rainfall_data_exists,
             "running_tasks": len(running_tasks),
             "task_ids": list(running_tasks.keys()),
+            "any_task_running": any_task_running,
             "results_directory": str(INFERENCE_RESULTS_DIR)
         }
         
@@ -200,12 +284,26 @@ class InferenceAPI:
     @async_handle_exceptions
     async def run_inference_task(
         background_tasks: BackgroundTasks,
-        model_path: str = Body('best.pt', description="模型文件路径"),
-        data_dir: str = Body(None, description="输入数据文件名或完整NC文件路径"),
-        device: str = Body(None, description="计算设备 (默认: cuda:0 或 cpu)"),
-        pred_length: int = Body(48, description="预测时间步数")
+        model_path: str = Body('best.pt', description="Model file path"),
+        data_dir: str = Body(None, description="Input data filename or full NC file path"),
+        device: str = Body(None, description="Computing device (default: cuda:0 or cpu)"),
+        pred_length: int = Body(48, description="Prediction timesteps")
     ):
         """Run inference task"""
+        # Check if any task is already running
+        if InferenceAPI.is_any_task_running():
+            return {
+                "success": False,
+                "error": "Another inference task is currently running. Please wait for it to complete before starting a new one.",
+                "data": {
+                    "running_tasks": [
+                        {"task_id": task_id, "status": task_info.get("status"), "start_time": task_info.get("start_time")} 
+                        for task_id, task_info in running_tasks.items() 
+                        if task_info.get("status") == "running"
+                    ]
+                }
+            }
+        
         # Check parameters
         if not model_path:
             raise HTTPException(
@@ -239,15 +337,15 @@ class InferenceAPI:
             "pred_length": pred_length
         }
         
-        # 验证模型文件
+        # Validate model file
         model_full_path = FilePath(MODEL_DIR) / model_path
         if not model_full_path.exists():
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"模型文件不存在: {model_full_path}"
+                detail=f"Model file does not exist: {model_full_path}"
             )
         
-        # 验证数据文件/目录
+        # Validate data file/directory
         # Check if data_dir is a full path or just a filename
         data_path = FilePath(data_dir)
         if data_path.is_absolute():
@@ -255,7 +353,7 @@ class InferenceAPI:
             if not data_path.exists():
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"数据文件不存在: {data_path}"
+                    detail=f"Data file does not exist: {data_path}"
                 )
         else:
             # Just a filename, check in the rainfall directory
@@ -263,26 +361,26 @@ class InferenceAPI:
             if not data_file_path.exists():
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"数据文件不存在: {data_file_path}"
+                    detail=f"Data file does not exist: {data_file_path}"
                 )
             # Update data_dir to use the full path
             data_dir = str(data_file_path)
         
-        # 生成任务ID
+        # Generate task ID
         task_id = f"inference_{int(time.time())}_{os.path.basename(data_dir).replace('.nc', '')}"
         
-        # 准备输出目录
+        # Prepare output directory
         task_dir = INFERENCE_RESULTS_DIR / task_id
         task_dir.mkdir(exist_ok=True)
         
-        # 保存参数到JSON文件
+        # Save parameters to JSON file
         params_file = task_dir / "parameters.json"
         with open(params_file, 'w') as f:
             json.dump(parameters, f, indent=2)
         
-        # 添加到后台任务
+        # Add to background tasks with lock to ensure only one runs at a time
         background_tasks.add_task(
-            execute_inference_task,
+            execute_inference_task_with_lock,
             task_id=task_id,
             model_path=model_path,
             data_dir=data_dir,
@@ -291,7 +389,7 @@ class InferenceAPI:
             task_dir=task_dir
         )
         
-        # 标记任务为运行中
+        # Mark task as running
         running_tasks[task_id] = {
             "status": "running",
             "start_time": time.time(),
@@ -304,7 +402,7 @@ class InferenceAPI:
             "data": {
                 "task_id": task_id,
                 "status": "running",
-                "message": "推理任务已开始"
+                "message": "Inference task started"
             }
         }
     
@@ -440,6 +538,37 @@ class InferenceAPI:
         }
 
 
+# Wrapper function to execute inference task with lock
+async def execute_inference_task_with_lock(
+    task_id: str, 
+    model_path: str, 
+    data_dir: str, 
+    device: str, 
+    pred_length: int, 
+    task_dir: FilePath
+):
+    """
+    Execute inference task with a lock to ensure only one task runs at a time
+    
+    Args:
+        task_id: Task ID
+        model_path: Model file path
+        data_dir: Input data filename or full NC file path
+        device: Computing device
+        pred_length: Prediction timesteps
+        task_dir: Task output directory
+    """
+    async with task_lock:
+        await execute_inference_task(
+            task_id=task_id,
+            model_path=model_path,
+            data_dir=data_dir,
+            device=device,
+            pred_length=pred_length,
+            task_dir=task_dir
+        )
+
+# Original execute_inference_task function
 async def execute_inference_task(
     task_id: str, 
     model_path: str, 
@@ -449,22 +578,28 @@ async def execute_inference_task(
     task_dir: FilePath
 ):
     """
-    执行推理任务
+    Execute inference task
     
     Args:
-        task_id: 任务ID
-        model_path: 模型文件路径
-        data_dir: 输入数据文件名或完整NC文件路径
-        device: 计算设备
-        pred_length: 预测时间步数
-        task_dir: 任务输出目录
+        task_id: Task ID
+        model_path: Model file path
+        data_dir: Input data filename or full NC file path
+        device: Computing device
+        pred_length: Prediction timesteps
+        task_dir: Task output directory
     """
     start_time = time.time()
     
-    # 更新任务状态
-    running_tasks[task_id]["status"] = "running"
+    # Update task status
+    running_tasks[task_id] = {
+        "status": "running",
+        "start_time": start_time,
+        "progress": 0,
+        "stage": "initialization",
+        "message": "Task started"
+    }
     
-    # 构建参数字典用于记录
+    # Build parameter dictionary for recording
     params = {
         'model_path': model_path,
         'data_dir': data_dir,
@@ -472,41 +607,108 @@ async def execute_inference_task(
         'pred_length': pred_length
     }
     
+    # Create a thread-safe queue for progress updates
+    from queue import Queue
+    progress_queue = Queue()
+    
+    # Create a thread to broadcast progress updates
+    def sync_progress_callback(stage, progress, message):
+        """Thread-safe progress callback that adds updates to the queue"""
+        progress_queue.put((stage, progress, message))
+    
+    # Background task to process progress updates
+    async def process_progress_queue():
+        """Process progress updates from the queue and broadcast to WebSocket clients"""
+        while task_id in running_tasks and running_tasks[task_id]["status"] == "running":
+            # Check if there are updates in the queue
+            if not progress_queue.empty():
+                try:
+                    # Get an update from the queue
+                    stage, progress, message = progress_queue.get_nowait()
+                    
+                    # Update task info
+                    if task_id in running_tasks:
+                        running_tasks[task_id].update({
+                            "progress": progress,
+                            "stage": stage,
+                            "message": message,
+                            "elapsed_time": time.time() - start_time
+                        })
+                    
+                    # Broadcast progress update
+                    await WebSocketManager.broadcast_progress(task_id, {
+                        "type": "progress",
+                        "task_id": task_id,
+                        "status": running_tasks[task_id]["status"],
+                        "progress": progress,
+                        "stage": stage,
+                        "message": message,
+                        "elapsed_time": time.time() - start_time
+                    })
+                except Exception as e:
+                    logger.error(f"Error processing progress update: {str(e)}")
+            
+            # Sleep a short time before checking the queue again
+            await asyncio.sleep(0.1)
+    
+    # Start the progress queue processing task
+    progress_task = asyncio.create_task(process_progress_queue())
+    
     try:
-        # 在线程池中执行推理函数
+        # Execute inference function in a thread pool
         def run_process():
             try:
-                # 使用新的参数格式调用推理函数
+                # Call inference function with progress callback
                 return InferenceService.run_inference(
                     model_path=model_path,
-                    data_dir=data_dir,  # 使用数据目录名称或完整NC文件路径
+                    data_dir=data_dir,
                     device=device,
-                    start_tmp=None,  # 使用默认生成的时间戳
+                    start_tmp=None,  # Use auto-generated timestamp
                     output_dir=task_dir,
-                    pred_length=pred_length
+                    pred_length=pred_length,
+                    progress_callback=sync_progress_callback
                 )
             except Exception as e:
-                logger.error(f"推理执行失败: {str(e)}")
+                logger.error(f"Inference execution failed: {str(e)}")
                 return {
                     "success": False,
-                    "message": f"推理执行失败: {str(e)}"
+                    "message": f"Inference execution failed: {str(e)}"
                 }
         
-        # 在线程池中执行
+        # Execute in thread pool
         result = await run_in_threadpool(run_process)
         
-        # 计算执行时间
+        # Calculate execution time
         end_time = time.time()
         elapsed_time = end_time - start_time
         
-        # 确定任务状态
+        # Determine task status
         status = "completed" if result.get("success", False) else "failed"
         
-        # 更新任务状态
+        # Update task status
         if task_id in running_tasks:
             running_tasks[task_id]["status"] = status
+            if status == "completed":
+                running_tasks[task_id]["progress"] = 100
+                running_tasks[task_id]["stage"] = "completion"
+                running_tasks[task_id]["message"] = "Task completed successfully"
+            else:
+                running_tasks[task_id]["stage"] = "error"
+                running_tasks[task_id]["message"] = result.get("message", "Unknown error")
         
-        # 保存状态信息
+        # Send final status update
+        await WebSocketManager.broadcast_progress(task_id, {
+            "type": "status",
+            "task_id": task_id,
+            "status": status,
+            "progress": 100 if status == "completed" else 0,
+            "stage": "completion" if status == "completed" else "error",
+            "message": "Task completed successfully" if status == "completed" else result.get("message", "Unknown error"),
+            "elapsed_time": elapsed_time,
+            "results": result.get("results", {})
+        })
+        
+        # Save status information
         status_info = {
             "task_id": task_id,
             "status": status,
@@ -520,17 +722,28 @@ async def execute_inference_task(
         with open(task_dir / "status.json", 'w') as f:
             json.dump(status_info, f, indent=2)
             
-        logger.info(f"推理任务 {task_id} 已完成，状态: {status}，用时: {elapsed_time:.2f} 秒")
+        logger.info(f"Inference task {task_id} completed, status: {status}, duration: {elapsed_time:.2f} seconds")
         
     except Exception as e:
-        # 记录错误
-        logger.error(f"执行推理任务 {task_id} 失败: {str(e)}")
+        # Log error
+        logger.error(f"Error executing inference task {task_id}: {str(e)}")
         
-        # 更新状态
+        # Update status
         if task_id in running_tasks:
             running_tasks[task_id]["status"] = "failed"
+            running_tasks[task_id]["stage"] = "error"
+            running_tasks[task_id]["message"] = str(e)
         
-        # 保存错误信息
+        # Send error status update
+        await WebSocketManager.broadcast_progress(task_id, {
+            "type": "error",
+            "task_id": task_id,
+            "status": "failed",
+            "message": str(e),
+            "elapsed_time": time.time() - start_time
+        })
+        
+        # Save error information
         end_time = time.time()
         elapsed_time = end_time - start_time
         
@@ -548,6 +761,15 @@ async def execute_inference_task(
             json.dump(error_info, f, indent=2)
     
     finally:
-        # 移除运行中的任务
+        # Cancel the progress queue processing task
+        progress_task.cancel()
+        try:
+            await progress_task
+        except asyncio.CancelledError:
+            pass
+        
+        # Wait a while before removing the task to allow clients to get the final status
+        await asyncio.sleep(60)
+        # Remove running task
         if task_id in running_tasks:
             del running_tasks[task_id] 

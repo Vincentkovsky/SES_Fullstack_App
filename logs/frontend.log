@@ -3,14 +3,30 @@
 > vite --port 5173
 
 
-  VITE v5.4.11  ready in 1972 ms
+  VITE v5.4.11  ready in 543 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
 [1m[33m[@vue/compiler-sfc][0m[33m `defineEmits` is a compiler macro and no longer needs to be imported.[0m
 
-4:10:47 pm [vite] hmr update /src/components/SettingsModal.vue
-4:19:59 pm [vite] hmr update /src/components/SettingsModal.vue
-4:20:14 pm [vite] hmr update /src/components/SettingsModal.vue
-4:20:27 pm [vite] hmr update /src/components/SettingsModal.vue
-4:20:40 pm [vite] hmr update /src/components/SettingsModal.vue
+5:55:54 pm [vite] hmr update /src/components/SettingsModal.vue
+5:56:25 pm [vite] hmr update /src/components/SettingsModal.vue
+5:56:42 pm [vite] hmr update /src/components/SettingsModal.vue
+5:56:57 pm [vite] hmr update /src/components/SettingsModal.vue
+5:57:14 pm [vite] hmr update /src/components/SettingsModal.vue
+5:58:03 pm [vite] hmr update /src/components/DeckGLMap.vue
+5:58:21 pm [vite] hmr update /src/components/SettingsModal.vue
+5:58:37 pm [vite] hmr update /src/components/SettingsModal.vue
+6:04:16 pm [vite] hmr update /src/components/SettingsModal.vue
+6:08:03 pm [vite] hmr update /src/components/SettingsModal.vue
+6:08:21 pm [vite] hmr update /src/components/SettingsModal.vue
+6:08:38 pm [vite] hmr update /src/components/SettingsModal.vue
+6:08:55 pm [vite] hmr update /src/components/SettingsModal.vue
+6:09:01 pm [vite] hmr update /src/components/SettingsModal.vue
+6:09:08 pm [vite] hmr update /src/components/SettingsModal.vue?vue&type=style&index=0&scoped=67bc804a&lang.css, /src/components/SettingsModal.vue
+6:09:12 pm [vite] hmr update /src/components/SettingsModal.vue
+6:09:19 pm [vite] hmr update /src/components/SettingsModal.vue
+6:09:26 pm [vite] hmr update /src/components/SettingsModal.vue
+6:09:34 pm [vite] hmr update /src/components/SettingsModal.vue
+6:09:43 pm [vite] hmr update /src/components/SettingsModal.vue
+6:09:55 pm [vite] hmr update /src/components/SettingsModal.vue
