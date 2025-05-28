@@ -201,51 +201,43 @@ class InferenceAPI:
     async def run_inference_task(
         background_tasks: BackgroundTasks,
         model_path: str = Body('best.pt', description="模型文件路径"),
-        data_dir: str = Body(None, description="输入数据文件名"),
+        data_dir: str = Body(None, description="输入数据文件名或完整NC文件路径"),
         device: str = Body(None, description="计算设备 (默认: cuda:0 或 cpu)"),
         pred_length: int = Body(48, description="预测时间步数")
     ):
-        """
-        运行推理任务
+        """Run inference task"""
+        # Check parameters
+        if not model_path:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Model path is required"
+            )
         
-        Args:
-            background_tasks: 后台任务管理器
-            model_path: 模型文件路径 (默认: best.pt)
-            data_dir: 输入数据文件名 (默认: 自动选择可用的NC文件)
-            device: 计算设备 (默认: cuda:0 或 cpu)
-            pred_length: 预测时间步数 (默认: 48)
+        if not data_dir:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Data file/directory is required"
+            )
         
-        Returns:
-            任务ID和状态信息
-        """
-        # 使用默认设备如果未指定
-        if device is None:
+        # Use CPU if device not specified
+        if not device:
             device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-            
-        # 如果没有指定数据文件，查找可用的NC文件
-        if data_dir is None:
-            try:
-                # 查找第一个可用的NC文件
-                nc_files = list(RAINFALL_DATA_DIR.glob('**/*.nc'))
-                if nc_files:
-                    # 选择第一个NC文件
-                    data_dir = nc_files[0].name
-                else:
-                    # 如果没有找到NC文件，使用默认值
-                    data_dir = 'rainfall_20221024.nc'
-            except Exception as e:
-                logger.error(f"自动查找NC文件失败: {str(e)}")
-                data_dir = 'rainfall_20221024.nc'
         
-        # 构建参数字典用于日志记录和保存
+        # Convert parameters
+        try:
+            pred_length = int(pred_length)
+            if pred_length <= 0:
+                pred_length = 48
+        except (ValueError, TypeError):
+            pred_length = 48
+        
+        # Log parameters
         parameters = {
-            'model_path': model_path,
-            'data_dir': data_dir,
-            'device': device,
-            'pred_length': pred_length
+            "model_path": model_path,
+            "data_dir": data_dir,
+            "device": device,
+            "pred_length": pred_length
         }
-        
-        logger.info(f"准备开始推理任务，参数: {parameters}")
         
         # 验证模型文件
         model_full_path = FilePath(MODEL_DIR) / model_path
@@ -255,16 +247,29 @@ class InferenceAPI:
                 detail=f"模型文件不存在: {model_full_path}"
             )
         
-        # 验证数据文件
-        data_file_path = RAINFALL_DATA_DIR / data_dir
-        if not data_file_path.exists():
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"数据文件不存在: {data_file_path}"
-            )
+        # 验证数据文件/目录
+        # Check if data_dir is a full path or just a filename
+        data_path = FilePath(data_dir)
+        if data_path.is_absolute():
+            # Full path provided
+            if not data_path.exists():
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"数据文件不存在: {data_path}"
+                )
+        else:
+            # Just a filename, check in the rainfall directory
+            data_file_path = RAINFALL_DATA_DIR / data_dir
+            if not data_file_path.exists():
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"数据文件不存在: {data_file_path}"
+                )
+            # Update data_dir to use the full path
+            data_dir = str(data_file_path)
         
         # 生成任务ID
-        task_id = f"inference_{int(time.time())}_{data_dir.replace('.nc', '')}"
+        task_id = f"inference_{int(time.time())}_{os.path.basename(data_dir).replace('.nc', '')}"
         
         # 准备输出目录
         task_dir = INFERENCE_RESULTS_DIR / task_id
@@ -449,7 +454,7 @@ async def execute_inference_task(
     Args:
         task_id: 任务ID
         model_path: 模型文件路径
-        data_dir: 输入数据文件名
+        data_dir: 输入数据文件名或完整NC文件路径
         device: 计算设备
         pred_length: 预测时间步数
         task_dir: 任务输出目录
@@ -467,9 +472,6 @@ async def execute_inference_task(
         'pred_length': pred_length
     }
     
-    # 完整的数据文件路径
-    data_file_path = str(RAINFALL_DATA_DIR / data_dir)
-    
     try:
         # 在线程池中执行推理函数
         def run_process():
@@ -477,7 +479,7 @@ async def execute_inference_task(
                 # 使用新的参数格式调用推理函数
                 return InferenceService.run_inference(
                     model_path=model_path,
-                    data_file=data_file_path,  # 使用完整的文件路径
+                    data_dir=data_dir,  # 使用数据目录名称或完整NC文件路径
                     device=device,
                     start_tmp=None,  # 使用默认生成的时间戳
                     output_dir=task_dir,

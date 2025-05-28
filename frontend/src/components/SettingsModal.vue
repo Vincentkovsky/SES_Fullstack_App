@@ -100,7 +100,6 @@
                             </div>
                           </div>
                         </div>
-                        <div v-if="isLoadingCudaInfo" class="loading-indicator">Loading CUDA information...</div>
                       </div>
                       
                       <!-- Rainfall Data Files Dropdown -->
@@ -369,9 +368,17 @@ const handleInferenceTaskError = (data: { error: string }) => {
 const fetchHistoricalSimulationsData = async () => {
   try {
     console.log('Fetching historical simulations...');
+    // Store current selection
+    const currentSimulation = selectedHistoricalSimulation.value;
+    
     const data = await fetchHistoricalSimulations();
     historicalSimulations.value = data;
     console.log('Historical simulations fetched:', data);
+    
+    // Restore the selection if it exists in the new data
+    if (currentSimulation && data.includes(currentSimulation)) {
+      selectedHistoricalSimulation.value = currentSimulation;
+    }
   } catch (error) {
     console.error('Error fetching historical simulations:', error);
     throw error; // Re-throw to be handled by caller
@@ -398,14 +405,19 @@ const fetchCudaInfo = async () => {
     const response = await getCudaInfo();
     
     if (response.success) {
+      // Store current device selection before updating
+      const currentDeviceSelection = inferenceSettings.value.device;
+      
       cudaInfo.value = response.data;
       console.log('CUDA information fetched:', response.data);
       
-      // If CUDA is available, set the default device to the first CUDA device
-      if (response.data.cuda_available && response.data.devices.length > 0) {
-        inferenceSettings.value.device = `cuda:${response.data.devices[0].device_id}`;
-      } else {
-        inferenceSettings.value.device = 'cpu';
+      // Only set the default device if it hasn't been set yet
+      if (!currentDeviceSelection || currentDeviceSelection === '') {
+        if (response.data.cuda_available && response.data.devices.length > 0) {
+          inferenceSettings.value.device = `cuda:${response.data.devices[0].device_id}`;
+        } else {
+          inferenceSettings.value.device = 'cpu';
+        }
       }
     }
   } catch (error) {
@@ -416,7 +428,11 @@ const fetchCudaInfo = async () => {
       devices: [],
       current_device: null
     };
-    inferenceSettings.value.device = 'cpu';
+    
+    // Only reset to CPU if device hasn't been selected yet
+    if (!inferenceSettings.value.device) {
+      inferenceSettings.value.device = 'cpu';
+    }
   } finally {
     isLoadingCudaInfo.value = false;
   }
@@ -430,19 +446,24 @@ const fetchRainfallFiles = async () => {
     const response = await getRainfallFiles();
     
     if (response.success) {
+      // Store current selection before updating
+      const currentRainfallFile = inferenceSettings.value.dataDir;
+      
       rainfallFiles.value = response.data.rainfall_files;
       console.log('Rainfall files fetched:', response.data.rainfall_files);
       
-      // Set default rainfall file if available
-      if (response.data.rainfall_files.length > 0) {
-        // Look for a file with name starting with 'rainfall_'
-        const defaultFile = response.data.rainfall_files.find(file => 
-          file.name.startsWith('rainfall_'));
-        
-        if (defaultFile) {
-          inferenceSettings.value.dataDir = defaultFile.name;
-        } else {
-          inferenceSettings.value.dataDir = response.data.rainfall_files[0].name;
+      // Only set default rainfall file if none is selected yet
+      if (!currentRainfallFile || currentRainfallFile === '') {
+        if (response.data.rainfall_files.length > 0) {
+          // Look for a file with name starting with 'rainfall_'
+          const defaultFile = response.data.rainfall_files.find(file => 
+            file.name.startsWith('rainfall_'));
+          
+          if (defaultFile) {
+            inferenceSettings.value.dataDir = defaultFile.name;
+          } else {
+            inferenceSettings.value.dataDir = response.data.rainfall_files[0].name;
+          }
         }
       }
     }
@@ -510,7 +531,7 @@ const startInference = () => {
 
 
 // Data loading function
-const loadData = async () => {
+const loadData = async (preserveSelections = true) => {
   isLoading.value = true;
   error.value = null;
 
@@ -529,7 +550,6 @@ const loadData = async () => {
       const firstTimestamp = props.timestamps[0];
       const lastTimestamp = props.timestamps[props.timestamps.length - 1];
       
-
       const startDate = getDateFromTimestamp(firstTimestamp);
       const endDate = getDateFromTimestamp(lastTimestamp);
       

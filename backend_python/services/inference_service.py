@@ -86,7 +86,7 @@ class ResultsProcessor:
         
         Args:
             water_level: Water level prediction results
-            data_dir: Input data directory
+            data_dir: Input data directory or path to NC file
             output_dir: Output directory
         
         Returns:
@@ -98,9 +98,21 @@ class ResultsProcessor:
         try:
             wl_array = water_level[0][0].transpose(1, 0)  # (48, 47791)
             
+            # Determine source file path based on whether data_dir is a file path or directory name
+            data_path = Path(data_dir)
+            if data_path.is_file() and data_path.suffix == '.nc':
+                # Data_dir is a full file path
+                source_file = data_path
+                # Extract filename for dataset name
+                nc_file_name = data_path.name
+            else:
+                # Data_dir is a directory name (original behavior)
+                data_dir_path = MODEL_DIR / data_dir
+                source_file = data_dir_path / f'{data_dir}.nc'
+                nc_file_name = f'{data_dir}.nc'
+            
             # Read initial water level
-            data_dir_path = MODEL_DIR / data_dir
-            with nc.Dataset(f'{data_dir_path}/{data_dir}.nc', 'r') as dataset:
+            with nc.Dataset(str(source_file), 'r') as dataset:
                 wl_0 = dataset.variables['Mesh2D_s1'][0, :-12]  # 47791 initial water level
             
             # Load preprocessed data
@@ -126,7 +138,6 @@ class ResultsProcessor:
             result_file = Path(output_dir) / 'result.nc'
             
             # Copy original nc file to result directory
-            source_file = Path(data_dir_path) / f'{data_dir}.nc'
             if not result_file.exists():
                 shutil.copy(source_file, result_file)
             
@@ -260,7 +271,7 @@ class InferenceService:
         
         Args:
             model_path: Path to the model file (default: best.pt)
-            data_dir: Input data directory (default: rainfall_20221024)
+            data_dir: Input data path - can be a directory name or full path to .nc file (default: rainfall_20221024)
             device: Computing device (default: cuda:0 if available, otherwise cpu)
             start_tmp: Start timestamp (default: auto-generated)
             output_dir: Output directory (default: created based on data_dir and timestamp)
@@ -299,7 +310,8 @@ class InferenceService:
             from dataset import FloodDataset
             
             # Create dataset and data loader
-            val_dataset = FloodDataset(f'{MODEL_DIR}/{data_dir}', inference_config)
+            val_dataset = FloodDataset(data_dir, inference_config)
+
             val_loader = DataLoader(
                 val_dataset,
                 batch_size=1,
