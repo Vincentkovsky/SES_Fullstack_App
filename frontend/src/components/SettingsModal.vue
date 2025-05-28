@@ -19,34 +19,82 @@
                   
                   <!-- Inference Progress Section -->
                   <div v-if="inferenceTaskRunning" class="inference-progress-container">
-                    <h3>Inference Task Running</h3>
-                    <div class="progress-info">
-                      <p>Task ID: {{ currentInferenceTask.taskId }}</p>
-                      <p>Status: {{ inferenceStatusText }}</p>
-                      <p>Stage: {{ currentInferenceTask.stage || 'Initializing' }}</p>
-                      <p>Running time: {{ formatElapsedTime(currentInferenceTask.elapsed) }}</p>
+                    <div class="progress-header">
+                      <h3>Inference Task Running</h3>
+                      <div class="status-badge" :class="{
+                        'status-running': currentInferenceTask.status === 'running',
+                        'status-completed': currentInferenceTask.status === 'completed',
+                        'status-failed': currentInferenceTask.status === 'failed',
+                        'status-cancelled': currentInferenceTask.status === 'cancelled'
+                      }">{{ inferenceStatusText }}</div>
                     </div>
+                    
+                    <div class="progress-info">
+                      <div class="info-item">
+                        <div class="info-label">Task ID:</div>
+                        <div class="task-id-container">
+                          <div class="task-id-value">{{ currentInferenceTask.taskId }}</div>
+                        </div>
+                      </div>
+                      <div class="info-item">
+                        <div class="info-label">Stage:</div>
+                        <div class="info-value-container">
+                          <div class="stage-badge">{{ currentInferenceTask.stage || 'Initializing' }}</div>
+                        </div>
+                      </div>
+                      <div class="info-item">
+                        <div class="info-label">Running time:</div>
+                        <div class="info-value-container">
+                          <div class="time-value">{{ formatElapsedTime(currentInferenceTask.elapsed) }}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
                     <div class="progress-bar-container">
                       <div class="progress-bar">
                         <div 
                           class="progress-fill" 
+                          :class="{ 'animated': currentInferenceTask.status === 'running' }"
                           :style="{ 
                             width: `${currentInferenceTask.progress || 0}%`,
-                            background: currentInferenceTask.stage === 'reconnecting' ? 'linear-gradient(to right, #f59e0b, #b45309)' : 'linear-gradient(to right, #1E3D78, #3663B0)'
+                            background: getProgressBarColor(currentInferenceTask.stage, currentInferenceTask.status)
                           }"
                         ></div>
                       </div>
                       <div class="progress-text">{{ currentInferenceTask.progress || 0 }}%</div>
                     </div>
+                    
                     <div class="progress-message">
-                      {{ currentInferenceTask.message || 'Processing...' }}
+                      <div class="message-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="16" x2="12" y2="12"></line>
+                          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                      </div>
+                      <div class="message-text">
+                        {{ currentInferenceTask.message || 'Processing...' }}
+                      </div>
                     </div>
+                    
                     <div v-if="inferenceTaskError" class="error-message">
-                      {{ inferenceTaskError }}
+                      <div class="error-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="12"></line>
+                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                      </div>
+                      <div class="error-text">{{ inferenceTaskError }}</div>
                     </div>
                     
                     <!-- 修改条件显示逻辑，在任务运行中时始终显示按钮 -->
                     <button v-if="inferenceTaskRunning && (currentInferenceTask.status === 'running' || currentInferenceTask.status === 'starting')" class="warning-button" @click="handleCancelInferenceTask">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cancel-icon">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                      </svg>
                       Cancel Task
                     </button>
                   </div>
@@ -334,6 +382,23 @@ const formatElapsedTime = (seconds?: number): string => {
   }
   
   return `${minutes} min ${remainingSeconds} sec`;
+};
+
+// 获取进度条颜色
+const getProgressBarColor = (stage?: string, status?: string): string => {
+  if (status === 'failed') {
+    return 'linear-gradient(to right, #ef4444, #b91c1c)';
+  }
+  
+  if (status === 'cancelled') {
+    return 'linear-gradient(to right, #f59e0b, #b45309)';
+  }
+  
+  if (stage === 'reconnecting') {
+    return 'linear-gradient(to right, #f59e0b, #b45309)';
+  }
+  
+  return 'linear-gradient(to right, #1E3D78, #3663B0)';
 };
 
 const getDateFromTimestamp = (timestamp: string): Date | null => {
@@ -1372,62 +1437,185 @@ onBeforeUnmount(() => {
 
 /* Inference progress styles */
 .inference-progress-container {
-  padding: 1rem;
+  padding: 1.25rem;
   background: rgba(249, 250, 251, 0.8);
   border-radius: 8px;
   margin-bottom: 1.5rem;
   border: 1px solid rgba(209, 213, 219, 0.4);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.inference-progress-container h3 {
-  font-size: 1rem;
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(209, 213, 219, 0.4);
+  padding-bottom: 0.75rem;
+}
+
+.progress-header h3 {
+  font-size: 1.125rem;
   font-weight: 600;
   color: #1E3D78;
-  margin-bottom: 1rem;
+  margin: 0;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-running {
+  background: linear-gradient(to right, #1E3D78, #3663B0);
+}
+
+.status-completed {
+  background: linear-gradient(to right, #10B981, #059669);
+}
+
+.status-failed {
+  background: linear-gradient(to right, #EF4444, #B91C1C);
+}
+
+.status-cancelled {
+  background: linear-gradient(to right, #F59E0B, #B45309);
 }
 
 .progress-info {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(209, 213, 219, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.progress-info p {
-  margin: 0.25rem 0;
+.info-item {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.task-id-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.task-id-value {
+  font-family: monospace;
   font-size: 0.875rem;
-  color: #4b5563;
+  color: #1f2937;
+  background: rgba(243, 244, 246, 0.7);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  white-space: normal;
+  word-break: break-all;
+  width: 100%;
+  line-height: 1.4;
+}
+
+.info-value-container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
+
+.stage-badge {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background: rgba(243, 244, 246, 0.7);
+  color: #1f2937;
+  font-size: 0.875rem;
+  font-weight: 400;
+  width: 100%;
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  line-height: 1.4;
+}
+
+.time-value {
+  font-weight: 400;
+  color: #1f2937;
+  background: rgba(243, 244, 246, 0.7);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  width: 100%;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 .progress-bar-container {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   position: relative;
+  padding-top: 1rem;
 }
 
 .progress-bar {
-  height: 8px;
+  height: 10px;
   background: rgba(209, 213, 219, 0.4);
-  border-radius: 4px;
+  border-radius: 5px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .progress-fill {
   height: 100%;
-  background: #1E3D78;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: width 0.3s ease;
 }
 
 .progress-text {
   position: absolute;
   right: 0;
-  top: -20px;
-  font-size: 0.75rem;
-  color: #4b5563;
+  top: -5px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1E3D78;
 }
 
 .progress-message {
+  margin-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+  background-color: rgba(243, 244, 246, 0.7);
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(209, 213, 219, 0.4);
+}
+
+.message-icon {
+  margin-right: 0.5rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.message-text {
   font-size: 0.875rem;
-  color: #4b5563;
-  margin-bottom: 1rem;
-  font-style: italic;
+  color: #1f2937;
+  line-height: 1.4;
 }
 
 @keyframes progress-animation {
@@ -1443,7 +1631,6 @@ onBeforeUnmount(() => {
 }
 
 .progress-fill.animated {
-  background: linear-gradient(to right, #1E3D78, #3663B0, #1E3D78);
   background-size: 200% 200%;
   animation: progress-animation 2s infinite;
 }
@@ -1456,8 +1643,112 @@ onBeforeUnmount(() => {
   font-size: 0.875rem;
   border-radius: 6px;
   margin-top: 1rem;
+  display: flex;
+  align-items: flex-start;
 }
 
+.error-icon {
+  margin-right: 0.5rem;
+  color: #B91C1C;
+  margin-top: 2px;
+}
+
+.error-text {
+  font-size: 0.875rem;
+  color: #B91C1C;
+  line-height: 1.4;
+}
+
+.warning-button {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 1.25rem;
+  background: linear-gradient(to right, #EF4444, #B91C1C);
+  color: white;
+  border: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.warning-button:hover {
+  background: linear-gradient(to right, #DC2626, #991B1B);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4);
+}
+
+.warning-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(239, 68, 68, 0.3);
+}
+
+.cancel-icon {
+  margin-right: 0.5rem;
+}
+
+/* Device utilization styles */
+.device-utilization {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(249, 250, 251, 0.7);
+  border-radius: 6px;
+  border: 1px solid rgba(209, 213, 219, 0.4);
+}
+
+.device-stats {
+  margin-bottom: 8px;
+}
+
+.device-stats:last-child {
+  margin-bottom: 0;
+}
+
+.device-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #4b5563;
+}
+
+.utilization-bar {
+  height: 8px;
+  background: rgba(229, 231, 235, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.utilization-fill {
+  height: 100%;
+  background: linear-gradient(to right, #1E3D78, #3663B0);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.utilization-text {
+  position: absolute;
+  right: 4px;
+  top: -16px;
+  font-size: 0.7rem;
+  color: #4b5563;
+}
+
+.loading-indicator {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* 图表样式恢复 */
 .graph-container {
   display: flex;
   flex-direction: column;
@@ -1599,79 +1890,5 @@ onBeforeUnmount(() => {
 
 .rainfall-toggle-button:hover {
   opacity: 0.9;
-}
-
-/* Device utilization styles */
-.device-utilization {
-  margin-top: 10px;
-  padding: 8px;
-  background: rgba(249, 250, 251, 0.7);
-  border-radius: 6px;
-  border: 1px solid rgba(209, 213, 219, 0.4);
-}
-
-.device-stats {
-  margin-bottom: 8px;
-}
-
-.device-stats:last-child {
-  margin-bottom: 0;
-}
-
-.device-name {
-  font-size: 0.8rem;
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #4b5563;
-}
-
-.utilization-bar {
-  height: 8px;
-  background: rgba(229, 231, 235, 0.6);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-
-.utilization-fill {
-  height: 100%;
-  background: linear-gradient(to right, #1E3D78, #3663B0);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.utilization-text {
-  position: absolute;
-  right: 4px;
-  top: -16px;
-  font-size: 0.7rem;
-  color: #4b5563;
-}
-
-.loading-indicator {
-  margin-top: 4px;
-  font-size: 0.8rem;
-  color: #6b7280;
-  font-style: italic;
-}
-
-.warning-button {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
-  margin-top: 1rem;
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
-  border: none;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.warning-button:hover {
-  background: rgba(220, 38, 38, 0.95);
 }
 </style> 
