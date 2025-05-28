@@ -570,3 +570,23 @@ export const getRainfallFiles = async (): Promise<RainfallFilesResponse> => {
     throw error instanceof Error ? error : new Error(String(error));
   }
 };
+
+/**
+ * Cancel an inference task
+ * @param taskId Task ID to cancel
+ * @returns API response with success status
+ */
+export const cancelInferenceTask = async (taskId: string): Promise<{ success: boolean; message: string; data?: any }> => {
+  try {
+    const response = await axios.post(`${API_CONFIG.BASE_URL}/inference/tasks/${taskId}/cancel`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to cancel task ${taskId}:`, error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const responseData = axiosError.response?.data as any;
+      throw new Error(responseData?.detail || responseData?.message || axiosError.message);
+    }
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+};

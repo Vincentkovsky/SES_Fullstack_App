@@ -93,8 +93,11 @@ def main():
     start_time = datetime.now()
     
     try:
+        # 创建推理服务实例
+        inference_service = InferenceService()
+        
         # 运行推理 - 使用新的参数格式
-        result = InferenceService.run_inference(
+        result = inference_service.run_inference(
             model_path=args.model_path,
             data_dir=args.data_dir,
             device=args.device,

@@ -537,6 +537,97 @@ class InferenceAPI:
             }
         }
 
+    @staticmethod
+    @router.post("/tasks/{task_id}/cancel", response_model=Dict[str, Any])
+    @async_handle_exceptions
+    async def cancel_inference_task(task_id: str = Path(..., description="Task ID")):
+        """Cancel a running inference task"""
+        if task_id not in running_tasks:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Task with ID {task_id} not found"
+            )
+        
+        task_info = running_tasks[task_id]
+        if task_info.get("status") != "running":
+            return {
+                "success": False,
+                "message": f"Task {task_id} is not running (status: {task_info.get('status')})"
+            }
+        
+        logger.info(f"Canceling task {task_id}")
+        
+        # 获取任务进程句柄（如果存在）
+        process_handle = task_info.get("process_handle")
+        if process_handle:
+            try:
+                # 尝试终止进程
+                logger.info(f"Attempting to terminate process for task {task_id}")
+                process_handle.terminate()
+                
+                # 给进程一些时间来清理
+                await asyncio.sleep(1)
+                
+                # 如果进程还在运行，强制终止
+                if process_handle.is_alive():
+                    logger.warning(f"Process for task {task_id} did not terminate gracefully, killing it")
+                    process_handle.kill()
+            except Exception as e:
+                logger.error(f"Error terminating process for task {task_id}: {str(e)}")
+        
+        # 取消进度队列任务（如果存在）
+        progress_task = task_info.get("progress_task")
+        if progress_task and not progress_task.done():
+            try:
+                logger.info(f"Cancelling progress task for {task_id}")
+                progress_task.cancel()
+            except Exception as e:
+                logger.error(f"Error cancelling progress task: {str(e)}")
+        
+        # Mark task as cancelled
+        task_info["status"] = "cancelled"
+        task_info["stage"] = "cancelled"
+        task_info["message"] = "Task cancelled by user"
+        task_info["end_time"] = time.time()
+        task_info["elapsed_time"] = task_info["end_time"] - task_info["start_time"]
+        
+        # Notify any connected websockets
+        await WebSocketManager.broadcast_progress(task_id, {
+            "type": "status",
+            "task_id": task_id,
+            "status": "cancelled",
+            "progress": task_info.get("progress", 0),
+            "stage": "cancelled",
+            "message": "Task cancelled by user",
+            "elapsed_time": task_info["elapsed_time"]
+        })
+        
+        # Save status to file
+        task_dir = INFERENCE_RESULTS_DIR / task_id
+        if task_dir.exists():
+            status_info = {
+                "task_id": task_id,
+                "status": "cancelled",
+                "start_time": task_info["start_time"],
+                "end_time": task_info["end_time"],
+                "elapsed_time": task_info["elapsed_time"],
+                "parameters": task_info.get("parameters", {}),
+                "message": "Task cancelled by user"
+            }
+            
+            with open(task_dir / "status.json", 'w') as f:
+                json.dump(status_info, f, indent=2)
+        
+        return {
+            "success": True,
+            "message": f"Task {task_id} has been cancelled",
+            "data": {
+                "task_id": task_id,
+                "status": "cancelled",
+                "elapsed_time": task_info["elapsed_time"]
+            }
+        }
+
 
 # Wrapper function to execute inference task with lock
 async def execute_inference_task_with_lock(
@@ -653,13 +744,22 @@ async def execute_inference_task(
     
     # Start the progress queue processing task
     progress_task = asyncio.create_task(process_progress_queue())
-    
+
+    # 将进度任务保存到running_tasks字典中
+    if task_id in running_tasks:
+        running_tasks[task_id]["progress_task"] = progress_task
+
     try:
         # Execute inference function in a thread pool
         def run_process():
             try:
                 # Call inference function with progress callback
-                return InferenceService.run_inference(
+                inference_service = InferenceService()
+                # 保存进程引用到running_tasks
+                if task_id in running_tasks:
+                    running_tasks[task_id]["process_handle"] = inference_service
+                
+                return inference_service.run_inference(
                     model_path=model_path,
                     data_dir=data_dir,
                     device=device,

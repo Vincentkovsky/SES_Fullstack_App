@@ -309,8 +309,37 @@ class ResultsProcessor:
 class InferenceService:
     """Main inference service class"""
     
-    @staticmethod
+    def __init__(self):
+        """Initialize inference service with process tracking variables"""
+        self._is_running = False
+        self._terminated = False
+        self._process = None
+    
+    def terminate(self):
+        """Terminate the running inference process"""
+        logger.info("Received termination request for inference process")
+        self._terminated = True
+        
+        # 如果有子进程，终止它
+        if self._process is not None:
+            try:
+                logger.info(f"Attempting to terminate subprocess with PID: {self._process.pid}")
+                import signal
+                import os
+                os.kill(self._process.pid, signal.SIGTERM)
+                logger.info(f"Sent SIGTERM to process {self._process.pid}")
+                return True
+            except Exception as e:
+                logger.error(f"Error terminating subprocess: {str(e)}")
+                return False
+        return True
+    
+    def is_alive(self):
+        """Check if the inference process is still alive"""
+        return self._is_running and not self._terminated
+    
     def run_inference(
+        self,
         model_path: str = 'best.pt', 
         data_dir: str = 'rainfall_20221024', 
         device: str = None, 
@@ -335,9 +364,18 @@ class InferenceService:
         Returns:
             Inference result information
         """
+        self._is_running = True
+        self._terminated = False
+        
         try:
             # Progress tracking function
             def update_progress(stage, progress, message=None):
+                # 检查是否已请求终止
+                if self._terminated:
+                    if progress_callback:
+                        progress_callback("cancelled", progress, "Task cancelled by user")
+                    raise InterruptedError("Inference task was cancelled by user")
+                
                 if progress_callback:
                     progress_callback(stage, progress, message)
                 logger.info(f"Progress - {stage}: {progress}% - {message or ''}")
@@ -466,20 +504,32 @@ class InferenceService:
                     "tif_count": len(tif_files)
                 }
             }
+        except InterruptedError as e:
+            # 处理取消任务的情况
+            logger.info(f"Inference task was cancelled: {str(e)}")
+            self._is_running = False
+            return {
+                "success": False,
+                "message": f"Task cancelled: {str(e)}",
+                "timestamp": get_timestamp(),
+                "cancelled": True
+            }
         except Exception as e:
             # Report error in progress if callback is available
             if progress_callback:
                 progress_callback("error", 0, f"Error during inference: {str(e)}")
             
             logger.error(f"Error during inference: {str(e)}")
+            self._is_running = False
             return {
                 "success": False,
                 "message": f"Error during inference: {str(e)}",
                 "timestamp": get_timestamp()
             }
+        finally:
+            self._is_running = False
 
-    @staticmethod
-    def execute_inference_script(params: Dict[str, Any] = None) -> Tuple[Dict[str, Any], int]:
+    def execute_inference_script(self, params: Dict[str, Any] = None) -> Tuple[Dict[str, Any], int]:
         """
         Execute inference and return timestamped results
         
@@ -500,7 +550,7 @@ class InferenceService:
         
         try:
             # Run inference
-            result = InferenceService.run_inference(
+            result = self.run_inference(
                 model_path=params.get('model_path', 'best.pt'),
                 data_dir=params.get('data_dir', 'rainfall_20221024'),
                 device=params.get('device', 'cuda:0' if torch.cuda.is_available() else 'cpu'),
@@ -563,8 +613,10 @@ def generate_tif_files(start_tmp, output_dir):
 
 def run_inference(params, output_dir):
     """Backward compatibility function for running inference"""
+    inference_service = InferenceService()
+    
     if isinstance(params, dict):
-        return InferenceService.run_inference(
+        return inference_service.run_inference(
             model_path=params.get('model_path', 'best.pt'),
             data_dir=params.get('data_dir', 'rainfall_20221024'),
             device=params.get('device', 'cuda:0' if torch.cuda.is_available() else 'cpu'),
@@ -574,11 +626,12 @@ def run_inference(params, output_dir):
         )
     else:
         # 假设 params 是 model_path 参数
-        return InferenceService.run_inference(model_path=params, output_dir=output_dir)
+        return inference_service.run_inference(model_path=params, output_dir=output_dir)
 
 def execute_inference_script(params=None):
     """Backward compatibility function for executing inference script"""
-    return InferenceService.execute_inference_script(params)
+    inference_service = InferenceService()
+    return inference_service.execute_inference_script(params)
 
 def get_latest_inference_dir():
     """Backward compatibility function for getting the latest inference directory"""

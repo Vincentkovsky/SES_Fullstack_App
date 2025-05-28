@@ -45,8 +45,8 @@
                       {{ inferenceTaskError }}
                     </div>
                     
-                    <!-- Add cancel button if needed -->
-                    <button v-if="currentInferenceTask.status === 'running'" class="warning-button" @click="handleCancelInferenceTask">
+                    <!-- 修改条件显示逻辑，在任务运行中时始终显示按钮 -->
+                    <button v-if="inferenceTaskRunning && (currentInferenceTask.status === 'running' || currentInferenceTask.status === 'starting')" class="warning-button" @click="handleCancelInferenceTask">
                       Cancel Task
                     </button>
                   </div>
@@ -190,7 +190,7 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles, getInferenceTasksList } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles, getInferenceTasksList, cancelInferenceTask } from '../services/api';
 import type { GaugingData, CudaInfoResponse, RainfallFilesResponse, CudaDeviceInfo, RainfallFileInfo } from '../services/api';
 
 // API配置常量
@@ -321,12 +321,13 @@ const formatDate = (date: Date): string => {
   return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
-// 格式化已运行时间
+// 格式化已运行时间，使用本地计时器
 const formatElapsedTime = (seconds?: number): string => {
-  if (seconds === undefined) return '0s';
+  // 优先使用本地计时器的值，如果任务正在运行
+  const elapsedSeconds = inferenceTaskRunning.value ? localElapsedTime.value : (seconds || 0);
   
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const remainingSeconds = Math.floor(elapsedSeconds % 60);
   
   if (minutes === 0) {
     return `${remainingSeconds} seconds`;
@@ -400,6 +401,12 @@ const connectProgressWebSocket = (taskId: string) => {
           return; // Ignore pong responses
         }
         
+        // 当收到初始状态时，同步本地计时器
+        if (data.elapsed_time && inferenceTaskRunning.value) {
+          // 重新启动本地计时器，从服务器报告的时间开始
+          startElapsedTimeCounter(data.elapsed_time);
+        }
+        
         // Update inference task status
         currentInferenceTask.value = {
           ...currentInferenceTask.value,
@@ -415,14 +422,27 @@ const connectProgressWebSocket = (taskId: string) => {
         if (data.type === 'error') {
           inferenceTaskError.value = data.message;
           console.error('Inference task error from WebSocket:', data.message);
+          stopElapsedTimeCounter(); // 错误时停止计时器
         }
         
+        // 处理各种状态
         if (data.status === 'completed') {
           console.log('Task completed event from WebSocket');
           handleInferenceTaskCompleted({ taskId: data.task_id, results: data.results });
         } else if (data.status === 'failed') {
           console.error('Task failed event from WebSocket');
           inferenceTaskError.value = data.message;
+          stopElapsedTimeCounter(); // 失败时停止计时器
+        } else if (data.status === 'cancelled') {
+          console.log('Task cancelled event from WebSocket');
+          // 停止计时器
+          stopElapsedTimeCounter();
+          
+          // 2秒后关闭模态框
+          setTimeout(() => {
+            inferenceTaskRunning.value = false;
+            close();
+          }, 2000);
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error, event.data);
@@ -502,6 +522,9 @@ const handleInferenceTaskStarted = (data: { taskId: string; status: string; mess
     elapsed: 0
   };
   
+  // 启动本地计时器
+  startElapsedTimeCounter(0);
+  
   console.log('Starting WebSocket connection for task:', data.taskId);
   // Connect to WebSocket for real-time progress updates
   connectProgressWebSocket(data.taskId);
@@ -547,8 +570,12 @@ const handleInferenceTaskCompleted = (data: { taskId: string; results?: any }) =
   currentInferenceTask.value = {
     ...currentInferenceTask.value,
     status: 'completed',
-    progress: 100
+    progress: 100,
+    elapsed: localElapsedTime.value // 保存最终运行时间
   };
+  
+  // 停止本地计时器
+  stopElapsedTimeCounter();
   
   // 向 DeckGLMap 组件发送内部完成事件
   window.dispatchEvent(new CustomEvent('inference-task-completed-internal', { 
@@ -832,6 +859,9 @@ const checkRunningTasks = async () => {
       if (runningTask) {
         console.log('Found running inference task:', runningTask);
         
+        // 计算初始已运行时间
+        const initialElapsedTime = runningTask.elapsed_time || (Date.now() / 1000 - runningTask.start_time);
+        
         // 自动连接到这个任务的WebSocket并显示进度
         inferenceTaskRunning.value = true;
         inferenceTaskError.value = null;
@@ -841,8 +871,11 @@ const checkRunningTasks = async () => {
           progress: 0, // 初始进度，将通过WebSocket更新
           stage: 'reconnecting',
           message: 'Reconnecting to running task...',
-          elapsed: runningTask.elapsed_time || 0
+          elapsed: initialElapsedTime
         };
+        
+        // 启动本地计时器，从计算出的时间开始
+        startElapsedTimeCounter(initialElapsedTime);
         
         // 连接WebSocket获取实时进度
         connectProgressWebSocket(runningTask.task_id);
@@ -993,6 +1026,9 @@ onBeforeUnmount(() => {
     cudaRefreshInterval = null;
   }
   
+  // 停止计时器
+  stopElapsedTimeCounter();
+  
   // Disconnect WebSocket
   disconnectProgressWebSocket();
   
@@ -1013,30 +1049,87 @@ const handleCancelInferenceTask = async () => {
   try {
     console.log(`Attempting to cancel inference task ${currentInferenceTask.value.taskId}`);
     
-    // 这里需要实现API调用来取消任务
-    // 目前假设我们还没有实现这个API，所以我们只是关闭WebSocket连接
-    disconnectProgressWebSocket();
+    // 调用API取消任务
+    const response = await cancelInferenceTask(currentInferenceTask.value.taskId);
     
-    // 重置状态
-    inferenceTaskRunning.value = false;
-    currentInferenceTask.value = {
-      taskId: '',
-      status: '',
-      progress: 0,
-      stage: 'initialization',
-      elapsed: 0
-    };
-    
-    // 提示用户
-    inferenceTaskError.value = "Task cancellation requested. The task might still be running on the server.";
-    
-    // 重新加载数据
-    await loadData();
+    if (response.success) {
+      console.log(`Task ${currentInferenceTask.value.taskId} cancelled successfully`);
+      
+      // 关闭WebSocket连接
+      disconnectProgressWebSocket();
+      
+      // 停止计时器
+      stopElapsedTimeCounter();
+      
+      // 更新UI状态
+      currentInferenceTask.value = {
+        ...currentInferenceTask.value,
+        status: 'cancelled',
+        stage: 'cancelled',
+        message: 'Task cancelled by user',
+        progress: currentInferenceTask.value.progress || 0
+      };
+      
+      // 2秒后重置状态并关闭模态框
+      setTimeout(() => {
+        inferenceTaskRunning.value = false;
+        close();
+      }, 2000);
+    } else {
+      throw new Error(response.message || 'Failed to cancel task');
+    }
   } catch (error) {
     console.error('Error cancelling inference task:', error);
     inferenceTaskError.value = error instanceof Error ? error.message : 'Failed to cancel inference task';
+    
+    // 即使出错也尝试断开连接并停止计时器
+    disconnectProgressWebSocket();
+    stopElapsedTimeCounter();
   }
 };
+
+// 添加计时器变量
+let elapsedTimeInterval: number | null = null;
+let localElapsedTime = ref(0);
+
+// 启动本地计时器，每秒更新一次运行时间
+const startElapsedTimeCounter = (initialElapsedTime: number = 0) => {
+  // 清除现有计时器
+  if (elapsedTimeInterval !== null) {
+    clearInterval(elapsedTimeInterval);
+    elapsedTimeInterval = null;
+  }
+  
+  // 设置初始值
+  localElapsedTime.value = initialElapsedTime;
+  
+  // 启动新的计时器，每秒递增
+  elapsedTimeInterval = window.setInterval(() => {
+    if (inferenceTaskRunning.value) {
+      localElapsedTime.value += 1;
+    } else {
+      // 如果任务不再运行，停止计时器
+      clearInterval(elapsedTimeInterval!);
+      elapsedTimeInterval = null;
+    }
+  }, 1000);
+};
+
+// 停止计时器
+const stopElapsedTimeCounter = () => {
+  if (elapsedTimeInterval !== null) {
+    clearInterval(elapsedTimeInterval);
+    elapsedTimeInterval = null;
+  }
+};
+
+// 在组件卸载时清理计时器
+onBeforeUnmount(() => {
+  // 清理计时器
+  stopElapsedTimeCounter();
+  
+  // ...其他现有的清理代码
+});
 </script>
 
 <style scoped>
