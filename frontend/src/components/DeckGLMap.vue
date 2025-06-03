@@ -418,7 +418,7 @@ const createTileLayer = (timestamp: string) => {
     id: `TileLayer-${timestamp}`,
     data: tileUrl,
     maxZoom: 16,
-    minZoom: 12,
+    minZoom: 13,
     tileSize: 256,
     maxCacheSize: 100,
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -477,7 +477,7 @@ const createRainfallLayer = (timestamp: string) => {
     id: `RainfallLayer-${currentSimulation.value}-${timestamp}`,
     data: tileUrl,
     maxZoom: 16,
-    minZoom: 12,
+    minZoom: 13,
     tileSize: 256,
     maxCacheSize: 100,
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -664,8 +664,8 @@ const initializeMap = async () => {
     container: mapContainer.value,
     style: 'mapbox://styles/mapbox/streets-v12',
     center: [147.356, -35.117],
-    zoom: 12,
-    minZoom: 12,
+    zoom: 13,
+    minZoom: 13,
     maxZoom: 16,
     accessToken: import.meta.env.VITE_SHARED_MAPBOX_ACCESS_TOKEN
   });
