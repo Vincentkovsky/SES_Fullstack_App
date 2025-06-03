@@ -26,7 +26,7 @@ router = APIRouter(prefix="/api")
 
 # 基础路径
 BASE_DIR = Path(__file__).parent.parent
-GEOTIFF_DIR = BASE_DIR / "data/3di_res/geotiff"
+GEOTIFF_DIR = BASE_DIR / "data/inference_results"
 
 # Web墨卡托投影到UTM的转换器
 MERC_TO_UTM = Transformer.from_crs(
@@ -108,7 +108,7 @@ async def get_water_depth(
     """获取指定位置和时间的水深数据"""
     try:
         # 构建GeoTIFF文件路径
-        filepath = GEOTIFF_DIR / simulation / f"{timestamp}.tif"
+        filepath = GEOTIFF_DIR / simulation / "geotiff" / f"{timestamp}.tif"
         
         if not filepath.exists():
             raise HTTPException(

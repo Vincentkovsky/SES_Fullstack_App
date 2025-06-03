@@ -3,9 +3,12 @@
 > vite --port 5173
 
 
-  VITE v5.4.11  ready in 491 ms
+  VITE v5.4.11  ready in 1372 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
 [1m[33m[@vue/compiler-sfc][0m[33m `defineEmits` is a compiler macro and no longer needs to be imported.[0m
 
+6:47:51 pm [vite] hmr update /src/components/DeckGLMap.vue
+6:50:25 pm [vite] hmr update /src/components/DeckGLMap.vue
+6:50:45 pm [vite] hmr update /src/components/DeckGLMap.vue

@@ -12,6 +12,8 @@ import multiprocessing as mp
 from tqdm import tqdm
 from threedidepth.calculate import calculate_waterdepth
 import shutil
+import pwd
+import grp
 
 from core.config import Config
 from utils.helpers import get_timestamp
@@ -209,12 +211,24 @@ class ResultsProcessor:
             gridadmin_path = f"{MODEL_DIR}/gridadmin.h5"
             results_path = f"{output_dir}/result.nc"
             dem_path = f"{MODEL_DIR}/5m_dem.tif"
-            tif_output_dir = f"{output_dir}/{start_tmp}"
+            tif_output_dir = f"{output_dir}/geotiff"
             num_workers = min(mp.cpu_count() - 2, 24)  # Reserve 2 cores for system
             infer_steps = 48
             
             # Create output directory
             os.makedirs(tif_output_dir, exist_ok=True)
+            
+            # Set consistent ownership and permissions
+            try:
+                # Change ownership to wenzjin:TCCTVS
+                os.chown(tif_output_dir, 
+                         pwd.getpwnam('wenzjin').pw_uid,
+                         grp.getgrnam('TCCTVS').gr_gid)
+                # Set consistent permissions (rwxrwsr-x)
+                os.chmod(tif_output_dir, 0o2775)  # 2 sets the setgid bit
+                logger.info(f"Set ownership of {tif_output_dir} to wenzjin:TCCTVS with permissions 2775")
+            except Exception as e:
+                logger.warning(f"Failed to set ownership/permissions on {tif_output_dir}: {str(e)}")
             
             # Report progress if callback is available
             if progress_callback:
@@ -393,6 +407,18 @@ class InferenceService:
             
             # Create output directory
             os.makedirs(output_dir, exist_ok=True)
+            
+            # Set consistent ownership and permissions
+            try:
+                # Change ownership to wenzjin:TCCTVS
+                os.chown(output_dir, 
+                         pwd.getpwnam('wenzjin').pw_uid,
+                         grp.getgrnam('TCCTVS').gr_gid)
+                # Set consistent permissions (rwxrwsr-x)
+                os.chmod(output_dir, 0o2775)  # 2 sets the setgid bit
+                logger.info(f"Set ownership of {output_dir} to wenzjin:TCCTVS with permissions 2775")
+            except Exception as e:
+                logger.warning(f"Failed to set ownership/permissions on {output_dir}: {str(e)}")
             
             # Update inference config with pred_length
             inference_config = INFERENCE_CONFIG.copy()

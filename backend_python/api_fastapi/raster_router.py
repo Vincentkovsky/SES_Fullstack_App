@@ -37,7 +37,7 @@ router = APIRouter(prefix="/api")
 
 # 基础路径
 BASE_DIR = Path(__file__).parent.parent
-GEOTIFF_DIR = BASE_DIR / "data/3di_res/geotiff"
+GEOTIFF_DIR = BASE_DIR / "data/inference_results"
 
 # Web墨卡托投影常量
 TILE_SIZE = 256
@@ -232,7 +232,7 @@ def get_cached_tile(filepath_str, z, x, y):
 
 async def get_simulation_timesteps(simulation_id: str):
     """获取指定模拟场景的时间步列表"""
-    sim_dir = GEOTIFF_DIR / simulation_id
+    sim_dir = GEOTIFF_DIR / simulation_id / "geotiff"
     
     def collect_timesteps():
         if not sim_dir.exists() or not sim_dir.is_dir():
@@ -306,7 +306,7 @@ async def get_tile(
 ):
     """获取指定模拟场景、时间步、缩放级别和坐标的栅格瓦片"""
     try:
-        filepath = GEOTIFF_DIR / simulation_id / f"{timestep_id}.tif"
+        filepath = GEOTIFF_DIR / simulation_id / "geotiff" / f"{timestep_id}.tif"
         
         if not filepath.exists():
             raise HTTPException(

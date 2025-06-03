@@ -3,7 +3,6 @@
     <SettingsModal 
       :is-open="isSettingsOpen" 
       :timestamps="timestamps"
-      v-model="isSteedMode"
       @close="isSettingsOpen = false"
       @update-settings="handleSettingsUpdate"
       @start-inference="handleInferenceStart"
@@ -176,7 +175,6 @@ const isPlaying = ref(true);
 const playbackSpeed = ref(1);
 const currentTimestamp = ref('');
 const progress = ref(0);
-const isSteedMode = ref(false);
 let map: mapboxgl.Map | null = null;
 
 // Add environment variables
@@ -910,49 +908,6 @@ watch(playbackSpeed, (newSpeed) => {
     console.log(`Playback speed changed: ${newSpeed}x (${frameInterval}ms per frame)`);
     
     startAnimation();
-  }
-}, { flush: 'sync' });
-
-watch(isSteedMode, async (newMode) => {
-  try {
-    // Stop existing animation
-    if (animationIntervalId !== null) {
-      clearInterval(animationIntervalId);
-      animationIntervalId = null;
-    }
-    
-    // 获取当前选择的模拟
-    const simulation = currentSimulation.value || '20221024_20221022';
-    
-    // 刷新时间步列表
-    const response = await fetch(`${API_BASE_URL}/simulations/${simulation}/timesteps`);
-    if (!response.ok) {
-      throw new Error(`HTTP错误: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    if (data.success && data.data) {
-      // 提取时间步ID列表
-      timestamps = data.data.map((item: any) => item.timestep_id);
-      console.log(`模式切换后获取到${timestamps.length}个时间步`);
-    } else {
-      throw new Error('API返回的数据格式不正确');
-    }
-    
-    if (timestamps.length === 0) {
-      throw new Error('No timestamps available');
-    }
-
-    // 重置动画
-    currentTimeIndex = 0;
-    currentTimestamp.value = timestamps[0];
-    updateLayers(0);
-    
-    if (isPlaying.value) {
-      startAnimation();
-    }
-  } catch (error) {
-    console.error('Error refreshing tiles after mode change:', error);
   }
 }, { flush: 'sync' });
 
