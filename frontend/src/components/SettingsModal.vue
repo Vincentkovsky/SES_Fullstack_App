@@ -188,6 +188,49 @@
                           </option>
                         </select>
                       </div>
+                      
+                      <!-- Metadata Display -->
+                      <div v-if="selectedHistoricalSimulation && !isLoadingMetadata" class="metadata-container">
+                        <div v-if="simulationMetadata" class="metadata-card">
+                          <h4 class="metadata-title">Simulation Details</h4>
+                          <div class="metadata-content">
+                            <div class="metadata-item">
+                              <div class="metadata-label">Simulation Start Time</div>
+                              <div class="metadata-value">{{ simulationMetadata.start_time }}</div>
+                            </div>
+                            <div class="metadata-item">
+                              <div class="metadata-label">Duration</div>
+                              <div class="metadata-value">{{ formatDuration(simulationMetadata.duration_seconds) }}</div>
+                            </div>
+                            <div class="metadata-item">
+                              <div class="metadata-label">Model</div>
+                              <div class="metadata-value">{{ simulationMetadata.model }}</div>
+                            </div>
+                            <div class="metadata-item">
+                              <div class="metadata-label">Device</div>
+                              <div class="metadata-value">{{ simulationMetadata.device }}</div>
+                            </div>
+                            <div class="metadata-item">
+                              <div class="metadata-label">Prediction Length</div>
+                              <div class="metadata-value">{{ simulationMetadata.pred_length /2  }} hours</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div v-else class="metadata-placeholder">
+                          <div class="placeholder-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                          </div>
+                          <div class="placeholder-text">No metadata available for this simulation</div>
+                        </div>
+                      </div>
+                      <div v-else-if="isLoadingMetadata" class="metadata-loading">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading simulation metadata...</div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -238,7 +281,7 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles, getInferenceTasksList, cancelInferenceTask } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles, getInferenceTasksList, cancelInferenceTask, fetchSimulationMetadata } from '../services/api';
 import type { GaugingData, CudaInfoResponse, RainfallFilesResponse, CudaDeviceInfo, RainfallFileInfo } from '../services/api';
 
 // API配置常量
@@ -317,6 +360,10 @@ const cudaInfo = ref<{
 const isLoadingRainfallFiles = ref(false);
 const rainfallFiles = ref<RainfallFileInfo[]>([]);
 
+// Simulation metadata state
+const simulationMetadata = ref<any>(null);
+const isLoadingMetadata = ref(false);
+
 // 推理任务状态
 const inferenceTaskRunning = ref(false);
 const currentInferenceTask = ref<InferenceTaskStatus>({
@@ -356,6 +403,22 @@ const inferenceStatusText = computed(() => {
       return currentInferenceTask.value.status || 'Unknown';
   }
 });
+
+// 格式化时间间隔
+const formatDuration = (seconds: number): string => {
+  if (!seconds || isNaN(seconds)) return 'Unknown';
+  
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  
+  const parts = [];
+  if (hours > 0) parts.push(`${hours} ${hours === 1 ? 'hour' : 'hours'}`);
+  if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`);
+  if (remainingSeconds > 0 && hours === 0) parts.push(`${remainingSeconds} ${remainingSeconds === 1 ? 'second' : 'seconds'}`);
+  
+  return parts.join(' ');
+};
 
 // Utility functions
 const formatDate = (date: Date): string => {
@@ -875,6 +938,29 @@ const startInference = async () => {
   }
 };
 
+// 获取模拟元数据
+const fetchMetadata = async (simulation: string) => {
+  if (!simulation) return;
+  
+  try {
+    isLoadingMetadata.value = true;
+    console.log(`Fetching metadata for simulation ${simulation}`);
+    const response = await fetchSimulationMetadata(simulation);
+    
+    if (response.success && response.data) {
+      simulationMetadata.value = response.data;
+      console.log('Simulation metadata:', response.data);
+    } else {
+      simulationMetadata.value = null;
+      console.warn(`No metadata found for simulation ${simulation}`);
+    }
+  } catch (error) {
+    console.error(`Error fetching metadata for simulation ${simulation}:`, error);
+    simulationMetadata.value = null;
+  } finally {
+    isLoadingMetadata.value = false;
+  }
+};
 
 // Data loading function
 const loadData = async (preserveSelections = true) => {
@@ -977,6 +1063,9 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
   try {
     isLoading.value = true;
     error.value = null;
+    
+    // Fetch metadata for the selected simulation
+    await fetchMetadata(simulation);
     
     // Check for rainfall data availability
     try {
@@ -1890,5 +1979,108 @@ onBeforeUnmount(() => {
 
 .rainfall-toggle-button:hover {
   opacity: 0.9;
+}
+
+/* Metadata styles */
+.metadata-container {
+  margin-top: 1rem;
+  background: rgba(249, 250, 251, 0.7);
+  border-radius: 8px;
+  border: 1px solid rgba(209, 213, 219, 0.4);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.metadata-card {
+  padding: 1rem;
+}
+
+.metadata-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1E3D78;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(209, 213, 219, 0.4);
+}
+
+.metadata-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.metadata-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metadata-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metadata-value {
+  font-size: 0.875rem;
+  color: #1f2937;
+  background: rgba(243, 244, 246, 0.5);
+  padding: 0.375rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(209, 213, 219, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metadata-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  gap: 0.75rem;
+}
+
+.placeholder-icon {
+  color: #9ca3af;
+}
+
+.placeholder-text {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.metadata-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(30, 61, 120, 0.3);
+  border-radius: 50%;
+  border-top-color: #1E3D78;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style> 

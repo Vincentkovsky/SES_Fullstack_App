@@ -331,6 +331,46 @@ async def get_tile(
             detail=str(e)
         )
 
+@router.get("/simulations/{simulation_id}/metadata", response_model=Dict[str, Any])
+async def get_simulation_metadata(simulation_id: str = FastAPIPath(...)):
+    """获取特定模拟场景的元数据信息"""
+    try:
+        # 构建metadata.json文件路径
+        metadata_path = GEOTIFF_DIR / simulation_id / "metadata.json"
+        
+        # 检查文件是否存在
+        if not metadata_path.exists():
+            return {
+                'success': True,
+                'data': None,
+                'message': f"未找到模拟场景 {simulation_id} 的元数据"
+            }
+        
+        # 读取metadata.json文件
+        def read_metadata():
+            with open(metadata_path, 'r') as f:
+                return json.load(f)
+        
+        # 在线程池中执行IO操作
+        metadata = await run_in_threadpool(read_metadata)
+        
+        return {
+            'success': True,
+            'data': metadata
+        }
+    except json.JSONDecodeError as e:
+        logger.error(f"解析元数据JSON失败: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"元数据格式错误: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"获取模拟元数据失败: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
 @router.get("/colormap", response_model=Dict[str, Any])
 async def get_colormap():
     """获取当前使用的颜色映射"""

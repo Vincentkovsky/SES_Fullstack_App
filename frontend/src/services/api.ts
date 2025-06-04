@@ -590,3 +590,24 @@ export const cancelInferenceTask = async (taskId: string): Promise<{ success: bo
     throw error instanceof Error ? error : new Error(String(error));
   }
 };
+
+// Add function to fetch simulation metadata
+export const fetchSimulationMetadata = async (simulation: string): Promise<{ success: boolean; data: any }> => {
+  try {
+    const url = `${API_CONFIG.BASE_URL}/simulations/${simulation}/metadata`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching simulation metadata:', error);
+    return {
+      success: false,
+      data: null
+    };
+  }
+};

@@ -518,6 +518,45 @@ class InferenceService:
             end_time = datetime.now()
             elapsed_time = (end_time - start_time).total_seconds()
             
+            # Create metadata.json with important information about the inference
+            try:
+                metadata = {
+                    "task_id": start_tmp,
+                    "timestamp": start_tmp,
+                    "start_time": start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "duration_seconds": elapsed_time,
+                    "model": model_path,
+                    "data_source": data_dir,
+                    "device": device,
+                    "pred_length": pred_length,
+                    "results": {
+                        "nc_file": os.path.basename(nc_file) if nc_file else None,
+                        "tif_count": len(tif_files),
+                        "first_timestamp": os.path.basename(tif_files[0]) if tif_files else None,
+                        "last_timestamp": os.path.basename(tif_files[-1]) if tif_files else None,
+                    },
+                    "simulation_name": os.path.basename(data_dir).replace('.nc', '')
+                }
+                
+                # Write metadata to file
+                metadata_path = os.path.join(output_dir, "metadata.json")
+                with open(metadata_path, "w") as f:
+                    import json
+                    json.dump(metadata, f, indent=2)
+                
+                # Set consistent ownership and permissions for the metadata file
+                try:
+                    os.chown(metadata_path, 
+                            pwd.getpwnam('wenzjin').pw_uid,
+                            grp.getgrnam('TCCTVS').gr_gid)
+                    os.chmod(metadata_path, 0o2775)
+                    logger.info(f"Created metadata file at {metadata_path}")
+                except Exception as e:
+                    logger.warning(f"Failed to set ownership/permissions on {metadata_path}: {str(e)}")
+            except Exception as e:
+                logger.error(f"Error creating metadata file: {str(e)}")
+            
             # Return result information
             return {
                 "success": True,
