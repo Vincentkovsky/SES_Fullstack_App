@@ -218,17 +218,13 @@ class ResultsProcessor:
             # Create output directory
             os.makedirs(tif_output_dir, exist_ok=True)
             
-            # Set consistent ownership and permissions
+            # Set appropriate permissions (rwxrwsr-x)
             try:
-                # Change ownership to wenzjin:TCCTVS
-                os.chown(tif_output_dir, 
-                         pwd.getpwnam('wenzjin').pw_uid,
-                         grp.getgrnam('TCCTVS').gr_gid)
-                # Set consistent permissions (rwxrwsr-x)
-                os.chmod(tif_output_dir, 0o2775)  # 2 sets the setgid bit
-                logger.info(f"Set ownership of {tif_output_dir} to wenzjin:TCCTVS with permissions 2775")
+                # Set permissions to 0o2775 (setgid bit + rwxrwsr-x)
+                os.chmod(tif_output_dir, 0o2775)
+                logger.info(f"Set permissions of {tif_output_dir} to 0o2775 (rwxrwsr-x)")
             except Exception as e:
-                logger.warning(f"Failed to set ownership/permissions on {tif_output_dir}: {str(e)}")
+                logger.warning(f"Failed to set permissions on {tif_output_dir}: {str(e)}")
             
             # Report progress if callback is available
             if progress_callback:
@@ -408,17 +404,13 @@ class InferenceService:
             # Create output directory
             os.makedirs(output_dir, exist_ok=True)
             
-            # Set consistent ownership and permissions
+            # Set appropriate permissions (rwxrwsr-x)
             try:
-                # Change ownership to wenzjin:TCCTVS
-                os.chown(output_dir, 
-                         pwd.getpwnam('wenzjin').pw_uid,
-                         grp.getgrnam('TCCTVS').gr_gid)
-                # Set consistent permissions (rwxrwsr-x)
-                os.chmod(output_dir, 0o2775)  # 2 sets the setgid bit
-                logger.info(f"Set ownership of {output_dir} to wenzjin:TCCTVS with permissions 2775")
+                # Set permissions to 0o2775 (setgid bit + rwxrwsr-x)
+                os.chmod(output_dir, 0o2775)
+                logger.info(f"Set permissions of {output_dir} to 0o2775 (rwxrwsr-x)")
             except Exception as e:
-                logger.warning(f"Failed to set ownership/permissions on {output_dir}: {str(e)}")
+                logger.warning(f"Failed to set permissions on {output_dir}: {str(e)}")
             
             # Update inference config with pred_length
             inference_config = INFERENCE_CONFIG.copy()
@@ -545,15 +537,12 @@ class InferenceService:
                     import json
                     json.dump(metadata, f, indent=2)
                 
-                # Set consistent ownership and permissions for the metadata file
+                # Set appropriate permissions for the metadata file
                 try:
-                    os.chown(metadata_path, 
-                            pwd.getpwnam('wenzjin').pw_uid,
-                            grp.getgrnam('TCCTVS').gr_gid)
                     os.chmod(metadata_path, 0o2775)
-                    logger.info(f"Created metadata file at {metadata_path}")
+                    logger.info(f"Created metadata file at {metadata_path} with permissions 0o2775")
                 except Exception as e:
-                    logger.warning(f"Failed to set ownership/permissions on {metadata_path}: {str(e)}")
+                    logger.warning(f"Failed to set permissions on {metadata_path}: {str(e)}")
             except Exception as e:
                 logger.error(f"Error creating metadata file: {str(e)}")
             

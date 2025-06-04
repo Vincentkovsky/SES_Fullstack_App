@@ -1086,9 +1086,6 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
       rainfallData.value = [];
     }
     
-    // Emit the selection first
-    emit('select-historical-simulation', simulation);
-    
     // Wait for timestamps to be updated
     await new Promise(resolve => setTimeout(resolve, 100));
     
