@@ -435,8 +435,6 @@ class InferenceService:
             sys.path.append(str(MODEL_DIR))
             from dataset import FloodDataset
             
-            # Progress - Loading dataset
-            update_progress("data_loading", 15, "Loading dataset")
             
             # Create dataset and data loader
             val_dataset = FloodDataset(data_dir, inference_config)
@@ -448,11 +446,9 @@ class InferenceService:
                 pin_memory=False
             )
             
-            # Progress - Dataset loaded
-            update_progress("data_loading", 20, "Dataset loaded")
             
             # Progress - Loading model
-            update_progress("model_loading", 25, f"Loading model from {model_path}")
+            update_progress("model_loading", 15, f"Loading model from {model_path}")
             
             # Load model
             model = ModelLoader.load_model(f'{MODEL_DIR}/{model_path}', torch_device, dtype)
@@ -462,11 +458,12 @@ class InferenceService:
             side_lens = torch.load(f'{MODEL_DIR}/side_lengths.pt', weights_only=True).to(torch_device)
             square_centers = torch.load(f'{MODEL_DIR}/square_centers.pt', weights_only=True).to(torch_device, dtype=dtype)
             
-            # Progress - Model loaded
-            update_progress("model_loading", 30, "Model and static data loaded")
+            # Progress - Model and data loaded
+            update_progress("model_loading", 20, "Model loaded")
             
-            # Progress - Running inference
-            update_progress("inference", 40, "Starting model inference")
+            
+            # Progress - Loading dataset
+            update_progress("data_loading", 25, "Loading dataset")
             
             all_water_levels = []  # Store (pred, target) tuples
             
@@ -477,6 +474,12 @@ class InferenceService:
                     rain = rain.to(torch_device, dtype=dtype)
                     water_level_target = water_level_target.to(torch_device, dtype=dtype)
                     
+                    # Progress - Dataset loaded
+                    update_progress("data_loading", 40, "Dataset loaded to device")
+
+                    # Progress - Running inference
+                    update_progress("inference", 45, "Starting model inference")
+
                     # Forward pass
                     water_level_pred, has_water_pred, u_pred, v_pred = model(data, rain, dem_embed, side_lens, square_centers)
                     

@@ -270,7 +270,7 @@ async def get_simulations():
             if sim_dir.is_dir():
                 simulations.append(sim_dir.name)
         
-        simulations.sort()  # 对模拟场景列表进行排序
+        simulations.sort(reverse=True)  # Sort simulations in descending order
         
         return {'success': True, 'message': simulations}
     except Exception as e:

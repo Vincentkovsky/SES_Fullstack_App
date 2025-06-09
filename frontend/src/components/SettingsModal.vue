@@ -181,7 +181,7 @@
                     <div v-if="activeTab === 'historical'" class="tab-content">
                       <div class="setting-item">
                         <label for="historical-simulation">Historical Floods</label>
-                        <select id="historical-simulation" v-model="selectedHistoricalSimulation">
+                        <select id="historical-simulation" v-model="selectedHistoricalSimulation" @focus="reloadHistoricalSimulations">
                           <option value="">Select a flood event</option>
                           <option v-for="simulation in historicalSimulations" :key="simulation" :value="simulation">
                             {{ simulation }}
@@ -204,7 +204,7 @@
                             </div>
                             <div class="metadata-item">
                               <div class="metadata-label">Model</div>
-                              <div class="metadata-value">{{ simulationMetadata.model }}</div>
+                              <div class="metadata-value">FloodTransformer</div>
                             </div>
                             <div class="metadata-item">
                               <div class="metadata-label">Device</div>
@@ -994,6 +994,16 @@ const loadData = async (preserveSelections = true) => {
     console.error('Error loading data:', e);
   } finally {
     isLoading.value = false;
+  }
+};
+
+// Add new function to reload historical simulations
+const reloadHistoricalSimulations = async () => {
+  try {
+    console.log('Reloading historical simulations list...');
+    await fetchHistoricalSimulationsData();
+  } catch (e) {
+    console.error('Error reloading historical simulations:', e);
   }
 };
 
