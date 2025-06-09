@@ -3,11 +3,9 @@
 > vite --port 5173
 
 
-  VITE v5.4.11  ready in 505 ms
+  VITE v5.4.11  ready in 441 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
 [1m[33m[@vue/compiler-sfc][0m[33m `defineEmits` is a compiler macro and no longer needs to be imported.[0m
 
-6:23:03 pm [vite] hmr update /src/components/SettingsModal.vue
-6:29:25 pm [vite] hmr update /src/components/SettingsModal.vue

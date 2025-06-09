@@ -9,6 +9,24 @@
       @select-historical-simulation="handleHistoricalSimulation"
     />
     <div ref="mapContainer" style="width: 100%; height: 100vh;"></div>
+    
+    <!-- Add loading notification -->
+    <div class="loading-notification" :class="{ 'visible': isLoadingResults }">
+      <div class="loading-spinner"></div>
+      <div class="loading-message">Loading simulation results...</div>
+    </div>
+    
+    <!-- Add success notification -->
+    <div class="success-notification" :class="{ 'visible': showSuccessMessage }">
+      <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <div class="success-message">Simulation loaded successfully!</div>
+    </div>
+    
     <div class="map-controls">
       <MapZoomControls
         class="panel-button"
@@ -251,6 +269,12 @@ const isLegendVisible = computed(() => {
 
 // Add state for tracking current inference task
 const currentInferenceTaskId = ref<string | null>(null);
+
+// Add state for loading results
+const isLoadingResults = ref(false);
+
+// Add state for success message
+const showSuccessMessage = ref(false);
 
 // Define emit
 const emit = defineEmits<{
@@ -1026,9 +1050,17 @@ const handleInferenceStart = async (inferenceSettings: {
         await waitForTaskCompletion(result.data.task_id);
         console.log(`Task ${result.data.task_id} completed successfully`);
         
+        // Show loading notification while updating the map
+        isLoadingResults.value = true;
+        
         // Refresh tiles list after task completion
         const newTilesResponse = await fetchTilesList();
         timestamps = newTilesResponse.message || [];
+        
+        // Set current simulation to the newly created one
+        const simulationId = result.data.task_id || inferenceSettings.dataDir.replace('.nc', '');
+        currentSimulation.value = simulationId;
+        console.log(`Setting current simulation to newly created: ${simulationId}`);
         
         // Reset animation state
         currentTimeIndex = 0;
@@ -1041,6 +1073,17 @@ const handleInferenceStart = async (inferenceSettings: {
         if (isPlaying.value) {
           startAnimation();
         }
+        
+        // Hide loading notification after a short delay
+        setTimeout(() => {
+          isLoadingResults.value = false;
+          
+          // Show success message
+          showSuccessMessage.value = true;
+          setTimeout(() => {
+            showSuccessMessage.value = false;
+          }, 3000);
+        }, 1500);
       } catch (error) {
         console.error(`Error waiting for task ${result.data.task_id} completion:`, error);
         throw error;
@@ -1073,6 +1116,9 @@ const handleHistoricalSimulation = async (simulation: string) => {
   console.log(`Loading historical simulation: ${simulation}`);
   
   try {
+    // Show loading notification
+    isLoadingResults.value = true;
+    
     // Stop any current animation
     if (animationIntervalId !== null) {
       clearInterval(animationIntervalId);
@@ -1134,9 +1180,21 @@ const handleHistoricalSimulation = async (simulation: string) => {
     if (isPlaying.value) {
       startAnimation();
     }
+    
+    // Hide loading notification and show success message
+    setTimeout(() => {
+      isLoadingResults.value = false;
+      
+      // Show success message
+      showSuccessMessage.value = true;
+      setTimeout(() => {
+        showSuccessMessage.value = false;
+      }, 3000);
+    }, 1000);
 
   } catch (error) {
     console.error('Error loading historical simulation:', error);
+    isLoadingResults.value = false;
   }
 };
 
@@ -1418,5 +1476,111 @@ const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_SHARED_OPENWEATHERMAP_API_KE
   bottom: 80px;
   left: 20px;
   z-index: 1000;
+}
+
+/* Add loading notification styles */
+.loading-notification {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 1001;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #1E3D78;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 15px rgba(30, 61, 120, 0.5);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-message {
+  margin-top: 20px;
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.loading-notification.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Add success notification styles */
+.success-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 1002;
+  transition: all 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 16px;
+  padding: 30px 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  max-width: 90%;
+  width: 400px;
+}
+
+.success-icon {
+  color: #10B981;
+  margin-bottom: 20px;
+  animation: scale-in 0.5s ease forwards;
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-message {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.success-notification.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: all;
 }
 </style>

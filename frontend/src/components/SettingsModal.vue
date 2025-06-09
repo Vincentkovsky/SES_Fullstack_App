@@ -557,6 +557,12 @@ const connectProgressWebSocket = (taskId: string) => {
         if (data.status === 'completed') {
           console.log('Task completed event from WebSocket');
           handleInferenceTaskCompleted({ taskId: data.task_id, results: data.results });
+          
+          // Automatically close the modal when inference is completed
+          setTimeout(() => {
+            inferenceTaskRunning.value = false;
+            close();
+          }, 1000);
         } else if (data.status === 'failed') {
           console.error('Task failed event from WebSocket');
           inferenceTaskError.value = data.message;
