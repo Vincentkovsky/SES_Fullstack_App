@@ -27,6 +27,8 @@ demoJC/
 ai_inference/
 ai_inference*
 logs/
+*.log
+
 
 
 
