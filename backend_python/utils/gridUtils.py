@@ -42,7 +42,7 @@ def constructGrid(rows, cols,topleftX, topleftY, spacing):
     x = topleftX + np.arange(cols) * spacing
     y = topleftY + np.arange(rows) * spacing
     X, Y = np.meshgrid(x, y)
-    
+    # Save grid coordinates to a file for debugging
     return X,Y
 
 

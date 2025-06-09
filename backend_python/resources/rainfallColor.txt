@@ -1,0 +1,6 @@
+# Rainfall color table
+# value means precipitation intensity, unit: mm/half an hour
+# Value   R   G   B   A
+0    0 0 0 0
+1    173 216 230 0  
+45   0 0 255 255      

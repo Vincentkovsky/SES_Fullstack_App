@@ -5,10 +5,9 @@
       :class="{ active: isFloodLayerActive }"
       @click="toggleFloodLayer" 
       aria-label="Toggle flood layer"
-      
     >
       <img 
-        :src="isFloodLayerActive ? 'src/assets/icon/Flood1.svg' : 'src/assets/icon/Flood0.svg'" 
+        :src="isFloodLayerActive ? floodActiveIcon : floodInactiveIcon" 
         alt="Flood layer" 
       />
     </button>
@@ -19,7 +18,7 @@
       aria-label="Toggle weather layer"
     >
       <img 
-        :src="isWeatherLayerActive ? 'src/assets/icon/weather1.svg' : 'src/assets/icon/weather0.svg'" 
+        :src="isWeatherLayerActive ? weatherActiveIcon : weatherInactiveIcon" 
         alt="Weather layer" 
       />
     </button>
@@ -27,9 +26,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import floodActiveIcon from '../assets/icon/Flood1.svg';
+import floodInactiveIcon from '../assets/icon/Flood0.svg';
+import weatherActiveIcon from '../assets/icon/weather1.svg';
+import weatherInactiveIcon from '../assets/icon/weather0.svg';
 
-const props = defineProps<{
+const { isFloodLayerActive, isWeatherLayerActive } = defineProps<{
   isFloodLayerActive: boolean
   isWeatherLayerActive: boolean
 }>();
@@ -48,11 +50,12 @@ const toggleWeatherLayer = () => emit('toggle-weather');
   display: flex;
   flex-direction: column;
   gap: 8px;
+  align-items: center;
 }
 
 .layer-button {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   padding: 0;
   border: none;
   background: transparent;

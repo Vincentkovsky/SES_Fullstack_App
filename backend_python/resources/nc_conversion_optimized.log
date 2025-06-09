@@ -1,0 +1,112 @@
+2025-04-01 12:45:35,271 - INFO - 找到 3 个NetCDF文件需要处理
+2025-04-01 12:45:35,271 - INFO - 批处理开始时间: 2025-04-01 12:45:35
+2025-04-01 12:45:35,271 - INFO - 使用DEM文件: ../data/3di_res/5m_dem.tif
+2025-04-01 12:45:35,271 - INFO - 使用gridadmin文件: ../data/3di_res/gridadmin.h5
+2025-04-01 12:45:35,271 - INFO - 处理文件 1/3: 20221101_20221106.nc
+2025-04-01 12:45:35,271 - INFO - 处理NetCDF文件: ../data/3di_res/netcdf/20221101_20221106.nc
+2025-04-01 12:45:35,271 - INFO - 计算水深度 (步骤 0): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000000.tif
+2025-04-01 12:45:35,274 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 12:45:36,578 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000000.tif
+2025-04-01 12:45:36,578 - INFO - 计算水深度 (步骤 1): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000001.tif
+2025-04-01 12:45:36,579 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 12:45:37,955 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000001.tif
+2025-04-01 12:45:37,955 - INFO - 计算水深度 (步骤 2): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000002.tif
+2025-04-01 12:45:37,956 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 12:45:39,400 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000002.tif
+2025-04-01 12:45:39,401 - INFO - 计算水深度 (步骤 3): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000003.tif
+2025-04-01 12:45:39,401 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 12:45:40,073 - INFO - 用户中断了处理
+2025-04-01 12:46:48,127 - INFO - 找到 3 个NetCDF文件需要处理
+2025-04-01 12:46:48,128 - INFO - 批处理开始时间: 2025-04-01 12:46:48
+2025-04-01 12:46:48,128 - INFO - 使用DEM文件: ../data/3di_res/5m_dem.tif
+2025-04-01 12:46:48,128 - INFO - 使用gridadmin文件: ../data/3di_res/gridadmin.h5
+2025-04-01 12:46:48,128 - INFO - 处理文件 1/3: 20221101_20221106.nc
+2025-04-01 12:46:48,128 - INFO - 处理NetCDF文件: ../data/3di_res/netcdf/20221101_20221106.nc
+2025-04-01 12:46:48,128 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000000.tif
+2025-04-01 12:46:48,128 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000001.tif
+2025-04-01 12:46:48,128 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000002.tif
+2025-04-01 12:46:48,128 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000003.tif
+2025-04-01 12:46:48,128 - INFO - 计算水深度 (步骤 4): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000004.tif
+2025-04-01 12:46:48,133 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 12:46:49,510 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000004.tif
+2025-04-01 12:46:49,510 - INFO - 计算水深度 (步骤 5): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000005.tif
+2025-04-01 12:46:49,511 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 12:46:50,032 - INFO - 用户中断了处理
+2025-04-01 13:42:12,267 - INFO - 找到 3 个NetCDF文件需要处理
+2025-04-01 13:42:12,267 - INFO - 批处理开始时间: 2025-04-01 13:42:12
+2025-04-01 13:42:12,267 - INFO - 使用DEM文件: ../data/3di_res/5m_dem.tif
+2025-04-01 13:42:12,267 - INFO - 使用gridadmin文件: ../data/3di_res/gridadmin.h5
+2025-04-01 13:42:12,267 - INFO - 处理文件 1/3: 20221101_20221106.nc
+2025-04-01 13:42:12,267 - INFO - 处理NetCDF文件: ../data/3di_res/netcdf/20221101_20221106.nc
+2025-04-01 13:42:12,267 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000000.tif
+2025-04-01 13:42:12,267 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000001.tif
+2025-04-01 13:42:12,267 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000002.tif
+2025-04-01 13:42:12,267 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000003.tif
+2025-04-01 13:42:12,267 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000004.tif
+2025-04-01 13:42:12,267 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000005.tif
+2025-04-01 13:42:12,267 - INFO - 计算水深度 (步骤 6): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000006.tif
+2025-04-01 13:42:12,272 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:42:13,566 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000006.tif
+2025-04-01 13:42:13,566 - INFO - 计算水深度 (步骤 7): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000007.tif
+2025-04-01 13:42:13,567 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:42:13,576 - INFO - 用户中断了处理
+2025-04-01 13:47:33,812 - INFO - 找到 3 个NetCDF文件需要处理
+2025-04-01 13:47:33,812 - INFO - 批处理开始时间: 2025-04-01 13:47:33
+2025-04-01 13:47:33,812 - INFO - 使用DEM文件: ../data/3di_res/5m_dem.tif
+2025-04-01 13:47:33,812 - INFO - 使用gridadmin文件: ../data/3di_res/gridadmin.h5
+2025-04-01 13:47:33,812 - INFO - 处理文件 1/3: 20221101_20221106.nc
+2025-04-01 13:47:33,812 - INFO - 处理NetCDF文件: ../data/3di_res/netcdf/20221101_20221106.nc
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000000.tif
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000001.tif
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000002.tif
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000003.tif
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000004.tif
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000005.tif
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000006.tif
+2025-04-01 13:47:33,812 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000007.tif
+2025-04-01 13:47:33,812 - INFO - 计算水深度 (步骤 8): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000008.tif
+2025-04-01 13:47:33,815 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:47:35,063 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000008.tif
+2025-04-01 13:47:35,063 - INFO - 计算水深度 (步骤 9): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000009.tif
+2025-04-01 13:47:35,064 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:47:36,350 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000009.tif
+2025-04-01 13:47:36,350 - INFO - 计算水深度 (步骤 10): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000010.tif
+2025-04-01 13:47:36,351 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:47:37,813 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000010.tif
+2025-04-01 13:47:37,813 - INFO - 计算水深度 (步骤 11): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000011.tif
+2025-04-01 13:47:37,813 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:47:39,114 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000011.tif
+2025-04-01 13:47:39,114 - INFO - 计算水深度 (步骤 12): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000012.tif
+2025-04-01 13:47:39,115 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:47:40,169 - INFO - 用户中断了处理
+2025-04-01 13:50:11,943 - INFO - 找到 3 个NetCDF文件需要处理
+2025-04-01 13:50:11,943 - INFO - 批处理开始时间: 2025-04-01 13:50:11
+2025-04-01 13:50:11,943 - INFO - 使用DEM文件: ../data/3di_res/5m_dem.tif
+2025-04-01 13:50:11,943 - INFO - 使用gridadmin文件: ../data/3di_res/gridadmin.h5
+2025-04-01 13:50:11,943 - INFO - 处理文件 1/3: 20221101_20221106.nc
+2025-04-01 13:50:11,943 - INFO - 处理NetCDF文件: ../data/3di_res/netcdf/20221101_20221106.nc
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000000.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000001.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000002.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000003.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000004.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000005.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000006.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000007.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000008.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000009.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000010.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000011.tif
+2025-04-01 13:50:11,943 - INFO - 文件已存在，跳过计算: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000012.tif
+2025-04-01 13:50:11,943 - INFO - 计算水深度 (步骤 13): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000013.tif
+2025-04-01 13:50:11,947 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:50:23,561 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000013.tif
+2025-04-01 13:50:23,561 - INFO - 计算水深度 (步骤 14): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000014.tif
+2025-04-01 13:50:23,563 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:50:35,000 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000014.tif
+2025-04-01 13:50:35,000 - INFO - 计算水深度 (步骤 15): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000015.tif
+2025-04-01 13:50:35,001 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:50:46,299 - INFO - 水深度计算完成: ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000015.tif
+2025-04-01 13:50:46,299 - INFO - 计算水深度 (步骤 16): ../data/3di_res/waterdepth_folder/waterdepth_20221101_20221106_000016.tif
+2025-04-01 13:50:46,300 - INFO - New chunk for timeseries size has been set to 10
+2025-04-01 13:50:47,760 - INFO - 用户中断了处理

@@ -1,0 +1,38 @@
+# 文件描述
+
+## 核心模块
+
+- config.py: 应用配置管理
+- logging.py: 日志配置
+- cache.py: 内存缓存实现
+
+## 工具模块
+
+- helpers.py: 通用辅助函数
+- ncToTilesUtils.py: 将NetCDF文件转换为GeoTIFF和地图瓦片的工具类
+- tileGeneratorUtils.py: 生成地图瓦片的工具类
+
+## 服务模块
+
+- water_data_service.py: 水数据获取服务
+- inference_service.py: 推理服务
+- tile_service.py: 瓦片服务
+
+## API模块
+
+- health_api.py: 健康检查API
+- cache_api.py: 缓存管理API
+- gauging_api.py: 水位测量API
+- tile_api.py: 瓦片服务API
+- inference_api.py: 推理服务API
+- water_depth_api.py: 水深度API
+
+## 脚本
+
+- convert_nc_to_tiles.py: 批量处理NetCDF文件的命令行脚本
+## NC文件处理流程
+
+1. 从NetCDF文件中提取时间戳
+2. 计算水深度
+3. 处理水深度GeoTIFF文件
+4. 生成地图瓦片

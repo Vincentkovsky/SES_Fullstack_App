@@ -1,16 +1,18 @@
 <template>
   <div class="zoom-controls">
     <button class="zoom-button" @click="zoomIn" aria-label="Zoom in">
-      <img src="../assets/icon/zoomIn.svg" alt="Zoom in" />
+      <img :src="zoomInIcon" alt="Zoom in" />
     </button>
     <button class="zoom-button" @click="zoomOut" aria-label="Zoom out">
-      <img src="../assets/icon/zoomOut.svg" alt="Zoom out" />
+      <img :src="zoomOutIcon" alt="Zoom out" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { defineEmits } from 'vue';
+import zoomInIcon from '../assets/icon/zoomIn.svg';
+import zoomOutIcon from '../assets/icon/zoomOut.svg';
 
 const emit = defineEmits<{
   (e: 'zoom-in'): void

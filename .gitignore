@@ -23,6 +23,14 @@ wheels/
 .env
 venv/
 .venv/
+demoJC/
+ai_inference/
+ai_inference*
+logs/
+*.log
+
+
+
 
 # Vue/TypeScript Frontend
 .DS_Store
@@ -49,8 +57,13 @@ Thumbs.db
 
 
 #large files and other tedious files
-timeseries_tiles/
-**/timeseries_tiles/
+timeseries_tiles*/
+**/timeseries_tiles*/
+backend_python/data
 *.nc
 *.zip
 *.tif
+
+*.json
+*.xml
+

@@ -1,0 +1,13 @@
+# 代码规范
+
+## Python规范
+
+- 使用内置logging模块进行日志记录
+- 使用handle_exceptions装饰器统一处理API错误
+- 统一使用jsonify和HTTPStatus进行响应
+
+## 导入顺序
+
+1. 标准库
+2. 第三方库
+3. 项目内部模块
