@@ -558,6 +558,12 @@ const connectProgressWebSocket = (taskId: string) => {
           console.log('Task completed event from WebSocket');
           handleInferenceTaskCompleted({ taskId: data.task_id, results: data.results });
           
+          // Emit the task ID as a historical simulation to load in DeckGLMap
+          if (data.task_id) {
+            console.log(`Emitting select-historical-simulation event with task ID: ${data.task_id}`);
+            emit('select-historical-simulation', data.task_id);
+          }
+          
           // Automatically close the modal when inference is completed
           setTimeout(() => {
             inferenceTaskRunning.value = false;

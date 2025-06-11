@@ -24,7 +24,7 @@
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>
       </div>
-      <div class="success-message">Simulation loaded successfully!</div>
+      <div class="success-message">{{ successMessage }}</div>
     </div>
     
     <div class="map-controls">
@@ -275,6 +275,7 @@ const isLoadingResults = ref(false);
 
 // Add state for success message
 const showSuccessMessage = ref(false);
+const successMessage = ref('Simulation loaded successfully!');
 
 // Define emit
 const emit = defineEmits<{
@@ -1053,37 +1054,17 @@ const handleInferenceStart = async (inferenceSettings: {
         // Show loading notification while updating the map
         isLoadingResults.value = true;
         
-        // Refresh tiles list after task completion
-        const newTilesResponse = await fetchTilesList();
-        timestamps = newTilesResponse.message || [];
+        // The simulation will be loaded through the select-historical-simulation event
+        // emitted by the SettingsModal when the inference task completes
         
-        // Set current simulation to the newly created one
-        const simulationId = result.data.task_id || inferenceSettings.dataDir.replace('.nc', '');
-        currentSimulation.value = simulationId;
-        console.log(`Setting current simulation to newly created: ${simulationId}`);
-        
-        // Reset animation state
-        currentTimeIndex = 0;
-        if (timestamps.length > 0) {
-          currentTimestamp.value = timestamps[0];
-          updateLayers(0);
-        }
-        
-        // Restart animation if it was playing
-        if (isPlaying.value) {
-          startAnimation();
-        }
+        // Set success message for inference completion
+        successMessage.value = 'Inference completed successfully!';
         
         // Hide loading notification after a short delay
+        // (The full result will be loaded by handleHistoricalSimulation)
         setTimeout(() => {
           isLoadingResults.value = false;
-          
-          // Show success message
-          showSuccessMessage.value = true;
-          setTimeout(() => {
-            showSuccessMessage.value = false;
-          }, 3000);
-        }, 1500);
+        }, 1000);
       } catch (error) {
         console.error(`Error waiting for task ${result.data.task_id} completion:`, error);
         throw error;
@@ -1142,6 +1123,13 @@ const handleHistoricalSimulation = async (simulation: string) => {
         // 提取时间步ID列表
         timestamps = data.data.map((item: any) => item.timestep_id);
         console.log(`获取到${timestamps.length}个时间步`);
+        
+        // If this is a newly completed inference task, ensure we're showing the flood layer
+        if (currentInferenceTaskId.value === simulation) {
+          console.log("This is a newly completed inference task, showing flood layer");
+          isFloodLayerActive.value = true;
+          isWeatherLayerActive.value = false;
+        }
       } else {
         throw new Error('API返回的数据格式不正确');
       }
@@ -1181,15 +1169,24 @@ const handleHistoricalSimulation = async (simulation: string) => {
       startAnimation();
     }
     
+    // Check if this was a new inference task
+    const isNewInferenceResult = currentInferenceTaskId.value === simulation;
+    
+    // Set appropriate success message
+    successMessage.value = isNewInferenceResult 
+      ? 'Inference completed successfully!' 
+      : 'Simulation loaded successfully!';
+    
     // Hide loading notification and show success message
     setTimeout(() => {
       isLoadingResults.value = false;
       
       // Show success message
       showSuccessMessage.value = true;
+      
       setTimeout(() => {
         showSuccessMessage.value = false;
-      }, 3000);
+      }, 500);
     }, 1000);
 
   } catch (error) {
