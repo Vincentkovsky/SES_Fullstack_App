@@ -212,7 +212,7 @@ class ResultsProcessor:
             results_path = f"{output_dir}/result.nc"
             dem_path = f"{MODEL_DIR}/5m_dem.tif"
             tif_output_dir = f"{output_dir}/geotiff"
-            num_workers = min(mp.cpu_count() - 2, 24)  # Reserve 2 cores for system
+            num_workers = min(mp.cpu_count() * 2, 64)  # Reserve 2 cores for system
             infer_steps = 48
             
             # Create output directory
