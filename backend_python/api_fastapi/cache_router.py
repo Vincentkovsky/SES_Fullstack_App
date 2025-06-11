@@ -22,7 +22,7 @@ from core.fastapi_helpers import async_handle_exceptions
 from core.config import Config
 
 # 导入各API模块的缓存
-from .gauging_router import station_cache, data_cache
+from .gauging_router import gauge_data_cache
 from .raster_router import file_modification_times
 
 # 设置日志
@@ -46,8 +46,7 @@ async def get_cache_info():
         # 收集内存缓存信息
         memory_cache = {
             "gauging": {
-                "stations": len(station_cache),
-                "data": len(data_cache)
+                "gauge_data": len(gauge_data_cache)
             },
             "raster": {
                 "files": len(file_modification_times)
@@ -60,7 +59,7 @@ async def get_cache_info():
         # 检查各种缓存目录
         cache_dirs = [
             ("tiles", BASE_DIR / "data/tiles"),
-            ("gauging", BASE_DIR / "data/gauging_stations")
+            ("gauge_data", BASE_DIR / "data/gauge_data")
         ]
         
         for name, path in cache_dirs:
@@ -96,8 +95,7 @@ async def clear_all_cache(background_tasks: BackgroundTasks):
     """清除所有缓存"""
     try:
         # 清除内存缓存
-        station_cache.clear()
-        data_cache.clear()
+        gauge_data_cache.clear()
         file_modification_times.clear()
         
         # 在后台清除磁盘缓存
@@ -150,30 +148,29 @@ async def clear_gauging_cache():
     """清除测量站缓存"""
     try:
         # 清除内存缓存
-        station_cache.clear()
-        data_cache.clear()
+        gauge_data_cache.clear()
         
-        # 清除磁盘缓存
-        gauging_cache_dir = BASE_DIR / "data/gauging_stations"
+        # 清除缓存文件（如果有的话）
+        gauging_cache_dir = BASE_DIR / "data/gauge_data"
         
         if gauging_cache_dir.exists():
-            # 删除测量站缓存目录下的所有内容
+            # 保留CSV数据文件，删除其他缓存文件
             for item in gauging_cache_dir.iterdir():
-                if item.is_file():
+                if item.is_file() and not item.name.endswith(".csv"):
                     item.unlink()
             
-            logger.info("测量站缓存已清除")
+            logger.info("水位测量缓存已清除")
         
         return {
             "success": True,
-            "message": "测量站缓存已清除",
+            "message": "水位测量缓存已清除",
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
-        logger.error(f"清除测量站缓存失败: {str(e)}")
+        logger.error(f"清除水位测量缓存失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"清除测量站缓存失败: {str(e)}"
+            detail=f"清除水位测量缓存失败: {str(e)}"
         )
 
 async def clear_disk_cache():
@@ -185,11 +182,11 @@ async def clear_disk_cache():
             shutil.rmtree(tile_cache_dir)
             tile_cache_dir.mkdir(exist_ok=True)
         
-        # 清除测量站缓存
-        gauging_cache_dir = BASE_DIR / "data/gauging_stations"
+        # 清除水位测量缓存（保留CSV数据文件）
+        gauging_cache_dir = BASE_DIR / "data/gauge_data"
         if gauging_cache_dir.exists():
             for item in gauging_cache_dir.iterdir():
-                if item.is_file():
+                if item.is_file() and not item.name.endswith(".csv"):
                     item.unlink()
         
         logger.info("所有磁盘缓存已清除")

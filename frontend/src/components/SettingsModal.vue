@@ -950,7 +950,49 @@ const startInference = async () => {
   }
 };
 
-// 获取模拟元数据
+// Add a new helper function to extract date from NC file names
+const extractDateFromNCFile = (filename: string): { startDate: Date, endDate: Date } | null => {
+  // Match YYYYMMDD.nc pattern
+  const match = filename.match(/(\d{8})\.nc$/);
+  if (!match) return null;
+  
+  const dateStr = match[1];
+  const year = parseInt(dateStr.substring(0, 4));
+  const month = parseInt(dateStr.substring(4, 6)) - 1; // JavaScript months are 0-indexed
+  const day = parseInt(dateStr.substring(6, 8));
+  
+  // Create start date (beginning of day)
+  const startDate = new Date(year, month, day, 0, 0, 0);
+  
+  // Create end date (end of day)
+  const endDate = new Date(year, month, day+10, 23, 59, 59);
+  
+  return { startDate, endDate };
+};
+
+// Modify the watch function for inferenceSettings.dataDir to fetch gauge data
+watch(() => inferenceSettings.value.dataDir, async (dataDir) => {
+  if (!dataDir) return;
+  
+  try {
+    console.log(`Selected rainfall data file: ${dataDir}`);
+    
+    // Extract date range from NC file name
+    const dateRange = extractDateFromNCFile(dataDir);
+    if (dateRange) {
+      // Fetch gauge data for the extracted date range
+      console.log(`Fetching gauge data for range: ${formatDate(dateRange.startDate)} to ${formatDate(dateRange.endDate)}`);
+      gaugingData.value = await fetchGaugingData(
+        formatDate(dateRange.startDate), 
+        formatDate(dateRange.endDate)
+      );
+    }
+  } catch (error) {
+    console.error(`Error processing rainfall data file: ${error}`);
+  }
+});
+
+// Modify the fetchMetadata function to also fetch gauge data when metadata contains a data source
 const fetchMetadata = async (simulation: string) => {
   if (!simulation) return;
   
@@ -962,6 +1004,24 @@ const fetchMetadata = async (simulation: string) => {
     if (response.success && response.data) {
       simulationMetadata.value = response.data;
       console.log('Simulation metadata:', response.data);
+      
+      // Check if metadata has data_source with NC file
+      if (response.data.data_source) {
+        const dataSource = response.data.data_source;
+        if (typeof dataSource === 'string' && dataSource.endsWith('.nc')) {
+          // Extract date from the NC file name
+          const dateRange = extractDateFromNCFile(dataSource);
+          if (dateRange) {
+            // Fetch gauge data for the extracted date range
+            console.log(`Fetching gauge data based on metadata source: ${dataSource}`);
+            console.log(`Date range: ${formatDate(dateRange.startDate)} to ${formatDate(dateRange.endDate)}`);
+            gaugingData.value = await fetchGaugingData(
+              formatDate(dateRange.startDate), 
+              formatDate(dateRange.endDate)
+            );
+          }
+        }
+      }
     } else {
       simulationMetadata.value = null;
       console.warn(`No metadata found for simulation ${simulation}`);
@@ -1079,6 +1139,7 @@ watch(() => props.isOpen, async (isOpen) => {
   }
 });
 
+// Modify the watch function for selectedHistoricalSimulation
 watch(() => selectedHistoricalSimulation.value, async (simulation) => {
   if (!simulation) return;
 
@@ -1111,8 +1172,9 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
     // Wait for timestamps to be updated
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Fetch gauge data based on the new timestamps
-    if (props.timestamps.length > 0) {
+    // Only fetch gauge data based on timestamps if we haven't already fetched it from metadata
+    if (!gaugingData.value && props.timestamps.length > 0) {
+      console.log("Falling back to props.timestamps for gauge data", props.timestamps);
       const firstTimestamp = props.timestamps[0];
       const lastTimestamp = props.timestamps[props.timestamps.length - 1];
       
