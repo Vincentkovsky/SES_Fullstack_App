@@ -52,6 +52,7 @@ HALF_EARTH_CIRCUMFERENCE = 20037508.34
 # 进程池大小
 # 使用CPU核心数的2倍，因为这个任务是I/O绑定的
 PROCESS_POOL_SIZE = min(multiprocessing.cpu_count() * 2, 64)  # 最大64个进程
+logger.info(f"进程池大小: {PROCESS_POOL_SIZE}")
 
 # 创建进程池
 _process_pool = None

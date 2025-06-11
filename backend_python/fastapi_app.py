@@ -190,7 +190,7 @@ if __name__ == "__main__":
     host = Config.HOST
     port = Config.PORT
     reload = Config.DEBUG
-    workers = os.getenv("API_WORKERS", "16")  # 默认4个工作进程
+    workers = os.getenv("API_WORKERS", "64")  # 默认64个工作进程
     
     # 显示应用配置信息
     logger.info(f"启动应用 - 模式: {env_mode}, 地址: {host}:{port}, 工作进程: {workers}")

@@ -3,8 +3,8 @@
 You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
   warnings.warn(
 加载颜色映射失败: No color mapping found in environment variables
-2025-06-12 00:27:11 - root - WARNING - 未找到 .env.development 配置文件
-2025-06-12 00:27:11 - root - INFO - 启动应用 - 模式: development, 地址: localhost:3000, 工作进程: 16
+2025-06-12 00:42:11 - root - WARNING - 未找到 .env.development 配置文件
+2025-06-12 00:42:11 - root - INFO - 启动应用 - 模式: development, 地址: localhost:3000, 工作进程: 64
 /projects/TCCTVS/Anaconda3/envs/flood_new/lib/python3.10/site-packages/pydantic/_internal/_fields.py:151: UserWarning: Field "model_path" has conflict with protected namespace "model_".
 
 You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
@@ -26,19 +26,159 @@ You may be able to resolve this warning by setting `model_config['protected_name
 INFO:     Will watch for changes in these directories: ['/projects/TCCTVS/FSI/SES_Fullstack_App']
 WARNING:  "workers" flag is ignored when reloading is enabled.
 INFO:     Uvicorn running on http://localhost:3000 (Press CTRL+C to quit)
-INFO:     Started reloader process [2490791] using WatchFiles
+INFO:     Started reloader process [2514726] using WatchFiles
 /projects/TCCTVS/Anaconda3/envs/flood_new/lib/python3.10/site-packages/pydantic/_internal/_fields.py:151: UserWarning: Field "model_path" has conflict with protected namespace "model_".
 
 You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
   warnings.warn(
 加载颜色映射失败: No color mapping found in environment variables
+2025-06-12 00:42:15 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:15 - watchfiles.main - INFO - 1 change detected
 /projects/TCCTVS/Anaconda3/envs/flood_new/lib/python3.10/site-packages/pydantic/_internal/_fields.py:151: UserWarning: Field "model_path" has conflict with protected namespace "model_".
 
 You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
   warnings.warn(
-INFO:     Started server process [2491117]
+INFO:     Started server process [2515023]
 INFO:     Waiting for application startup.
-2025-06-12 00:27:15 - root - INFO - 应用启动中...
-2025-06-12 00:27:15 - root - INFO - 应用启动完成
+2025-06-12 00:42:16 - root - INFO - 应用启动中...
+2025-06-12 00:42:16 - root - INFO - 应用启动完成
 INFO:     Application startup complete.
-2025-06-12 00:27:32 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:16 - watchfiles.main - INFO - 4 changes detected
+2025-06-12 00:42:16 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:16 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:17 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:17 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:17 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:18 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:18 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:18 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:19 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:19 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:19 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:20 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:20 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:21 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:21 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:21 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:22 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:22 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:22 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:23 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:23 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:23 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:24 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:24 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:24 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:25 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:25 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:25 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:26 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:26 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:26 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:27 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:27 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:28 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:28 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:28 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:29 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:29 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:29 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:30 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:30 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:30 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:31 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:31 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:31 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:32 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:32 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:32 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:33 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:33 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:33 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:34 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:34 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:35 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:35 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:35 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:36 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:36 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:36 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:37 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:37 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:37 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:38 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:38 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:38 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:39 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:39 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:39 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:40 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:40 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:40 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:41 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:41 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:42 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:42 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:42 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:43 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:43 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:43 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:44 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:44 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:44 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:45 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:45 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:45 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:46 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:46 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:46 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:47 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:47 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:47 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:48 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:48 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:49 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:49 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:49 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:50 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:50 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:50 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:51 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:51 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:51 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:52 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:52 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:52 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:53 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:53 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:53 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:54 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:54 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:55 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:55 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:55 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:56 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:56 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:56 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:57 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:57 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:57 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:58 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:58 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:58 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:59 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:59 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:42:59 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:00 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:00 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:00 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:01 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:01 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:02 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:02 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:02 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:03 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:03 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:03 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:04 - watchfiles.main - INFO - 1 change detected
+2025-06-12 00:43:04 - watchfiles.main - INFO - 1 change detected
