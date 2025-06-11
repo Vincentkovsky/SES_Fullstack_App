@@ -25,6 +25,10 @@ from starlette.concurrency import run_in_threadpool
 import os
 import json
 from dotenv import load_dotenv
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
+import atexit
+import signal
 
 # 加载环境变量
 load_dotenv()
@@ -44,6 +48,36 @@ TILE_SIZE = 256
 EARTH_RADIUS = 6378137.0
 ORIGIN_SHIFT = np.pi * EARTH_RADIUS
 HALF_EARTH_CIRCUMFERENCE = 20037508.34
+
+# 进程池大小
+# 使用CPU核心数的2倍，因为这个任务是I/O绑定的
+PROCESS_POOL_SIZE = min(multiprocessing.cpu_count() * 2, 64)  # 最大64个进程
+
+# 创建进程池
+_process_pool = None
+
+def get_process_pool():
+    """获取或创建进程池"""
+    global _process_pool
+    if _process_pool is None:
+        _process_pool = ProcessPoolExecutor(max_workers=PROCESS_POOL_SIZE)
+    return _process_pool
+
+def shutdown_process_pool():
+    """关闭进程池"""
+    global _process_pool
+    if _process_pool is not None:
+        logger.info("正在关闭瓦片处理进程池...")
+        _process_pool.shutdown(wait=True)
+        _process_pool = None
+        logger.info("瓦片处理进程池已关闭")
+
+# 注册退出处理函数
+atexit.register(shutdown_process_pool)
+
+# 注册信号处理
+for sig in (signal.SIGINT, signal.SIGTERM):
+    signal.signal(sig, lambda signum, frame: shutdown_process_pool())
 
 def load_colormap_from_env() -> Dict[str, list]:
     """从环境变量加载颜色映射表"""
@@ -164,12 +198,9 @@ def apply_colormap(data, colormap):
 
     return rgba
 
-@lru_cache(maxsize=1000)
-def get_cached_tile(filepath_str, z, x, y):
-    """获取缓存的瓦片"""
-    # 检查文件修改时间并更新缓存键
-    _ = get_file_hash(filepath_str)
-    
+# 修改get_cached_tile函数，使其对于非LRU缓存的处理也是线程安全的
+def process_tile(filepath_str, z, x, y):
+    """在单独的进程中处理瓦片生成，这个函数不依赖于全局变量"""
     filepath = Path(filepath_str)
     west_merc, south_merc, east_merc, north_merc = tile_to_meters(x, y, z)
     
@@ -216,7 +247,9 @@ def get_cached_tile(filepath_str, z, x, y):
                 data = np.array(img_resized)
             
             # 应用颜色映射
-            rgba = apply_colormap(data, DEFAULT_COLORMAP)
+            # 在这里为进程池处理复制一份颜色映射
+            colormap = DEFAULT_COLORMAP.copy()
+            rgba = apply_colormap(data, colormap)
             
             # 创建最终图像
             img = Image.fromarray(rgba, mode='RGBA')
@@ -229,6 +262,24 @@ def get_cached_tile(filepath_str, z, x, y):
     except Exception as e:
         logger.error(f"生成瓦片失败: {e}")
         return create_transparent_tile()
+
+# 基于进程池的瓦片处理函数，用于处理缓存未命中的情况
+def process_tile_with_pool(filepath_str, z, x, y):
+    """使用进程池处理瓦片生成"""
+    pool = get_process_pool()
+    return pool.submit(process_tile, filepath_str, z, x, y).result()
+
+@lru_cache(maxsize=1000)
+def get_cached_tile(filepath_str, z, x, y):
+    """获取缓存的瓦片
+    
+    这个函数应该只在主线程中调用，不要在进程池中调用它，
+    因为LRU缓存是与进程相关的，在子进程中会创建新的缓存实例。
+    """
+    # 检查文件修改时间并更新缓存键
+    _ = get_file_hash(filepath_str)
+    # 使用process_tile函数处理瓦片生成
+    return process_tile(filepath_str, z, x, y)
 
 async def get_simulation_timesteps(simulation_id: str):
     """获取指定模拟场景的时间步列表"""
@@ -316,9 +367,22 @@ async def get_tile(
                 detail=f'未找到栅格数据: {filepath}'
             )
         
-        tile_data = await run_in_threadpool(
-            get_cached_tile, str(filepath), z, x, y
-        )
+        # 检查文件修改时间，这会影响缓存键
+        filepath_str = str(filepath)
+        file_hash = get_file_hash(filepath_str)
+        
+        # 创建一个检查和获取缓存瓦片的内部函数
+        def get_tile_data():
+            # 首先尝试从LRU缓存获取
+            try:
+                # 直接尝试调用get_cached_tile，如果在缓存中，会立即返回
+                return get_cached_tile(filepath_str, z, x, y)
+            except Exception:
+                # 如果缓存访问出错，使用进程池
+                return process_tile_with_pool(filepath_str, z, x, y)
+        
+        # 在线程池中执行，避免阻塞异步IO
+        tile_data = await run_in_threadpool(get_tile_data)
         
         return Response(
             content=tile_data,
@@ -328,6 +392,7 @@ async def get_tile(
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"获取瓦片失败: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
