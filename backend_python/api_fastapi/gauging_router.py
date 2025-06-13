@@ -69,11 +69,11 @@ async def get_gauging_data(
         
         # Check if CSV file exists
         if not DEFAULT_CSV_FILE.exists():
-            raise HTTPException(
+                raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Gauge data file not found: {DEFAULT_CSV_FILE}"
-            )
-        
+                )
+            
         # Read CSV file
         def read_gauge_data():
             # Check cache first
@@ -91,7 +91,7 @@ async def get_gauging_data(
                     doublequote=True,   # Double quotes within quoted fields are doubled
                     dtype={"River Level": float}  # Ensure River Level is parsed as float
                 )
-                
+        
                 # Rename columns to match expected names
                 df = df.rename(columns={
                     "Date": "timestamp",
@@ -116,7 +116,7 @@ async def get_gauging_data(
                 # Ensure water_level column exists
                 if 'water_level' not in df.columns:
                     raise ValueError("CSV file does not have a 'River Level' or 'water_level' column")
-                
+        
                 # Handle quotes in date strings if present
                 if isinstance(df['timestamp'].iloc[0], str) and df['timestamp'].iloc[0].startswith('"') and df['timestamp'].iloc[0].endswith('"'):
                     df['timestamp'] = df['timestamp'].str.strip('"')
@@ -150,7 +150,7 @@ async def get_gauging_data(
                             "site_id": DEFAULT_STATION_ID,
                             "site_name": "Wagga Wagga (Murrumbidgee River)",
                             "variable": "Water Level"
-                        },
+                },
                         "timestamps": [],
                         "values": []
                     }
@@ -184,7 +184,7 @@ async def get_gauging_data(
         gauge_data = await run_in_threadpool(read_gauge_data)
         
         return gauge_data
-    
+        
     except HTTPException:
         raise
     except Exception as e:

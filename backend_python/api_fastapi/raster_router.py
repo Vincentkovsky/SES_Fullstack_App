@@ -29,6 +29,7 @@ import multiprocessing
 from concurrent.futures import ProcessPoolExecutor
 import atexit
 import signal
+import time
 
 # 加载环境变量
 load_dotenv()
@@ -132,7 +133,8 @@ def get_file_hash(filepath: str) -> str:
         
         if current_mtime != mtime:
             file_modification_times[filepath] = mtime
-            get_cached_tile.cache_clear()  # 清除瓦片缓存
+            # 不要清除整个缓存，只标记文件已更新
+            # get_cached_tile.cache_clear()  # 删除这一行，避免不必要的缓存清除
             
         return f"{filepath}_{mtime}"
     except:
@@ -270,15 +272,22 @@ def process_tile_with_pool(filepath_str, z, x, y):
     pool = get_process_pool()
     return pool.submit(process_tile, filepath_str, z, x, y).result()
 
-@lru_cache(maxsize=1000)
+# 添加缓存统计
+cache_hits = 0
+cache_misses = 0
+
+@lru_cache(maxsize=5000)
 def get_cached_tile(filepath_str, z, x, y):
     """获取缓存的瓦片
     
     这个函数应该只在主线程中调用，不要在进程池中调用它，
     因为LRU缓存是与进程相关的，在子进程中会创建新的缓存实例。
     """
-    # 检查文件修改时间并更新缓存键
-    _ = get_file_hash(filepath_str)
+    global cache_hits
+    # 使用文件哈希作为缓存键的一部分
+    file_hash = get_file_hash(filepath_str)
+    # 增加缓存命中计数
+    cache_hits += 1
     # 使用process_tile函数处理瓦片生成
     return process_tile(filepath_str, z, x, y)
 
@@ -374,11 +383,29 @@ async def get_tile(
         
         # 创建一个检查和获取缓存瓦片的内部函数
         def get_tile_data():
+            global cache_hits, cache_misses
             # 首先尝试从LRU缓存获取
             try:
                 # 直接尝试调用get_cached_tile，如果在缓存中，会立即返回
-                return get_cached_tile(filepath_str, z, x, y)
-            except Exception:
+                start_time = time.time()
+                result = get_cached_tile(filepath_str, z, x, y)
+                elapsed = time.time() - start_time
+                # 记录缓存统计
+                if elapsed < 0.01:  # 如果处理时间很短，可能是缓存命中
+                    logger.debug(f"缓存命中 - 瓦片 z={z}, x={x}, y={y}, 处理时间: {elapsed:.4f}秒")
+                else:
+                    cache_misses += 1
+                    logger.debug(f"缓存未命中 - 瓦片 z={z}, x={x}, y={y}, 处理时间: {elapsed:.4f}秒")
+                
+                # 每1000次请求记录一次缓存统计
+                if (cache_hits + cache_misses) % 10 == 0:
+                    hit_rate = cache_hits / (cache_hits + cache_misses) if (cache_hits + cache_misses) > 0 else 0
+                    logger.info(f"瓦片缓存统计: 命中率 {hit_rate:.2%}, 命中 {cache_hits}, 未命中 {cache_misses}")
+                
+                return result
+            except Exception as e:
+                logger.debug(f"缓存访问出错: {str(e)}")
+                cache_misses += 1
                 # 如果缓存访问出错，使用进程池
                 return process_tile_with_pool(filepath_str, z, x, y)
         

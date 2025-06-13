@@ -195,6 +195,11 @@ const currentTimestamp = ref('');
 const progress = ref(0);
 let map: mapboxgl.Map | null = null;
 
+// 添加瓦片加载状态跟踪
+const tilesLoading = ref(false);
+const tilesLoadedForCurrentFrame = ref(false);
+const preloadedFrames = ref<Set<string>>(new Set());
+
 // Add environment variables
 const API_HOST = import.meta.env.VITE_HOST || 'localhost';
 const API_PORT = import.meta.env.VITE_BACKEND_PORT || 3000;
@@ -427,7 +432,7 @@ const formattedWaterDepth = computed(() => {
 });
 
 // Methods
-const createTileLayer = (timestamp: string) => {
+const createTileLayer = (timestamp: string, isPreloading = false) => {
   let tileUrl = '';
   
   if (currentSimulation.value) {
@@ -440,19 +445,20 @@ const createTileLayer = (timestamp: string) => {
   }
   
   return new TileLayer({
-    id: `TileLayer-${timestamp}`,
+    id: `TileLayer-${timestamp}${isPreloading ? '-preload' : ''}`,
     data: tileUrl,
     maxZoom: 16,
     minZoom: 13,
     tileSize: 256,
-    maxCacheSize: 100,
+    maxCacheSize: 500, // 增加缓存大小
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
     loadOptions: {
       fetch: {
-        maxConcurrency: 8,
+        maxConcurrency: 16, // 增加并发请求数
+        cache: 'force-cache' // 强制使用缓存
       }
     },
-    refinementStrategy: 'no-overlap',
+    refinementStrategy: 'best-available', // 改为best-available策略，先显示低分辨率瓦片
     updateTriggers: {
       data: timestamp
     },
@@ -463,6 +469,17 @@ const createTileLayer = (timestamp: string) => {
     onTileLoad: (tile: _Tile2DHeader<any>) => {
       const { x, y, z } = tile.index;
       console.debug(`Tile loaded successfully for timestamp ${timestamp} at z=${z}, x=${x}, y=${y}`);
+    },
+    onViewportLoad: () => {
+      if (!isPreloading) {
+        console.debug(`All visible tiles loaded for frame ${timestamp}`);
+        tilesLoadedForCurrentFrame.value = true;
+        tilesLoading.value = false;
+      } else {
+        // 如果是预加载，标记该帧已预加载
+        preloadedFrames.value.add(timestamp);
+        console.debug(`Frame ${timestamp} preloaded successfully`);
+      }
     },
     renderSubLayers: (props: any) => {
       const { boundingBox, data } = props.tile;
@@ -491,7 +508,7 @@ const createTileLayer = (timestamp: string) => {
   });
 };
 
-const createRainfallLayer = (timestamp: string) => {
+const createRainfallLayer = (timestamp: string, isPreloading = false) => {
   if (!currentSimulation.value) return null;
   
   console.log(`Creating rainfall layer for simulation ${currentSimulation.value} with timestamp ${timestamp}`);
@@ -499,19 +516,20 @@ const createRainfallLayer = (timestamp: string) => {
   const tileUrl = `${API_BASE_URL}/rainfall-tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}`;
   
   return new TileLayer({
-    id: `RainfallLayer-${currentSimulation.value}-${timestamp}`,
+    id: `RainfallLayer-${currentSimulation.value}-${timestamp}${isPreloading ? '-preload' : ''}`,
     data: tileUrl,
     maxZoom: 16,
     minZoom: 13,
     tileSize: 256,
-    maxCacheSize: 100,
+    maxCacheSize: 2000, // 增加缓存大小
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
     loadOptions: {
       fetch: {
-        maxConcurrency: 8,
+        maxConcurrency: 32, // 增加并发请求数
+        cache: 'force-cache' // 强制使用缓存
       }
     },
-    refinementStrategy: 'no-overlap',
+    refinementStrategy: 'best-available', // 改为best-available策略
     updateTriggers: {
       data: timestamp
     },
@@ -522,6 +540,17 @@ const createRainfallLayer = (timestamp: string) => {
     onTileLoad: (tile: _Tile2DHeader<any>) => {
       const { x, y, z } = tile.index;
       console.debug(`Rainfall tile loaded successfully for ${currentSimulation.value} ${timestamp} at z=${z}, x=${x}, y=${y}`);
+    },
+    onViewportLoad: () => {
+      if (!isPreloading) {
+        console.debug(`All visible rainfall tiles loaded for frame ${timestamp}`);
+        tilesLoadedForCurrentFrame.value = true;
+        tilesLoading.value = false;
+      } else {
+        // 如果是预加载，标记该帧已预加载
+        preloadedFrames.value.add(timestamp);
+        console.debug(`Rainfall frame ${timestamp} preloaded successfully`);
+      }
     },
     renderSubLayers: (props: any) => {
       const { boundingBox, data } = props.tile;
@@ -552,22 +581,27 @@ const createRainfallLayer = (timestamp: string) => {
 
 const updateLayers = (index: number) => {
   try {
+    tilesLoading.value = true;
+    tilesLoadedForCurrentFrame.value = false;
+    
     let newLayer = null;
     
-    // Determine which layer to create based on active layer type
+    // 确定使用哪个时间戳
+    const activeTimestamps = isFloodLayerActive.value ? timestamps : rainfallTimestamps.value;
+    const currentTimestampValue = activeTimestamps[index];
+    
+    // 确定要创建的图层类型
     if (isFloodLayerActive.value) {
-      newLayer = createTileLayer(timestamps[index]);
-      currentTimestamp.value = timestamps[index];
+      newLayer = createTileLayer(currentTimestampValue);
+      currentTimestamp.value = currentTimestampValue;
       
       // 如果有当前鼠标位置，更新水深信息
       if (cursorLat.value !== null && cursorLng.value !== null) {
         fetchWaterDepthInfo(cursorLat.value, cursorLng.value);
       }
     } else if (isWeatherLayerActive.value && currentSimulation.value && rainfallTimestamps.value.length > 0) {
-      // For rainfall, use the rainfall timestamps
-      const rainfallTimestamp = rainfallTimestamps.value[currentRainfallIndex.value];
-      newLayer = createRainfallLayer(rainfallTimestamp);
-      currentRainfallTimestamp.value = rainfallTimestamp;
+      newLayer = createRainfallLayer(currentTimestampValue);
+      currentRainfallTimestamp.value = currentTimestampValue;
     }
 
     if (previousLayer) {
@@ -606,40 +640,55 @@ const updateLayers = (index: number) => {
     previousLayer = currentLayer;
     currentLayer = newLayer;
     deckOverlay?.setProps({ layers: [previousLayer, currentLayer].filter(Boolean) });
+    
+    // 预加载下一帧
+    const nextIndex = (index + 1) % activeTimestamps.length;
+    const nextTimestamp = activeTimestamps[nextIndex];
+    preloadNextFrame(nextTimestamp);
+    
+    // 预加载下下一帧（如果播放速度快）
+    if (playbackSpeed.value >= 2) {
+      const nextNextIndex = (index + 2) % activeTimestamps.length;
+      const nextNextTimestamp = activeTimestamps[nextNextIndex];
+      setTimeout(() => {
+        preloadNextFrame(nextNextTimestamp);
+      }, 100); // 稍微延迟预加载下下一帧
+    }
   } catch (error) {
     console.error(`Error updating layers:`, error);
-    // Updated error handling for the new interval-based system
-    if (animationIntervalId !== null) {
-      clearInterval(animationIntervalId);
-      animationIntervalId = null;
-      isPlaying.value = false;
-    }
+    tilesLoading.value = false;
   }
 };
 
 const startAnimation = () => {
-  // Clear any existing animation interval
+  // 清除任何现有动画间隔
   if (animationIntervalId !== null) {
     clearInterval(animationIntervalId);
     animationIntervalId = null;
   }
   
-  // Set the appropriate timestamp array based on active layer
+  // 根据当前激活的图层类型设置适当的时间戳数组
   const activeTimestamps = isFloodLayerActive.value ? timestamps : rainfallTimestamps.value;
   
-  // Skip animation if there are no timestamps
+  // 如果没有时间戳，跳过动画
   if (activeTimestamps.length === 0) {
     return;
   }
   
-  // Get the interval based on current playback speed
+  // 根据当前播放速度获取间隔
   const frameInterval = FRAME_INTERVALS[playbackSpeed.value as keyof typeof FRAME_INTERVALS] || BASE_FRAME_INTERVAL;
   
   console.log(`Starting animation with fixed interval: ${frameInterval}ms per frame`);
   
-  // Start a new interval timer
+  // 启动新的间隔计时器
   animationIntervalId = window.setInterval(() => {
-    // Calculate next index with wrapping
+    // 如果瓦片仍在加载且播放速度不是最快的，延迟切换到下一帧
+    if (tilesLoading.value && !tilesLoadedForCurrentFrame.value && playbackSpeed.value < 3) {
+      console.debug('Tiles still loading, delaying frame advance');
+      return;
+    }
+    
+    // 计算下一个索引（带环绕）
     let nextIndex;
     
     if (isFloodLayerActive.value) {
@@ -894,7 +943,9 @@ onMounted(async () => {
       startDate.value = new Date(Number(year), Number(month) - 1, Number(day));
     }
 
-    await preloadFirstFrame(timestamps[0]);
+    // 预热初始帧
+    await preloadInitialFrames();
+    
     currentTimestamp.value = timestamps[0];
     updateLayers(0);
     
@@ -1196,6 +1247,97 @@ const handleHistoricalSimulation = async (simulation: string) => {
 };
 
 const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_SHARED_OPENWEATHERMAP_API_KEY;
+
+// 添加预加载下一帧的函数
+const preloadNextFrame = (timestamp: string) => {
+  // 如果已经预加载过，跳过
+  if (preloadedFrames.value.has(timestamp)) {
+    return;
+  }
+  
+  console.debug(`Preloading next frame: ${timestamp}`);
+  
+  // 根据当前激活的图层类型选择预加载函数
+  const preloadLayer = isFloodLayerActive.value 
+    ? createTileLayer(timestamp, true)
+    : createRainfallLayer(timestamp, true);
+  
+  if (preloadLayer) {
+    // 创建一个临时图层进行预加载，但不显示
+    const tempLayers = [previousLayer, currentLayer, preloadLayer].filter(Boolean);
+    deckOverlay?.setProps({ layers: tempLayers });
+    
+    // 设置超时，确保不会永久等待预加载
+    setTimeout(() => {
+      // 如果预加载超时，也标记为已预加载，避免重复尝试
+      if (!preloadedFrames.value.has(timestamp)) {
+        preloadedFrames.value.add(timestamp);
+        console.debug(`Preloading timed out for frame ${timestamp}`);
+      }
+      
+      // 移除预加载图层
+      const currentLayers = [previousLayer, currentLayer].filter(Boolean);
+      deckOverlay?.setProps({ layers: currentLayers });
+    }, 2000);
+  }
+};
+
+// 添加瓦片预热函数
+const preloadFrame = async (timestamp: string): Promise<void> => {
+  return new Promise((resolve) => {
+    console.debug(`Preloading frame: ${timestamp}`);
+    
+    // 如果已经预加载过，直接返回
+    if (preloadedFrames.value.has(timestamp)) {
+      console.debug(`Frame ${timestamp} already preloaded`);
+      resolve();
+      return;
+    }
+    
+    const layer = isFloodLayerActive.value 
+      ? createTileLayer(timestamp, true)
+      : createRainfallLayer(timestamp, true);
+    
+    if (!layer) {
+      resolve();
+      return;
+    }
+    
+    // 临时添加到地图上以触发加载
+    deckOverlay?.setProps({ layers: [layer] });
+    
+    // 设置超时，避免永久等待
+    setTimeout(() => {
+      preloadedFrames.value.add(timestamp);
+      console.debug(`Preload timeout for frame ${timestamp}`);
+      // 移除预加载图层
+      deckOverlay?.setProps({ layers: [] });
+      resolve();
+    }, 3000);
+  });
+};
+
+// 添加批量预热函数
+const preloadInitialFrames = async () => {
+  if (!timestamps.length) return;
+  
+  console.log('预热瓦片缓存...');
+  
+  // 预热前5帧或所有帧（如果少于5帧）
+  const framesToPreload = Math.min(5, timestamps.length);
+  const preloadPromises = [];
+  
+  for (let i = 0; i < framesToPreload; i++) {
+    preloadPromises.push(preloadFrame(timestamps[i]));
+  }
+  
+  try {
+    await Promise.all(preloadPromises);
+    console.log('预热完成');
+  } catch (error) {
+    console.warn('预热过程中出错:', error);
+  }
+};
 </script>
 
 <style scoped>
