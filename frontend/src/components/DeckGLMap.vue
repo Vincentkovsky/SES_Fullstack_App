@@ -580,129 +580,99 @@ const createRainfallLayer = (timestamp: string, isPreloading = false) => {
 };
 
 const updateLayers = (index: number) => {
-  try {
-    tilesLoading.value = true;
-    tilesLoadedForCurrentFrame.value = false;
-    
-    let newLayer = null;
-    
-    // 确定使用哪个时间戳
-    const activeTimestamps = isFloodLayerActive.value ? timestamps : rainfallTimestamps.value;
-    const currentTimestampValue = activeTimestamps[index];
-    
-    // 确定要创建的图层类型
-    if (isFloodLayerActive.value) {
-      newLayer = createTileLayer(currentTimestampValue);
-      currentTimestamp.value = currentTimestampValue;
-      
-      // 如果有当前鼠标位置，更新水深信息
-      if (cursorLat.value !== null && cursorLng.value !== null) {
-        fetchWaterDepthInfo(cursorLat.value, cursorLng.value);
-      }
-    } else if (isWeatherLayerActive.value && currentSimulation.value && rainfallTimestamps.value.length > 0) {
-      newLayer = createRainfallLayer(currentTimestampValue);
-      currentRainfallTimestamp.value = currentTimestampValue;
-    }
-
-    if (previousLayer) {
-      let startTime: number | null = null;
-      
-      const animate = (currentTime: number) => {
-        if (!startTime) startTime = currentTime;
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / TRANSITION_DURATION, 1);
-        const eased = TRANSITION_SETTINGS.easing(progress);
-        
-        const opacity = TRANSITION_SETTINGS.interpolation.opacity(1, 0, eased);
-        
-        const layerProps = previousLayer?.props;
-        previousLayer = previousLayer?.constructor === TileLayer 
-          ? new TileLayer({
-              ...layerProps,
-              opacity,
-            })
-          : null;
-        
-        deckOverlay?.setProps({ 
-          layers: [previousLayer, currentLayer].filter(Boolean) 
-        });
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          previousLayer = null;
-        }
-      };
-      
-      requestAnimationFrame(animate);
-    }
-
-    previousLayer = currentLayer;
-    currentLayer = newLayer;
-    deckOverlay?.setProps({ layers: [previousLayer, currentLayer].filter(Boolean) });
-    
-    // 预加载下一帧
-    const nextIndex = (index + 1) % activeTimestamps.length;
-    const nextTimestamp = activeTimestamps[nextIndex];
-    preloadNextFrame(nextTimestamp);
-    
-    // 预加载下下一帧（如果播放速度快）
-    if (playbackSpeed.value >= 2) {
-      const nextNextIndex = (index + 2) % activeTimestamps.length;
-      const nextNextTimestamp = activeTimestamps[nextNextIndex];
-      setTimeout(() => {
-        preloadNextFrame(nextNextTimestamp);
-      }, 100); // 稍微延迟预加载下下一帧
-    }
-  } catch (error) {
-    console.error(`Error updating layers:`, error);
-    tilesLoading.value = false;
-  }
-};
-
-const startAnimation = () => {
-  // 清除任何现有动画间隔
-  if (animationIntervalId !== null) {
-    clearInterval(animationIntervalId);
-    animationIntervalId = null;
-  }
-  
-  // 根据当前激活的图层类型设置适当的时间戳数组
-  const activeTimestamps = isFloodLayerActive.value ? timestamps : rainfallTimestamps.value;
-  
-  // 如果没有时间戳，跳过动画
-  if (activeTimestamps.length === 0) {
+  if (index < 0 || index >= timestamps.length) {
+    console.warn('Invalid timestamp index:', index);
     return;
   }
+
+  const timestamp = timestamps[index];
+  currentTimestamp.value = timestamp;
   
-  // 根据当前播放速度获取间隔
-  const frameInterval = FRAME_INTERVALS[playbackSpeed.value as keyof typeof FRAME_INTERVALS] || BASE_FRAME_INTERVAL;
+  // 更新图层
+  const newLayers = [
+    new BitmapLayer({
+      id: 'water-depth-layer',
+      data: `${API_BASE_URL}/tiles/${currentSimulation.value}/${timestamp}/{z}/{x}/{y}.png`,
+      bounds: [-180, -85, 180, 85],
+      opacity: 1,
+      maxCacheSize: 500,  // 增加缓存大小
+      maxConcurrency: 16,  // 增加并发请求数
+      cache: 'force-cache',  // 强制使用缓存
+      loadOptions: {
+        fetch: {
+          cache: 'force-cache',  // 强制使用缓存
+          headers: {
+            'Cache-Control': 'max-age=31536000'  // 1年缓存
+          }
+        }
+      },
+      onTileLoad: (tile) => {
+        // 记录瓦片加载完成
+        tilesLoadedForCurrentFrame.add(`${tile.x}-${tile.y}-${tile.z}`);
+        // 检查是否所有瓦片都已加载
+        if (tilesLoadedForCurrentFrame.size === tilesLoading.size) {
+          tilesLoading.clear();
+          tilesLoadedForCurrentFrame.clear();
+        }
+      },
+      onTileError: (error, tile) => {
+        console.error('Tile load error:', error, tile);
+        // 从加载集合中移除
+        tilesLoading.delete(`${tile.x}-${tile.y}-${tile.z}`);
+      },
+      onTileLoadStart: (tile) => {
+        // 记录瓦片开始加载
+        tilesLoading.add(`${tile.x}-${tile.y}-${tile.z}`);
+      }
+    })
+  ];
   
-  console.log(`Starting animation with fixed interval: ${frameInterval}ms per frame`);
-  
-  // 启动新的间隔计时器
-  animationIntervalId = window.setInterval(() => {
-    // 如果瓦片仍在加载且播放速度不是最快的，延迟切换到下一帧
-    if (tilesLoading.value && !tilesLoadedForCurrentFrame.value && playbackSpeed.value < 3) {
-      console.debug('Tiles still loading, delaying frame advance');
-      return;
-    }
-    
-    // 计算下一个索引（带环绕）
-    let nextIndex;
-    
-    if (isFloodLayerActive.value) {
-      nextIndex = (currentTimeIndex + 1) % timestamps.length;
-      currentTimeIndex = nextIndex;
-      progress.value = (nextIndex / timestamps.length) * 100;
+  layers.value = newLayers;
+};
+
+// 开始动画
+const startAnimation = () => {
+  if (animationIntervalId) {
+    clearInterval(animationIntervalId);
+  }
+
+  let lastFrameTime = performance.now();
+  const frameInterval = 1000 / playbackSpeed.value;
+
+  const animate = (currentTime: number) => {
+    const elapsed = currentTime - lastFrameTime;
+
+    if (elapsed >= frameInterval) {
+      // 检查瓦片是否仍在加载
+      if (tilesLoading.size > 0) {
+        // 如果瓦片仍在加载，延迟切换到下一帧
+        setTimeout(() => {
+          animationIntervalId = requestAnimationFrame(animate);
+        }, 100);
+        return;
+      }
+
+      currentTimeIndex = (currentTimeIndex + 1) % timestamps.length;
       updateLayers(currentTimeIndex);
-    } else {
-      nextIndex = (currentRainfallIndex.value + 1) % rainfallTimestamps.value.length;
-      currentRainfallIndex.value = nextIndex;
-      progress.value = (nextIndex / rainfallTimestamps.value.length) * 100;
-      updateLayers(currentRainfallIndex.value);
+      lastFrameTime = currentTime;
+
+      // 预加载下一帧
+      const nextIndex = (currentTimeIndex + 1) % timestamps.length;
+      preloadNextFrame(timestamps[nextIndex]);
+
+      // 如果播放速度快，预加载更多帧
+      if (playbackSpeed.value >= 2) {
+        const nextNextIndex = (currentTimeIndex + 2) % timestamps.length;
+        setTimeout(() => {
+          preloadNextFrame(timestamps[nextNextIndex]);
+        }, 100);
+      }
     }
-  }, frameInterval);
+
+    animationIntervalId = requestAnimationFrame(animate);
+  };
+
+  animationIntervalId = requestAnimationFrame(animate);
 };
 
 const togglePlayPause = () => {
