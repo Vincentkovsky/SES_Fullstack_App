@@ -521,11 +521,11 @@ const createRainfallLayer = (timestamp: string, isPreloading = false) => {
     maxZoom: 16,
     minZoom: 13,
     tileSize: 256,
-    maxCacheSize: 2000, // 增加缓存大小
+    maxCacheSize: 5000, // 增加缓存大小
     coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
     loadOptions: {
       fetch: {
-        maxConcurrency: 32, // 增加并发请求数
+        maxConcurrency: 64, // 增加并发请求数
         cache: 'force-cache' // 强制使用缓存
       }
     },
