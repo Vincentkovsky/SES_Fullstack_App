@@ -8,7 +8,12 @@
       @start-inference="handleInferenceStart"
       @select-historical-simulation="handleHistoricalSimulation"
     />
-    <div ref="mapContainer" style="width: 100%; height: 100vh;"></div>
+    <LocationInfoSidebar 
+      :is-open="isSidebarOpen"
+      :location-data="locationData"
+      @close="closeSidebar"
+    />
+    <div ref="mapContainer" class="map-main-content"></div>
     
     <!-- Add loading notification -->
     <div class="loading-notification" :class="{ 'visible': isLoadingResults }">
@@ -169,6 +174,7 @@ import MapLayerControls from './MapLayerControls.vue';
 import MapSettingsControl from './MapSettingsControl.vue';
 import MapBasemapControl from './MapBasemapControl.vue';
 import SettingsModal from './SettingsModal.vue';
+import LocationInfoSidebar from './LocationInfoSidebar.vue';
 import { debounce } from 'lodash-es';
 
 // Import icons
@@ -257,6 +263,19 @@ const isSettingsOpen = ref(false);
 
 // Add new state for simulation
 const currentSimulation = ref<string | null>(null);
+
+// Add new state for location info sidebar
+const isSidebarOpen = ref(false);
+const locationData = ref({
+  timestamp: '',
+  lat: 0,
+  lon: 0,
+  dem: 0,
+  waterLevel: 0,
+  waterDepth: 0,
+  velocityX: 0,
+  velocityY: 0
+});
 
 // 添加水深相关状态
 const waterDepth = ref<number | null>(null);
@@ -730,6 +749,58 @@ const zoomOut = () => {
   }
 };
 
+// Handle map click to show location info
+const handleMapClick = async (lat: number, lng: number) => {
+  // Generate mock/real data for the clicked location
+  const timestamp = currentTimestamp.value || new Date().toISOString();
+  
+  // Get actual water depth if available
+  let actualWaterDepth = waterDepth.value || 0;
+  if (isFloodLayerActive.value) {
+    try {
+      await fetchWaterDepthInfo(lat, lng);
+      actualWaterDepth = waterDepth.value || 0;
+    } catch (error) {
+      console.warn('Failed to fetch water depth:', error);
+    }
+  }
+  
+  // Mock DEM data (typically 200-300m elevation in Wagga Wagga area)
+  const mockDEM = 220 + Math.random() * 30;
+  
+  // Water level = DEM + water depth
+  const waterLevel = mockDEM + actualWaterDepth;
+  
+  // Mock velocity data (realistic values for flood scenarios: 0-3 m/s)
+  // Higher velocity where water depth is greater
+  const velocityMagnitude = actualWaterDepth > 0 ? Math.random() * 2.5 : 0;
+  const velocityAngle = Math.random() * Math.PI * 2;
+  const velocityX = velocityMagnitude * Math.cos(velocityAngle);
+  const velocityY = velocityMagnitude * Math.sin(velocityAngle);
+  
+  // Update location data
+  locationData.value = {
+    timestamp,
+    lat,
+    lon: lng,
+    dem: parseFloat(mockDEM.toFixed(2)),
+    waterLevel: parseFloat(waterLevel.toFixed(2)),
+    waterDepth: parseFloat(actualWaterDepth.toFixed(2)),
+    velocityX: parseFloat(velocityX.toFixed(3)),
+    velocityY: parseFloat(velocityY.toFixed(3))
+  };
+  
+  // Open sidebar
+  isSidebarOpen.value = true;
+  
+  console.log('Location clicked:', locationData.value);
+};
+
+// Close sidebar handler
+const closeSidebar = () => {
+  isSidebarOpen.value = false;
+};
+
 // Modify initializeMap to store map instance
 const initializeMap = async () => {
   if (!mapContainer.value) return;
@@ -768,6 +839,11 @@ const initializeMap = async () => {
   // 添加鼠标移出事件处理
   map.on('mouseout', () => {
     waterDepth.value = null;
+  });
+
+  // Add click handler for location info sidebar
+  map.on('click', (e) => {
+    handleMapClick(e.lngLat.lat, e.lngLat.lng);
   });
 
   // Add zoom handler
@@ -1354,7 +1430,7 @@ const preloadInitialFrames = async () => {
   overflow: hidden;
 }
 
-.map-container > div:first-child {
+.map-main-content {
   width: 100vw !important;
   height: 100vh !important;
   margin: 0;

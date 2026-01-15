@@ -30,7 +30,8 @@ This application is a full-stack system designed for flood prediction and visual
 ### Visualization
 - Interactive map with multiple layer controls
 - Time series data visualization for river gauge measurements
-- Rainfall visualization with legend support
+- **Real-time Rainfall Visualization**: Powered by [OpenWeatherMap Precipitation Layer](https://openweathermap.org/api/weathermaps) showing live precipitation data
+- River gauge chart with smooth animations and relative time display
 
 ## Usage Instructions
 
@@ -82,6 +83,34 @@ pip install -r requirements.txt
 # Frontend setup
 cd frontend
 npm install
+
+# Configure environment variables
+# Copy the example environment file and update with your API keys
+cp env.example .env
+# Edit .env and add your API keys:
+# - VITE_SHARED_MAPBOX_ACCESS_TOKEN (from https://mapbox.com)
+# - VITE_SHARED_OPENWEATHERMAP_API_KEY (from https://openweathermap.org/api)
+```
+
+### API Keys Configuration
+
+The frontend requires the following API keys:
+
+1. **Mapbox Access Token** (`VITE_SHARED_MAPBOX_ACCESS_TOKEN`)
+   - Get it from: https://account.mapbox.com/access-tokens/
+   - Used for: Base map visualization
+
+2. **OpenWeatherMap API Key** (`VITE_SHARED_OPENWEATHERMAP_API_KEY`)
+   - Get it from: https://openweathermap.org/api
+   - Used for: Real-time precipitation layer visualization
+   - Free tier available with sufficient API calls for development
+
+Create a `.env` file in the `frontend` directory with these keys:
+```bash
+VITE_SHARED_MAPBOX_ACCESS_TOKEN=your_mapbox_token_here
+VITE_SHARED_OPENWEATHERMAP_API_KEY=your_openweather_key_here
+VITE_HOST=localhost
+VITE_BACKEND_PORT=3000
 ```
 
 ### Running in Development Mode

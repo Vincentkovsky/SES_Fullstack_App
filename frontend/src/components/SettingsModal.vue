@@ -1,14 +1,8 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="isOpen" class="modal-overlay">
+      <div v-if="isOpen" class="modal-overlay" @click="close">
         <div class="modal-container" @click.stop>
-          <button class="close-button absolute-close" @click="close" aria-label="Close settings">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
           <div class="modal-content">
             <div class="settings-layout">
               <!-- Left Panel - Settings with tabs -->
@@ -126,8 +120,24 @@
                           <option value="wagga">Wagga Wagga</option>
                         </select>
                       </div>
+                      
                       <div class="setting-item">
-                        <label for="window">Inference Window</label>
+                        <label for="start-time">Start time</label>
+                        <select id="start-time" v-model="inferenceSettings.dataDir">
+                          <option value="">Select a start time</option>
+                          <option 
+                            v-for="file in rainfallFiles" 
+                            :key="file.name" 
+                            :value="file.name"
+                          >
+                            {{ formatRainfallFileName(file.name) }}
+                          </option>
+                        </select>
+                        <div v-if="isLoadingRainfallFiles" class="loading-indicator">Loading available times...</div>
+                      </div>
+                      
+                      <div class="setting-item">
+                        <label for="window">Prediction Window</label>
                         <select id="window" v-model="inferenceSettings.window">
                           <option value="24">24 Hours</option>
                           <option value="48">48 Hours</option>
@@ -149,31 +159,14 @@
                             {{ "CUDA " + device.device_id + " - "+ device.device_name }} ({{ device.free_memory_gb.toFixed(1) }}GB Available)
                           </option>
                         </select>
-                        <div v-if="cudaInfo.cuda_available && cudaInfo.devices.length > 0" class="device-utilization">
-                          <div v-for="device in cudaInfo.devices" :key="`util-${device.device_id}`" class="device-stats">
-                            <div class="device-name">CUDA {{ device.device_id }} - {{ device.device_name }}</div>
-                            <div class="utilization-bar">
-                              <div class="utilization-fill" :style="{ width: `${device.allocated_percent}%` }"></div>
-                              <span class="utilization-text">{{ device.allocated_percent.toFixed(1) }}% used</span>
-                            </div>
-                          </div>
-                        </div>
                       </div>
                       
-                      <!-- Rainfall Data Files Dropdown -->
+                      <!-- AI Model Selection -->
                       <div class="setting-item">
-                        <label for="rainfall-file">Rainfall Data</label>
-                        <select id="rainfall-file" v-model="inferenceSettings.dataDir">
-                          <option value="">Select a rainfall data file</option>
-                          <option 
-                            v-for="file in rainfallFiles" 
-                            :key="file.name" 
-                            :value="file.name"
-                          >
-                            {{ file.name }} ({{ file.size_mb.toFixed(1) }} MB)
-                          </option>
+                        <label for="ai-model">AI Model Selection</label>
+                        <select id="ai-model" v-model="inferenceSettings.model">
+                          <option value="FAI23B-1-48">FAI23B-1-48</option>
                         </select>
-                        <div v-if="isLoadingRainfallFiles" class="loading-indicator">Loading rainfall files...</div>
                       </div>
                     </div>
                     
@@ -189,47 +182,32 @@
                         </select>
                       </div>
                       
-                      <!-- Metadata Display -->
-                      <div v-if="selectedHistoricalSimulation && !isLoadingMetadata" class="metadata-container">
-                        <div v-if="simulationMetadata" class="metadata-card">
-                          <h4 class="metadata-title">Simulation Details</h4>
-                          <div class="metadata-content">
-                            <div class="metadata-item">
-                              <div class="metadata-label">Simulation Start Time</div>
-                              <div class="metadata-value">{{ simulationMetadata.start_time }}</div>
-                            </div>
-                            <div class="metadata-item">
-                              <div class="metadata-label">Duration</div>
-                              <div class="metadata-value">{{ formatDuration(simulationMetadata.duration_seconds) }}</div>
-                            </div>
-                            <div class="metadata-item">
-                              <div class="metadata-label">Model</div>
-                              <div class="metadata-value">FloodTransformer</div>
-                            </div>
-                            <div class="metadata-item">
-                              <div class="metadata-label">Device</div>
-                              <div class="metadata-value">{{ simulationMetadata.device }}</div>
-                            </div>
-                            <div class="metadata-item">
-                              <div class="metadata-label">Prediction Length</div>
-                              <div class="metadata-value">{{ simulationMetadata.pred_length /2  }} hours</div>
-                            </div>
-                          </div>
+                      <!-- Metadata Display - Simplified Format -->
+                      <div v-if="selectedHistoricalSimulation && simulationMetadata && !isLoadingMetadata" class="simulation-info">
+                        <div class="info-item-simple">
+                          <label>Area</label>
+                          <div class="info-value-static">Wagga Wagga</div>
                         </div>
-                        <div v-else class="metadata-placeholder">
-                          <div class="placeholder-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="12" y1="8" x2="12" y2="12"></line>
-                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                          </div>
-                          <div class="placeholder-text">No metadata available for this simulation</div>
+                        
+                        <div class="info-item-simple">
+                          <label>Start time</label>
+                          <div class="info-value-static">{{ simulationMetadata.start_time }}</div>
+                        </div>
+                        
+                        <div class="info-item-simple">
+                          <label>Prediction Window</label>
+                          <div class="info-value-static">{{ simulationMetadata.pred_length / 2 }} Hours</div>
+                        </div>
+                        
+                        <div class="info-item-simple">
+                          <label>Model</label>
+                          <div class="info-value-static">FAI23B-1-48</div>
                         </div>
                       </div>
+                      
                       <div v-else-if="isLoadingMetadata" class="metadata-loading">
                         <div class="loading-spinner"></div>
-                        <div class="loading-text">Loading simulation metadata...</div>
+                        <div class="loading-text">Loading simulation info...</div>
                       </div>
                     </div>
                   </div>
@@ -258,7 +236,7 @@
                       </div>
                     </div>
                     <div class="graph-item">
-                      <h4>Rainfall Data</h4>
+                      <h4>Rainfall</h4>
                       <div class="graph-content">
                         <RainfallMap 
                           :timestamp="currentTimestamp"
@@ -281,7 +259,7 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import RiverGaugeChart from './RiverGaugeChart.vue';
 import RainfallMap from './RainfallMap.vue';
-import { fetchGaugingData, fetchHistoricalSimulations, fetchRainfallTilesList, getCudaInfo, getRainfallFiles, getInferenceTasksList, cancelInferenceTask, fetchSimulationMetadata } from '../services/api';
+import { fetchGaugingData, fetchHistoricalSimulations, getCudaInfo, getRainfallFiles, getInferenceTasksList, cancelInferenceTask, fetchSimulationMetadata } from '../services/api';
 import type { GaugingData, CudaInfoResponse, RainfallFilesResponse, CudaDeviceInfo, RainfallFileInfo } from '../services/api';
 
 // API配置常量
@@ -302,6 +280,7 @@ type InferenceSettings = {
   window: string;
   device: string;
   dataDir: string;
+  model: string;
 };
 
 // 推理任务状态接口
@@ -339,8 +318,7 @@ const currentTimestamp = ref<string>('');
 const historicalSimulations = ref<string[]>([]);
 const selectedHistoricalSimulation = ref<string>('');
 const gaugingData = ref<GaugingData | null>(null);
-const rainfallData = ref<string[]>([]);
-const hasRainfallData = ref(false);
+const hasRainfallData = ref(true); // Always true when using OpenWeatherMap
 
 // CUDA information state
 const isLoadingCudaInfo = ref(false);
@@ -387,7 +365,8 @@ const inferenceSettings = ref<InferenceSettings>({
   area: 'wagga',
   window: '24',
   device: 'cpu',
-  dataDir: ''
+  dataDir: '',
+  model: 'FAI23B-1-48'
 });
 
 // 计算属性：推理状态文本
@@ -430,6 +409,20 @@ const formatDate = (date: Date): string => {
   const minutes = date.getMinutes().toString().padStart(2, '0');
   
   return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
+
+// 格式化rainfall文件名为日期时间显示
+const formatRainfallFileName = (filename: string): string => {
+  // Extract date from filename (format: YYYYMMDD.nc or similar)
+  const match = filename.match(/(\d{8})/);
+  if (match) {
+    const dateStr = match[1];
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    return `${year}${month}${day} 10:00:00`;
+  }
+  return filename;
 };
 
 // 格式化已运行时间，使用本地计时器
@@ -868,31 +861,14 @@ const fetchRainfallFiles = async () => {
   }
 };
 
-// Computed properties
-const hasRainfallDataForSelection = computed(() => {
-  return rainfallData.value.length > 0;
-});
-
 // Action handlers
 const loadHistoricalSimulation = async () => {
   if (selectedHistoricalSimulation.value) {
-    try {
-      // Check for rainfall data availability
-      console.log(`Checking rainfall data for simulation ${selectedHistoricalSimulation.value}`);
-      const rainfallTimestamps = await fetchRainfallTilesList(selectedHistoricalSimulation.value);
-      hasRainfallData.value = rainfallTimestamps.length > 0;
-      rainfallData.value = rainfallTimestamps;
-      
-      if (hasRainfallData.value) {
-        console.log(`Loaded ${rainfallTimestamps.length} rainfall timestamps for simulation ${selectedHistoricalSimulation.value}`);
-      } else {
-        console.warn(`No rainfall timestamps found for simulation ${selectedHistoricalSimulation.value}`);
-      }
-    } catch (error) {
-      console.warn(`Error checking rainfall data for simulation ${selectedHistoricalSimulation.value}:`, error);
-      hasRainfallData.value = false;
-      rainfallData.value = [];
-    }
+    console.log(`Loading historical simulation: ${selectedHistoricalSimulation.value}`);
+    
+    // Note: Rainfall data is now provided by OpenWeatherMap real-time layer
+    // No need to check for simulation-specific rainfall tiles
+    hasRainfallData.value = true; // OpenWeatherMap always provides data
     
     // Emit the simulation selection
     emit('select-historical-simulation', selectedHistoricalSimulation.value);
@@ -1150,24 +1126,10 @@ watch(() => selectedHistoricalSimulation.value, async (simulation) => {
     // Fetch metadata for the selected simulation
     await fetchMetadata(simulation);
     
-    // Check for rainfall data availability
-    try {
-      console.log(`Checking rainfall data for simulation ${simulation}`);
-      const rainfallTimestamps = await fetchRainfallTilesList(simulation);
-      hasRainfallData.value = rainfallTimestamps.length > 0;
-      rainfallData.value = rainfallTimestamps;
-      
-      if (hasRainfallData.value) {
-        console.log(`Loaded ${rainfallTimestamps.length} rainfall timestamps for simulation ${simulation}`);
-        currentTimestamp.value = rainfallTimestamps[0] || '';
-      } else {
-        console.warn(`No rainfall timestamps found for simulation ${simulation}`);
-      }
-    } catch (error) {
-      console.warn(`Error checking rainfall data for simulation ${simulation}:`, error);
-      hasRainfallData.value = false;
-      rainfallData.value = [];
-    }
+    // Note: Rainfall data is now provided by OpenWeatherMap real-time layer
+    // No need to fetch simulation-specific rainfall tiles
+    hasRainfallData.value = true; // OpenWeatherMap always provides real-time data
+    console.log(`Using OpenWeatherMap real-time precipitation data for simulation ${simulation}`);
     
     // Wait for timestamps to be updated
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -1389,22 +1351,21 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   width: 90%;
   max-width: 900px;
-  max-height: 90vh;
-  overflow-y: auto;
+  height: 600px;
+  overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.absolute-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 10;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-content {
   padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .panel-header {
@@ -1449,7 +1410,8 @@ onBeforeUnmount(() => {
 
 .settings-layout {
   display: flex;
-  min-height: 320px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .inference-panel {
@@ -1517,6 +1479,7 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(209, 213, 219, 0.4);
   border-radius: 6px;
   background-color: rgba(255, 255, 255, 0.9);
+  font-family: 'Times New Roman', Times, serif;
   font-size: 0.875rem;
   color: #1a1a1a;
   transition: all 0.2s;
@@ -1577,21 +1540,6 @@ onBeforeUnmount(() => {
 
 .secondary-button:hover {
   background: rgba(243, 244, 246, 0.8);
-}
-
-.close-button {
-  background: transparent;
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-  color: rgba(107, 114, 128, 0.8);
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-
-.close-button:hover {
-  background: rgba(243, 244, 246, 0.3);
-  color: rgba(26, 26, 26, 0.9);
 }
 
 /* Transition animations */
@@ -1864,53 +1812,6 @@ onBeforeUnmount(() => {
   margin-right: 0.5rem;
 }
 
-/* Device utilization styles */
-.device-utilization {
-  margin-top: 10px;
-  padding: 8px;
-  background: rgba(249, 250, 251, 0.7);
-  border-radius: 6px;
-  border: 1px solid rgba(209, 213, 219, 0.4);
-}
-
-.device-stats {
-  margin-bottom: 8px;
-}
-
-.device-stats:last-child {
-  margin-bottom: 0;
-}
-
-.device-name {
-  font-size: 0.8rem;
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #4b5563;
-}
-
-.utilization-bar {
-  height: 8px;
-  background: rgba(229, 231, 235, 0.6);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
-}
-
-.utilization-fill {
-  height: 100%;
-  background: linear-gradient(to right, #1E3D78, #3663B0);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.utilization-text {
-  position: absolute;
-  right: 4px;
-  top: -16px;
-  font-size: 0.7rem;
-  color: #4b5563;
-}
-
 .loading-indicator {
   margin-top: 4px;
   font-size: 0.8rem;
@@ -2134,6 +2035,39 @@ onBeforeUnmount(() => {
 .placeholder-text {
   font-size: 0.875rem;
   text-align: center;
+}
+
+/* Simplified simulation info display */
+.simulation-info {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-item-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.info-item-simple label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.info-value-static {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: rgba(249, 250, 251, 0.7);
+  border: 1px solid rgba(209, 213, 219, 0.4);
+  border-radius: 6px;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 0.875rem;
+  color: #1a1a1a;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .metadata-loading {

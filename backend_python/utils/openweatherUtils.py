@@ -2,7 +2,7 @@ import requests
 import numpy as np
 from datetime import datetime, timedelta
 
-API_KEY = "45b07159f9a38488403100e9f6256b67"
+API_KEY = "be0569ae40c2cb69050a4ada307cb497"
 
 def get_hourly_forecast(lat, lon, api_key=API_KEY, cnt=24, units="metric", lang=None):
     """
