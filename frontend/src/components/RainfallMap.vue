@@ -100,7 +100,7 @@ const initializeMap = () => {
     isLoading.value = false;
     return;
   }
-
+  
   console.log('RainfallMap: Initializing map with OpenWeatherMap Weather Maps 2.0 API');
   console.log('RainfallMap: API key length:', OPENWEATHER_API_KEY.length);
   console.log('RainfallMap: Using PA0 layer (Accumulated Precipitation) with enhanced color palette');
@@ -125,7 +125,7 @@ const initializeMap = () => {
       console.error('RainfallMap: Map error:', e);
       if (e.error) {
         error.value = `Map error: ${e.error.message || 'Unknown error'}`;
-      }
+    }
     });
   } catch (err) {
     console.error('RainfallMap: Failed to initialize map:', err);
@@ -153,12 +153,12 @@ const addPrecipitationLayer = () => {
     if (map.getLayer('precipitation-layer')) {
       console.log('RainfallMap: Removing existing precipitation layer');
       map.removeLayer('precipitation-layer');
-    }
+  }
     if (map.getSource('precipitation')) {
       console.log('RainfallMap: Removing existing precipitation source');
       map.removeSource('precipitation');
-    }
-    
+  }
+  
     // Get Unix timestamp for the selected date (rounded to 3 hours)
     const unixTime = getUnixTimeFromTimestamp(props.timestamp || '');
     
@@ -174,24 +174,24 @@ const addPrecipitationLayer = () => {
     
     // Add OpenWeatherMap Weather Maps 2.0 precipitation layer
     map.addSource('precipitation', {
-      type: 'raster',
+    type: 'raster',
       tiles: [tileUrl],
-      tileSize: 256,
+    tileSize: 256,
       minzoom: 0,
       maxzoom: 18,
       attribution: ''
-    });
+  });
 
-    map.addLayer({
+  map.addLayer({
       id: 'precipitation-layer',
-      type: 'raster',
+    type: 'raster',
       source: 'precipitation',
-      paint: {
+    paint: {
         'raster-opacity': 1.0, // Full opacity with custom palette
         'raster-fade-duration': 300,
         'raster-brightness-max': 1.0 // Ensure maximum brightness
-      }
-    });
+    }
+  });
 
     console.log('RainfallMap: Weather Maps 2.0 precipitation layer (PA0) added successfully');
     layerLoaded.value = true;

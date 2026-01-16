@@ -162,7 +162,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, onBeforeUnmount, defineEmits } from 'vue';
 import { TileLayer } from '@deck.gl/geo-layers';
-import { BitmapLayer } from '@deck.gl/layers';
+import { BitmapLayer, ScatterplotLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import mapboxgl from 'mapbox-gl';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
@@ -277,6 +277,9 @@ const locationData = ref({
   velocityY: 0
 });
 
+// Add state for marker pin position
+const markerPosition = ref<{ lat: number; lon: number } | null>(null);
+
 // 添加水深相关状态
 const waterDepth = ref<number | null>(null);
 const isLoadingWaterDepth = ref(false);
@@ -318,14 +321,9 @@ const formattedTimestamp = computed(() => {
     if (!match) return currentTimestamp.value;
     
     const [_, year, month, day, hour, minute] = match;
-    const currentDate = new Date(Number(year), Number(month) - 1, Number(day));
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
-    if (!startDate.value) return `${hour}:${minute} Day 1`;
-    
-    const diffTime = Math.abs(currentDate.getTime() - startDate.value.getTime()) +1;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return `${hour}:${minute} Day ${diffDays}`;
+    return `${day} ${months[parseInt(month) - 1]} ${year} ${hour}:${minute}`;
   } 
   // For rainfall timestamps - update to handle rainfall_YYYYMMDDHHMMSS format
   else if (isWeatherLayerActive.value) {
@@ -334,15 +332,10 @@ const formattedTimestamp = computed(() => {
     // Extract timestamp from rainfall_YYYYMMDDHHMMSS format
     const match = currentRainfallTimestamp.value.match(/rainfall_(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
     if (match) {
-      const [_, year, month, day, hour, minute, second] = match;
-      const currentDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const [_, year, month, day, hour, minute] = match;
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       
-      if (!startDate.value) return `${hour}:${minute} Day 1`;
-      
-      const diffTime = Math.abs(currentDate.getTime() - startDate.value.getTime()) + 1;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      return `${hour}:${minute} Day ${diffDays}`;
+      return `${day} ${months[parseInt(month) - 1]} ${year} ${hour}:${minute}`;
     }
     
     return currentRainfallTimestamp.value;
@@ -527,6 +520,37 @@ const createTileLayer = (timestamp: string, isPreloading = false) => {
   });
 };
 
+// Create marker pin layer
+const createMarkerLayer = () => {
+  if (!markerPosition.value) return null;
+  
+  return new ScatterplotLayer({
+    id: 'marker-pin',
+    data: [{
+      position: [markerPosition.value.lon, markerPosition.value.lat],
+      radius: 8,
+      color: [255, 0, 0, 255] // Red color
+    }],
+    pickable: true,
+    radiusScale: 1,
+    radiusMinPixels: 8,
+    radiusMaxPixels: 12,
+    lineWidthMinPixels: 2,
+    getPosition: (d: any) => d.position,
+    getRadius: (d: any) => d.radius,
+    getFillColor: (d: any) => d.color,
+    getLineColor: [255, 255, 255, 255], // White outline
+    stroked: true,
+    filled: true
+  });
+};
+
+// Helper function to get all layers including marker
+const getAllLayers = (...layers: (TileLayer | null)[]): (TileLayer | ScatterplotLayer | null)[] => {
+  const markerLayer = createMarkerLayer();
+  return [...layers.filter(Boolean), markerLayer].filter(Boolean);
+};
+
 const createRainfallLayer = (timestamp: string, isPreloading = false) => {
   if (!currentSimulation.value) return null;
   
@@ -643,7 +667,7 @@ const updateLayers = (index: number) => {
           : null;
         
         deckOverlay?.setProps({ 
-          layers: [previousLayer, currentLayer].filter(Boolean) 
+          layers: getAllLayers(previousLayer, currentLayer)
         });
         
         if (progress < 1) {
@@ -658,7 +682,7 @@ const updateLayers = (index: number) => {
 
     previousLayer = currentLayer;
     currentLayer = newLayer;
-    deckOverlay?.setProps({ layers: [previousLayer, currentLayer].filter(Boolean) });
+    deckOverlay?.setProps({ layers: getAllLayers(previousLayer, currentLayer) });
     
     // 预加载下一帧
     const nextIndex = (index + 1) % activeTimestamps.length;
@@ -751,6 +775,9 @@ const zoomOut = () => {
 
 // Handle map click to show location info
 const handleMapClick = async (lat: number, lng: number) => {
+  // Update marker position
+  markerPosition.value = { lat, lon: lng };
+  
   // Generate mock/real data for the clicked location
   const timestamp = currentTimestamp.value || new Date().toISOString();
   
@@ -792,6 +819,9 @@ const handleMapClick = async (lat: number, lng: number) => {
   
   // Open sidebar
   isSidebarOpen.value = true;
+  
+  // Update marker layer
+  deckOverlay?.setProps({ layers: getAllLayers(previousLayer, currentLayer) });
   
   console.log('Location clicked:', locationData.value);
 };
@@ -911,7 +941,7 @@ const toggleWeatherLayer = async () => {
       // Turn off flood layer
       isFloodLayerActive.value = false;
       if (currentLayer) {
-        deckOverlay?.setProps({ layers: [] });
+        deckOverlay?.setProps({ layers: getAllLayers() });
       }
 
       // Make sure we have a selected simulation
@@ -938,7 +968,7 @@ const toggleWeatherLayer = async () => {
       // Create and display the rainfall layer with the first timestamp
       const rainfallLayer = createRainfallLayer(currentRainfallTimestamp.value);
       currentLayer = rainfallLayer;
-      deckOverlay?.setProps({ layers: [rainfallLayer].filter(Boolean) });
+      deckOverlay?.setProps({ layers: getAllLayers(rainfallLayer) });
       
       // Start animation if playing
       if (isPlaying.value) {
@@ -951,7 +981,7 @@ const toggleWeatherLayer = async () => {
   } else {
     // Remove weather layer
     if (currentLayer) {
-      deckOverlay?.setProps({ layers: [] });
+      deckOverlay?.setProps({ layers: getAllLayers() });
       currentLayer = null;
     }
     
