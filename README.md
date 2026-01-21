@@ -1,4 +1,5 @@
-# Flood Simulation and Prediction System
+# FloodDT: An AI-empowered Real-time and Predictive Flood Digital Twin on a Web-Based GIS Platform
+
 
 ## Overview
 This application is a full-stack system designed for flood prediction and visualization. It combines advanced AI models with geospatial visualization to provide flood inundation forecasting and analysis tools.
